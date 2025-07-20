@@ -509,7 +509,7 @@ async def main():
     logger.info("🚀 Starting Proxy Intelligence System")
     
     # Configuration
-    github_token = os.getenv("GITHUB_TOKEN")
+    github_token = os.getenv("PROXY_GITHUB_TOKEN")
     max_pages = int(os.getenv("MAX_PAGES", "3"))
     max_concurrent = int(os.getenv("MAX_CONCURRENT", "50"))
     

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-Enhanced Proxy Discovery System
-Combines GitHub search with direct sources + database migration
+Repository-First Proxy Discovery System
+1. Search GitHub repositories for proxy projects (like your URL)
+2. Then scrape all proxy files from those repositories
+3. Add direct sources as backup
 """
 
 import asyncio
@@ -15,7 +17,6 @@ from pathlib import Path
 import os
 import sys
 
-# Minimal imports for GitHub Actions
 import aiohttp
 import aiofiles
 import psutil
@@ -28,7 +29,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Direct proxy sources (as backup)
+# Direct proxy sources as backup
 DIRECT_SOURCES = [
     "https://raw.githubusercontent.com/r00tee/Proxy-List/main/Https.txt",
     "https://raw.githubusercontent.com/r00tee/Proxy-List/main/Socks4.txt", 
@@ -55,7 +56,7 @@ class ProxyDatabase:
                 conn.execute("PRAGMA cache_size=10000")
                 conn.execute("PRAGMA temp_store=MEMORY")
                 
-                # Check if table exists and get current schema
+                # Check current schema
                 cursor = conn.execute("PRAGMA table_info(proxies)")
                 columns = [row[1] for row in cursor.fetchall()]
                 
@@ -64,14 +65,13 @@ class ProxyDatabase:
                     logger.info("📝 Creating new proxy table...")
                     self._create_new_table(conn)
                 else:
-                    # Check if we need to migrate
+                    # Migrate if needed
                     if 'proxy_type' not in columns:
                         logger.info("🔄 Migrating database schema...")
                         self._migrate_database(conn)
                     else:
                         logger.info("✅ Database schema is current")
                 
-                # Create/update indexes
                 self._create_indexes(conn)
                 
             logger.info("✅ Database initialized successfully")
@@ -88,6 +88,7 @@ class ProxyDatabase:
                 port INTEGER NOT NULL,
                 proxy_type TEXT,
                 source TEXT NOT NULL,
+                repository TEXT,
                 country TEXT,
                 last_checked TEXT,
                 is_working BOOLEAN DEFAULT 0,
@@ -99,13 +100,19 @@ class ProxyDatabase:
     
     def _migrate_database(self, conn):
         """Migrate old database to new schema"""
-        # Add proxy_type column if it doesn't exist
         try:
             conn.execute("ALTER TABLE proxies ADD COLUMN proxy_type TEXT")
             logger.info("  ✅ Added proxy_type column")
         except sqlite3.OperationalError as e:
             if "duplicate column name" not in str(e):
-                raise
+                pass
+        
+        try:
+            conn.execute("ALTER TABLE proxies ADD COLUMN repository TEXT")
+            logger.info("  ✅ Added repository column")
+        except sqlite3.OperationalError as e:
+            if "duplicate column name" not in str(e):
+                pass
     
     def _create_indexes(self, conn):
         """Create performance indexes"""
@@ -115,17 +122,20 @@ class ProxyDatabase:
             "CREATE INDEX IF NOT EXISTS idx_last_checked ON proxies(last_checked)"
         ]
         
-        # Only create proxy_type index if column exists
+        # Check which columns exist
         cursor = conn.execute("PRAGMA table_info(proxies)")
         columns = [row[1] for row in cursor.fetchall()]
+        
         if 'proxy_type' in columns:
             indexes.append("CREATE INDEX IF NOT EXISTS idx_proxy_type ON proxies(proxy_type)")
+        if 'repository' in columns:
+            indexes.append("CREATE INDEX IF NOT EXISTS idx_repository ON proxies(repository)")
         
         for index_sql in indexes:
             try:
                 conn.execute(index_sql)
             except sqlite3.OperationalError:
-                pass  # Index might already exist
+                pass
     
     def add_proxies_batch(self, proxies, batch_size=1000):
         """Add proxies with backward compatibility"""
@@ -136,18 +146,33 @@ class ProxyDatabase:
         
         try:
             with sqlite3.connect(self.db_path) as conn:
-                # Check if proxy_type column exists
+                # Check available columns
                 cursor = conn.execute("PRAGMA table_info(proxies)")
                 columns = [row[1] for row in cursor.fetchall()]
+                
                 has_proxy_type = 'proxy_type' in columns
+                has_repository = 'repository' in columns
                 
                 conn.execute("BEGIN TRANSACTION")
                 
                 for i in range(0, len(proxies), batch_size):
                     batch = proxies[i:i + batch_size]
                     
-                    if has_proxy_type:
-                        # New schema with proxy_type
+                    if has_proxy_type and has_repository:
+                        # Full new schema
+                        data = [
+                            (p['ip'], p['port'], p.get('proxy_type'), p['source'], 
+                             p.get('repository'), p.get('country'), p.get('last_checked'), 
+                             p.get('is_working', False), p.get('response_time'))
+                            for p in batch
+                        ]
+                        conn.executemany("""
+                            INSERT OR REPLACE INTO proxies 
+                            (ip, port, proxy_type, source, repository, country, last_checked, is_working, response_time)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, data)
+                    elif has_proxy_type:
+                        # Partial new schema
                         data = [
                             (p['ip'], p['port'], p.get('proxy_type'), p['source'], 
                              p.get('country'), p.get('last_checked'), 
@@ -160,7 +185,7 @@ class ProxyDatabase:
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                         """, data)
                     else:
-                        # Old schema without proxy_type
+                        # Old schema
                         data = [
                             (p['ip'], p['port'], p['source'], p.get('country'), 
                              p.get('last_checked'), p.get('is_working', False), 
@@ -180,14 +205,18 @@ class ProxyDatabase:
             raise
     
     def get_working_proxies(self, limit=None):
-        """Get working proxies with backward compatibility"""
+        """Get working proxies"""
         try:
             with sqlite3.connect(self.db_path) as conn:
-                # Check available columns
                 cursor = conn.execute("PRAGMA table_info(proxies)")
                 columns = [row[1] for row in cursor.fetchall()]
                 
-                if 'proxy_type' in columns:
+                if 'repository' in columns:
+                    query = """
+                        SELECT ip, port, proxy_type, source, repository, country, last_checked, response_time
+                        FROM proxies WHERE is_working = 1 ORDER BY response_time ASC
+                    """
+                elif 'proxy_type' in columns:
                     query = """
                         SELECT ip, port, proxy_type, source, country, last_checked, response_time
                         FROM proxies WHERE is_working = 1 ORDER BY response_time ASC
@@ -215,13 +244,23 @@ class ProxyDatabase:
                 total = conn.execute("SELECT COUNT(*) FROM proxies").fetchone()[0]
                 working = conn.execute("SELECT COUNT(*) FROM proxies WHERE is_working = 1").fetchone()[0]
                 
-                # Try to get countries
                 try:
                     countries = conn.execute("SELECT COUNT(DISTINCT country) FROM proxies WHERE country IS NOT NULL").fetchone()[0]
                 except:
                     countries = 0
                 
-                # Try to get type stats if column exists
+                # Repository stats
+                repo_stats = {}
+                try:
+                    cursor = conn.execute("PRAGMA table_info(proxies)")
+                    columns = [row[1] for row in cursor.fetchall()]
+                    if 'repository' in columns:
+                        for row in conn.execute("SELECT repository, COUNT(*) FROM proxies WHERE is_working = 1 AND repository IS NOT NULL GROUP BY repository ORDER BY COUNT(*) DESC LIMIT 10"):
+                            repo_stats[row[0]] = row[1]
+                except:
+                    pass
+                
+                # Type stats
                 type_stats = {}
                 try:
                     cursor = conn.execute("PRAGMA table_info(proxies)")
@@ -237,16 +276,17 @@ class ProxyDatabase:
                     "working_proxies": working,
                     "countries": countries,
                     "success_rate": round((working / total * 100) if total > 0 else 0, 2),
-                    "by_type": type_stats
+                    "by_type": type_stats,
+                    "by_repository": repo_stats
                 }
                 logger.info(f"📊 Database stats: {stats}")
                 return stats
         except Exception as e:
             logger.error(f"❌ Failed to get database stats: {e}")
-            return {"total_proxies": 0, "working_proxies": 0, "countries": 0, "success_rate": 0, "by_type": {}}
+            return {"total_proxies": 0, "working_proxies": 0, "countries": 0, "success_rate": 0, "by_type": {}, "by_repository": {}}
     
     def compress_database(self):
-        """Compress database to save space"""
+        """Compress database"""
         try:
             if os.path.exists(self.db_path):
                 with sqlite3.connect(self.db_path) as conn:
@@ -263,17 +303,17 @@ class ProxyDatabase:
         except Exception as e:
             logger.error(f"❌ Database compression failed: {e}")
 
-class EnhancedProxyDiscovery:
-    """Enhanced discovery with GitHub search + direct sources"""
+class RepositoryFirstDiscovery:
+    """Repository-first discovery strategy"""
     
     def __init__(self, github_token=None):
         self.github_token = github_token
         self.session = None
         self.discovered_count = 0
-        logger.info(f"🔧 Enhanced discovery initialized with token: {bool(github_token)}")
+        logger.info(f"🔧 Repository-first discovery initialized")
     
     async def __aenter__(self):
-        headers = {"User-Agent": "ProxyIntelligence/2.0"}
+        headers = {"User-Agent": "ProxyIntelligence/3.0"}
         if self.github_token:
             headers["Authorization"] = f"Bearer {self.github_token}"
             logger.info(f"🔑 GitHub token configured: {self.github_token[:10]}...")
@@ -289,22 +329,22 @@ class EnhancedProxyDiscovery:
             logger.info("🔌 HTTP session closed")
     
     async def discover_all_proxies(self, max_pages=3):
-        """Enhanced discovery: GitHub search + direct sources"""
-        logger.info(f"🔍 Starting enhanced discovery (GitHub + Direct sources)")
+        """Repository-first discovery strategy"""
+        logger.info(f"🔍 Starting repository-first discovery")
         
         all_proxies = []
         
-        # Primary: GitHub search for fresh results
+        # Phase 1: Search repositories first (like your URL)
         if self.github_token:
-            logger.info("🔎 Phase 1: GitHub repository search")
-            github_proxies = await self._github_comprehensive_search(max_pages)
-            all_proxies.extend(github_proxies)
-            logger.info(f"  ✅ GitHub search: {len(github_proxies)} proxies")
+            logger.info("🏢 Phase 1: Repository discovery")
+            repo_proxies = await self._discover_proxy_repositories(max_pages)
+            all_proxies.extend(repo_proxies)
+            logger.info(f"  ✅ Repository search: {len(repo_proxies)} proxies")
         else:
-            logger.warning("⚠️ No GitHub token - skipping GitHub search")
+            logger.warning("⚠️ No GitHub token - skipping repository search")
         
-        # Backup: Direct sources
-        logger.info("📡 Phase 2: Direct source backup")
+        # Phase 2: Direct sources backup
+        logger.info("📡 Phase 2: Direct sources backup")
         direct_proxies = await self._fetch_direct_sources()
         all_proxies.extend(direct_proxies)
         logger.info(f"  ✅ Direct sources: {len(direct_proxies)} proxies")
@@ -321,74 +361,77 @@ class EnhancedProxyDiscovery:
         logger.info(f"✅ Discovery complete: {len(result)} unique proxies (from {len(all_proxies)} total)")
         return result
     
-    async def _github_comprehensive_search(self, max_pages):
-        """Comprehensive GitHub search for proxy repositories"""
-        logger.info("🔍 Starting comprehensive GitHub search")
+    async def _discover_proxy_repositories(self, max_pages):
+        """Step 1: Find proxy repositories (like https://github.com/search?q=free+proxies&type=repositories)"""
+        logger.info("🔍 Step 1: Searching for proxy repositories")
         
-        # Enhanced search queries
-        search_queries = [
-            "proxy list filetype:txt",
-            "free proxies filetype:txt",
-            "socks proxy filetype:txt", 
-            "http proxy filetype:txt",
-            "proxy.txt",
-            "proxies.txt",
-            "proxy servers",
+        # Repository search queries (what you want)
+        repo_queries = [
+            "free proxies",
+            "proxy list", 
+            "socks proxy",
+            "http proxy",
             "working proxies",
-            "proxy list updated",
-            "free proxy list"
+            "proxy server",
+            "free proxy list",
+            "proxy collection"
         ]
         
+        discovered_repositories = set()
         all_proxies = []
         
-        for i, query in enumerate(search_queries):
-            logger.info(f"🔎 Query {i+1}/{len(search_queries)}: '{query}'")
+        for i, query in enumerate(repo_queries):
+            logger.info(f"🔎 Repository query {i+1}/{len(repo_queries)}: '{query}'")
             
             try:
-                proxies = await self._search_github_repositories(query, max_pages)
-                all_proxies.extend(proxies)
-                logger.info(f"  ✅ Found {len(proxies)} proxies")
+                repositories = await self._search_repositories(query, max_pages)
+                logger.info(f"  📋 Found {len(repositories)} repositories")
                 
-                # Rate limiting
+                # Step 2: Scrape all proxy files from each repository
+                for repo in repositories:
+                    if repo['full_name'] not in discovered_repositories:
+                        discovered_repositories.add(repo['full_name'])
+                        logger.info(f"  📁 Scraping repository: {repo['full_name']}")
+                        
+                        repo_proxies = await self._scrape_repository_files(repo)
+                        all_proxies.extend(repo_proxies)
+                        logger.info(f"    ✅ Extracted {len(repo_proxies)} proxies from {repo['full_name']}")
+                        
+                        # Small delay between repositories
+                        await asyncio.sleep(1)
+                
+                # Rate limiting between queries
                 await asyncio.sleep(3)
                 
-                # Stop if we have enough proxies
-                if len(all_proxies) > 100000:
-                    logger.info("⚠️ Reached 100k proxy limit")
-                    break
-                    
             except Exception as e:
-                logger.error(f"  ❌ Query failed: {e}")
+                logger.error(f"  ❌ Repository query failed: {e}")
                 continue
         
-        logger.info(f"✅ GitHub search complete: {len(all_proxies)} total proxies")
+        logger.info(f"✅ Repository discovery complete: {len(discovered_repositories)} repos, {len(all_proxies)} proxies")
         return all_proxies
     
-    async def _search_github_repositories(self, query, max_pages):
-        """Search GitHub repositories for proxy files"""
-        proxies = []
+    async def _search_repositories(self, query, max_pages):
+        """Search GitHub repositories (not code files)"""
+        repositories = []
         
         for page in range(1, max_pages + 1):
             try:
-                url = "https://api.github.com/search/code"
+                url = "https://api.github.com/search/repositories"
                 params = {
                     "q": query,
+                    "sort": "updated",  # Most recently updated first
+                    "order": "desc",
                     "page": page,
-                    "per_page": 30,  # Increased for more results
-                    "sort": "indexed"  # Get recently indexed content
+                    "per_page": 30
                 }
                 
-                logger.info(f"    📡 GitHub API request: page {page}")
+                logger.info(f"    📡 Repository search: page {page}")
                 
                 async with self.session.get(url, params=params) as response:
                     logger.info(f"      📊 Response: {response.status}")
                     
                     if response.status == 403:
                         logger.warning("      ⚠️ Rate limit hit")
-                        break
-                    
-                    if response.status == 422:
-                        logger.warning(f"      ⚠️ Invalid query: {query}")
                         break
                     
                     if response.status != 200:
@@ -399,43 +442,73 @@ class EnhancedProxyDiscovery:
                     items = data.get("items", [])
                     total_count = data.get("total_count", 0)
                     
-                    logger.info(f"      📋 Found {len(items)} files (total: {total_count})")
+                    logger.info(f"      📋 Found {len(items)} repositories (total: {total_count})")
                     
                     if not items:
                         break
                     
-                    # Process each file
-                    for j, item in enumerate(items):
-                        logger.info(f"        📄 File {j+1}: {item.get('name', 'unknown')}")
-                        file_proxies = await self._extract_from_github_file(item)
-                        proxies.extend(file_proxies)
-                        logger.info(f"          ✅ Extracted {len(file_proxies)} proxies")
-                        
-                        # Small delay between files
-                        await asyncio.sleep(0.5)
+                    repositories.extend(items)
                 
-                # Rate limiting between pages
+                # Rate limiting
                 await asyncio.sleep(2)
                 
             except Exception as e:
-                logger.error(f"    ❌ Page {page} error: {e}")
+                logger.error(f"    ❌ Repository search error: {e}")
                 continue
+        
+        return repositories
+    
+    async def _scrape_repository_files(self, repository):
+        """Step 2: Scrape all proxy files from a repository"""
+        repo_name = repository['full_name']
+        proxies = []
+        
+        try:
+            # Get repository contents
+            contents_url = f"https://api.github.com/repos/{repo_name}/contents"
+            
+            async with self.session.get(contents_url) as response:
+                if response.status != 200:
+                    logger.warning(f"      ⚠️ Failed to get contents: {response.status}")
+                    return []
+                
+                contents = await response.json()
+                
+                # Look for proxy files
+                proxy_files = []
+                for item in contents:
+                    if item['type'] == 'file':
+                        filename = item['name'].lower()
+                        # Check if it's likely a proxy file
+                        if any(keyword in filename for keyword in ['proxy', 'socks', 'http', '.txt', '.json']):
+                            proxy_files.append(item)
+                
+                logger.info(f"      📄 Found {len(proxy_files)} potential proxy files")
+                
+                # Extract proxies from each file
+                for file_item in proxy_files[:10]:  # Limit files per repo
+                    logger.info(f"        📝 Processing: {file_item['name']}")
+                    file_proxies = await self._extract_from_repository_file(file_item, repo_name)
+                    proxies.extend(file_proxies)
+                    logger.info(f"          ✅ Extracted {len(file_proxies)} proxies")
+                    
+                    # Small delay between files
+                    await asyncio.sleep(0.5)
+        
+        except Exception as e:
+            logger.error(f"      ❌ Repository scraping error: {e}")
         
         return proxies
     
-    async def _extract_from_github_file(self, item):
-        """Extract proxies from GitHub file"""
+    async def _extract_from_repository_file(self, file_item, repo_name):
+        """Extract proxies from a repository file"""
         try:
-            html_url = item.get("html_url", "")
-            if not html_url:
+            download_url = file_item.get('download_url')
+            if not download_url:
                 return []
             
-            # Convert to raw URL
-            raw_url = html_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
-            
-            async with self.session.get(raw_url) as response:
+            async with self.session.get(download_url) as response:
                 if response.status != 200:
-                    logger.warning(f"          ⚠️ Failed to fetch: {response.status}")
                     return []
                 
                 content = await response.text()
@@ -445,20 +518,18 @@ class EnhancedProxyDiscovery:
                     logger.warning(f"          ⚠️ File too large: {len(content)} bytes")
                     return []
                 
-                # Determine proxy type from URL/filename
-                proxy_type = self._guess_proxy_type(raw_url, item.get('name', ''))
+                # Determine proxy type
+                proxy_type = self._guess_proxy_type(download_url, file_item['name'])
                 
-                source_name = f"github:{item.get('repository', {}).get('full_name', 'unknown')}"
-                
-                proxies = self._parse_proxy_content(content, source_name, proxy_type)
+                proxies = self._parse_proxy_content(content, repo_name, proxy_type)
                 return proxies
         
         except Exception as e:
-            logger.warning(f"          ❌ Extraction error: {e}")
+            logger.warning(f"          ❌ File extraction error: {e}")
             return []
     
     async def _fetch_direct_sources(self):
-        """Fetch from direct proxy sources as backup"""
+        """Fetch from direct sources as backup"""
         logger.info("📡 Fetching from direct sources")
         
         all_proxies = []
@@ -474,13 +545,13 @@ class EnhancedProxyDiscovery:
                     
                     content = await response.text()
                     proxy_type = self._guess_proxy_type(url, url.split('/')[-1])
-                    source_name = f"direct:{url.split('/')[-2]}"
+                    repo_name = url.split('/')[-2]
                     
-                    proxies = self._parse_proxy_content(content, source_name, proxy_type)
+                    proxies = self._parse_proxy_content(content, repo_name, proxy_type)
                     all_proxies.extend(proxies)
                     logger.info(f"    ✅ Fetched {len(proxies)} proxies")
                 
-                await asyncio.sleep(1)  # Rate limiting
+                await asyncio.sleep(1)
                 
             except Exception as e:
                 logger.error(f"    ❌ Error: {e}")
@@ -504,8 +575,8 @@ class EnhancedProxyDiscovery:
         else:
             return 'mixed'
     
-    def _parse_proxy_content(self, content, source, proxy_type):
-        """Parse proxy content from any source"""
+    def _parse_proxy_content(self, content, repository, proxy_type):
+        """Parse proxy content"""
         proxies = []
         lines = content.splitlines()
         
@@ -516,10 +587,9 @@ class EnhancedProxyDiscovery:
             if not line or line.startswith(('#', '//', ';', '!')):
                 continue
             
-            # Various formats handling
             if ':' in line and '.' in line:
                 try:
-                    # Handle different separators
+                    # Handle different formats
                     for separator in ['|', '\t', ' ', ',']:
                         if separator in line:
                             line = line.split(separator)[0].strip()
@@ -534,7 +604,8 @@ class EnhancedProxyDiscovery:
                                 'ip': ip,
                                 'port': port,
                                 'proxy_type': proxy_type,
-                                'source': source
+                                'source': f"repository:{repository}",
+                                'repository': repository
                             })
                             
                 except (ValueError, IndexError):
@@ -566,7 +637,7 @@ class ProxyValidator:
             
         logger.info(f"🔍 Validating {len(proxies)} proxies")
         
-        # Process in chunks to manage memory
+        # Process in chunks
         chunk_size = 1000
         all_results = []
         
@@ -578,11 +649,10 @@ class ProxyValidator:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             all_results.extend(results)
         
-        # Count results
         validated = [r for r in all_results if isinstance(r, dict) and r.get('is_working')]
         logger.info(f"✅ Validation complete: {len(validated)}/{len(proxies)} working")
         
-        return all_results  # Return all for database storage
+        return all_results
     
     async def _validate_single(self, proxy):
         """Validate single proxy"""
@@ -594,11 +664,7 @@ class ProxyValidator:
                 timeout = aiohttp.ClientTimeout(total=self.timeout)
                 
                 async with aiohttp.ClientSession(timeout=timeout) as session:
-                    # Try multiple test endpoints
-                    test_urls = [
-                        "http://httpbin.org/ip",
-                        "http://icanhazip.com"
-                    ]
+                    test_urls = ["http://httpbin.org/ip", "http://icanhazip.com"]
                     
                     for test_url in test_urls:
                         try:
@@ -642,28 +708,41 @@ async def export_files(db, output_dir="docs"):
             await f.write(f"# Proxy List - {datetime.now(timezone.utc).isoformat()}\n")
             await f.write(f"# Working proxies: {stats['working_proxies']}\n")
             await f.write(f"# Success rate: {stats['success_rate']}%\n")
+            await f.write("# Discovered using repository-first strategy\n")
             await f.write("# Format: IP:PORT\n\n")
             
             for proxy in working_proxies:
                 await f.write(f"{proxy[0]}:{proxy[1]}\n")
         
-        # Export JSON
+        # Export JSON with repository info
         json_data = {
             "metadata": {
                 "generated_at": datetime.now(timezone.utc).isoformat(),
                 "total_working": len(working_proxies),
-                "database_stats": stats
+                "database_stats": stats,
+                "discovery_method": "repository-first"
             },
-            "proxies": [
-                {
-                    "ip": p[0],
-                    "port": p[1],
-                    "source": p[3] if len(p) > 3 else "unknown",
-                    "response_time_ms": p[-1] if len(p) > 6 else None
-                }
-                for p in working_proxies
-            ]
+            "proxies": []
         }
+        
+        # Build JSON with available fields
+        for p in working_proxies:
+            proxy_data = {
+                "ip": p[0],
+                "port": p[1]
+            }
+            
+            # Add fields based on available columns
+            if len(p) > 2:
+                proxy_data["type"] = p[2]
+            if len(p) > 3:
+                proxy_data["source"] = p[3]
+            if len(p) > 4:
+                proxy_data["repository"] = p[4]
+            if len(p) > 7:
+                proxy_data["response_time_ms"] = p[7]
+            
+            json_data["proxies"].append(proxy_data)
         
         json_path = Path(output_dir) / "proxies.json"
         async with aiofiles.open(json_path, 'w') as f:
@@ -674,7 +753,7 @@ async def export_files(db, output_dir="docs"):
         async with aiofiles.open(stats_path, 'w') as f:
             await f.write(json.dumps(stats, indent=2))
         
-        # Create dashboard
+        # Create enhanced dashboard
         await create_dashboard(stats, output_dir)
         
         logger.info(f"✅ Export complete: {len(working_proxies)} proxies")
@@ -685,25 +764,165 @@ async def export_files(db, output_dir="docs"):
         raise
 
 async def create_dashboard(stats, output_dir):
-    """Create dashboard"""
+    """Create enhanced dashboard with repository info"""
+    
+    # Build repository section
+    repo_section = ""
+    if stats.get('by_repository'):
+        repo_section = """
+    <div class="repositories">
+        <h2>Top Proxy Repositories</h2>
+        <div class="repo-grid">"""
+        
+        for repo, count in list(stats['by_repository'].items())[:10]:
+            repo_section += f"""
+            <div class="repo-card">
+                <div class="repo-name">{repo}</div>
+                <div class="repo-count">{count:,} proxies</div>
+            </div>"""
+        
+        repo_section += """
+        </div>
+    </div>"""
+    
+    # Build type section
+    type_section = ""
+    if stats.get('by_type'):
+        type_section = """
+        <div class="type-stats">
+            <h2>Proxies by Type</h2>
+            <div class="type-grid">"""
+        
+        for proxy_type, count in stats['by_type'].items():
+            type_section += f"""
+            <div class="type-card">
+                <div class="stat-number">{count:,}</div>
+                <div>{proxy_type.upper()}</div>
+            </div>"""
+        
+        type_section += """
+            </div>
+        </div>"""
+    
     html = f"""<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proxy Intelligence Dashboard</title>
     <style>
-        body {{ font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }}
-        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 10px; text-align: center; margin-bottom: 2rem; }}
-        .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }}
-        .stat {{ background: white; padding: 1.5rem; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-        .stat-number {{ font-size: 2rem; font-weight: bold; color: #667eea; }}
-        .downloads {{ background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-        .btn {{ display: inline-block; background: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 5px; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }}
+        .header {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }}
+        .stats {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }}
+        .stat {{
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .stat-number {{
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }}
+        .downloads {{
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }}
+        .btn {{
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 5px;
+            font-weight: 500;
+        }}
+        .btn:hover {{
+            background: #218838;
+        }}
+        .repositories, .type-stats {{
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }}
+        .repo-grid, .type-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }}
+        .repo-card {{
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }}
+        .repo-name {{
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }}
+        .repo-count {{
+            color: #666;
+            font-size: 0.9rem;
+        }}
+        .type-card {{
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+        }}
+        .footer {{
+            text-align: center;
+            margin-top: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }}
+        .strategy-info {{
+            background: #e7f3ff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #007bff;
+        }}
     </style>
 </head>
 <body>
     <div class="header">
         <h1>Proxy Intelligence Dashboard</h1>
-        <p>Enhanced GitHub + Direct Source Discovery</p>
+        <p>Repository-First Discovery Strategy</p>
+    </div>
+    
+    <div class="strategy-info">
+        <h3>🔍 Discovery Method: Repository-First</h3>
+        <p>This system searches GitHub repositories first (like github.com/search?q=free+proxies&type=repositories), 
+        then scrapes all proxy files from those repositories. This approach discovers fresher, 
+        more comprehensive proxy lists compared to random file searching.</p>
     </div>
     
     <div class="stats">
@@ -720,16 +939,28 @@ async def create_dashboard(stats, output_dir):
             <div>Success Rate</div>
         </div>
         <div class="stat">
-            <div class="stat-number">{stats['countries']}</div>
-            <div>Countries</div>
+            <div class="stat-number">{len(stats.get('by_repository', {}))}</div>
+            <div>Repositories</div>
         </div>
     </div>
     
+    {type_section}
+    
+    {repo_section}
+    
     <div class="downloads">
-        <h2>Download Proxy Lists</h2>
-        <a href="proxies.txt" class="btn">Text Format</a>
-        <a href="proxies.json" class="btn">JSON Format</a>
-        <a href="stats.json" class="btn">Statistics</a>
+        <h2>📥 Download Proxy Lists</h2>
+        <p>Fresh proxies discovered from active GitHub repositories:</p>
+        <a href="proxies.txt" class="btn">📄 Text Format</a>
+        <a href="proxies.json" class="btn">📊 JSON Format</a>
+        <a href="stats.json" class="btn">📈 Statistics</a>
+        <p><em>Updated automatically every 8 hours using repository-first discovery.</em></p>
+    </div>
+    
+    <div class="footer">
+        <p>Last updated: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")}</p>
+        <p>🏢 Repository-first discovery finds fresher proxy sources</p>
+        <p>📡 Backup sources: r00tee, VMHeaven repositories</p>
     </div>
 </body>
 </html>"""
@@ -739,9 +970,9 @@ async def create_dashboard(stats, output_dir):
         await f.write(html)
 
 async def main():
-    """Main execution function"""
+    """Main execution with repository-first strategy"""
     start_time = time.time()
-    logger.info("🚀 Starting Enhanced Proxy Intelligence System")
+    logger.info("🚀 Starting Repository-First Proxy Discovery")
     
     # Configuration
     github_token = os.getenv("GITHUB_TOKEN")
@@ -750,17 +981,18 @@ async def main():
     
     logger.info(f"🔧 Configuration:")
     logger.info(f"  - GitHub Token: {'✅ Set' if github_token else '❌ Missing'}")
-    logger.info(f"  - Max Pages: {max_pages}")
+    logger.info(f"  - Max Pages per query: {max_pages}")
     logger.info(f"  - Max Concurrent: {max_concurrent}")
+    logger.info(f"  - Strategy: Repository-first discovery")
     
     try:
         # Initialize database with migration
         logger.info("🗄️ Initializing database...")
         db = ProxyDatabase()
         
-        # Enhanced discovery
-        logger.info("🔍 Starting enhanced discovery...")
-        async with EnhancedProxyDiscovery(github_token) as discovery:
+        # Repository-first discovery
+        logger.info("🔍 Starting repository-first discovery...")
+        async with RepositoryFirstDiscovery(github_token) as discovery:
             proxies = await discovery.discover_all_proxies(max_pages)
         
         if not proxies:
@@ -774,8 +1006,8 @@ async def main():
         logger.info("🔍 Starting validation...")
         validator = ProxyValidator(max_concurrent=max_concurrent)
         
-        # Process in batches
-        batch_size = 3000
+        # Process in large batches for efficiency
+        batch_size = 5000
         all_validated = []
         
         for i in range(0, len(proxies), batch_size):
@@ -791,10 +1023,14 @@ async def main():
             # Add to database
             db.add_proxies_batch(validated)
             
-            # Memory check
+            # Memory monitoring
             process = psutil.Process()
             memory_mb = process.memory_info().rss / 1024 / 1024
             logger.info(f"💾 Memory: {memory_mb:.1f} MB")
+            
+            # Brief pause between large batches
+            if len(batch) >= 2000:
+                await asyncio.sleep(2)
         
         # Export results
         logger.info("📤 Exporting results...")
@@ -808,15 +1044,27 @@ async def main():
         stats = db.get_stats()
         execution_time = time.time() - start_time
         
-        logger.info("=" * 60)
-        logger.info("🎉 EXECUTION SUMMARY")
-        logger.info("=" * 60)
+        logger.info("=" * 70)
+        logger.info("🎉 REPOSITORY-FIRST DISCOVERY SUMMARY")
+        logger.info("=" * 70)
         logger.info(f"⏱️  Execution time: {execution_time:.1f} seconds")
         logger.info(f"🔍 Total discovered: {stats['total_proxies']:,}")
         logger.info(f"✅ Working proxies: {stats['working_proxies']:,}")
         logger.info(f"📊 Success rate: {stats['success_rate']}%")
         logger.info(f"📤 Exported: {exported_count:,}")
-        logger.info(f"🌍 Countries: {stats['countries']}")
+        logger.info(f"🏢 Repositories found: {len(stats.get('by_repository', {}))}")
+        
+        # Show top repositories
+        if stats.get('by_repository'):
+            logger.info("🏆 Top proxy repositories:")
+            for repo, count in list(stats['by_repository'].items())[:5]:
+                logger.info(f"  - {repo}: {count:,} working proxies")
+        
+        # Show breakdown by type
+        if stats.get('by_type'):
+            logger.info("📋 Breakdown by type:")
+            for proxy_type, count in stats['by_type'].items():
+                logger.info(f"  - {proxy_type.upper()}: {count:,}")
         
         # GitHub Actions output
         if os.getenv("GITHUB_ACTIONS"):
@@ -825,10 +1073,16 @@ async def main():
                     f.write(f"working_proxies={stats['working_proxies']}\n")
                     f.write(f"total_proxies={stats['total_proxies']}\n")
                     f.write(f"success_rate={stats['success_rate']}\n")
+                    f.write(f"repositories_found={len(stats.get('by_repository', {}))}\n")
             except Exception as e:
                 logger.warning(f"⚠️ GitHub Actions output failed: {e}")
         
-        logger.info("🚀 Enhanced discovery completed successfully!")
+        logger.info("🚀 Repository-first discovery completed successfully!")
+        
+        # Performance summary
+        repos_per_minute = len(stats.get('by_repository', {})) * 60 / execution_time if execution_time > 0 else 0
+        proxies_per_second = len(proxies) / execution_time if execution_time > 0 else 0
+        logger.info(f"⚡ Performance: {repos_per_minute:.1f} repos/min, {proxies_per_second:.1f} proxies/sec")
         
     except Exception as e:
         logger.error(f"❌ System failed: {e}")

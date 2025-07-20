@@ -1,0 +1,210 @@
+name: Optimized Proxy Discovery (Free Tier)
+
+on:
+  schedule:
+    # Run every 8 hours to stay within free tier limits
+    - cron: '0 */8 * * *'
+  workflow_dispatch:
+    inputs:
+      max_pages:
+        description: 'Max GitHub pages to search (1-10)'
+        required: false
+        default: '3'
+        type: string
+      max_concurrent:
+        description: 'Max concurrent validations (10-100)'
+        required: false
+        default: '50'
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  proxy-discovery:
+    name: Discover & Validate Proxies
+    runs-on: ubuntu-latest
+    timeout-minutes: 25  # Stay well under 30min limit
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Shallow clone for speed
+      
+      - name: Setup Python with caching
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: 'requirements-minimal.txt'
+      
+      - name: Install minimal dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install aiohttp aiofiles psutil
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name "ProxyBot"
+          git config --global user.email "proxy-bot@github.actions"
+      
+      - name: Check disk space and memory
+        run: |
+          echo "=== System Resources ==="
+          df -h
+          free -h
+          echo "=== Available Space ==="
+          du -sh . || true
+      
+      - name: Download existing database (if exists)
+        continue-on-error: true
+        run: |
+          # Try to restore database from previous run
+          if [ -f "proxies.db" ]; then
+            echo "Existing database found: $(du -h proxies.db)"
+            sqlite3 proxies.db "SELECT COUNT(*) as total_proxies FROM proxies;"
+            sqlite3 proxies.db "SELECT COUNT(*) as working_proxies FROM proxies WHERE is_working=1;"
+          else
+            echo "No existing database found, starting fresh"
+          fi
+      
+      - name: Run optimized proxy discovery
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAX_PAGES: ${{ github.event.inputs.max_pages || '3' }}
+          MAX_CONCURRENT: ${{ github.event.inputs.max_concurrent || '50' }}
+        run: |
+          echo "Starting discovery with MAX_PAGES=$MAX_PAGES, MAX_CONCURRENT=$MAX_CONCURRENT"
+          
+          # Run with memory monitoring
+          python proxy_discovery_optimized.py 2>&1 | tee discovery.log
+          
+          echo "=== Discovery Complete ==="
+          if [ -f "proxies.db" ]; then
+            echo "Database size: $(du -h proxies.db)"
+            echo "Total proxies: $(sqlite3 proxies.db 'SELECT COUNT(*) FROM proxies;')"
+            echo "Working proxies: $(sqlite3 proxies.db 'SELECT COUNT(*) FROM proxies WHERE is_working=1;')"
+          fi
+      
+      - name: Check output files
+        run: |
+          echo "=== Generated Files ==="
+          ls -la output/ || echo "No output directory"
+          if [ -f "output/proxies.txt" ]; then
+            echo "Proxies.txt size: $(du -h output/proxies.txt)"
+            echo "Proxy count: $(wc -l < output/proxies.txt)"
+          fi
+          if [ -f "output/stats.json" ]; then
+            echo "Stats:"
+            cat output/stats.json
+          fi
+      
+      - name: Optimize for GitHub Pages
+        run: |
+          # Create docs directory for GitHub Pages
+          mkdir -p docs
+          
+          # Copy optimized files
+          if [ -f "output/proxies.txt" ]; then
+            # Keep only top 10k proxies for GitHub Pages (size limit)
+            head -n 10004 output/proxies.txt > docs/proxies.txt  # Include header lines
+            echo "Optimized proxies.txt for GitHub Pages: $(wc -l < docs/proxies.txt) lines"
+          fi
+          
+          if [ -f "output/proxies.json" ]; then
+            # Limit JSON to top 5k proxies to stay under size limits
+            python3 -c "
+import json
+try:
+    with open('output/proxies.json', 'r') as f:
+        data = json.load(f)
+    
+    # Keep only top 5000 proxies sorted by response time
+    if 'proxies' in data:
+        data['proxies'] = sorted(data['proxies'], key=lambda x: x.get('response_time_ms', 9999))[:5000]
+        data['metadata']['note'] = 'Limited to top 5000 fastest proxies for GitHub Pages'
+    
+    with open('docs/proxies.json', 'w') as f:
+        json.dump(data, f, indent=2)
+    print('Optimized JSON created')
+except Exception as e:
+    print(f'Error optimizing JSON: {e}')
+"
+          fi
+          
+          # Copy stats
+          cp output/stats.json docs/ 2>/dev/null || echo "No stats file"
+      
+      - name: Generate lightweight dashboard
+        run: |
+          python3 -c "
+import json
+import os
+from datetime import datetime
+
+# Load stats
+try:
+    with open('docs/stats.json', 'r') as f:
+        stats = json.load(f)
+except:
+    stats = {'total_proxies': 0, 'working_proxies': 0, 'success_rate': 0, 'countries': 0}
+
+# Create minimal HTML dashboard
+html = f'''<!DOCTYPE html>
+<html lang=\"en\">
+<head>
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <title>Proxy Intelligence - Live Results</title>
+    <style>
+        body {{ font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f5f5f5; }}
+        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 10px; text-align: center; margin-bottom: 2rem; }}
+        .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }}
+        .stat {{ background: white; padding: 1.5rem; border-radius: 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        .stat-number {{ font-size: 2rem; font-weight: bold; color: #667eea; }}
+        .downloads {{ background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+        .btn {{ display: inline-block; background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 5px; }}
+        .footer {{ text-align: center; margin-top: 2rem; color: #666; }}
+    </style>
+</head>
+<body>
+    <div class=\"header\">
+        <h1>🔍 Proxy Intelligence</h1>
+        <p>Free tier optimized proxy discovery system</p>
+    </div>
+    
+    <div class=\"stats\">
+        <div class=\"stat\">
+            <div class=\"stat-number\">{stats['working_proxies']:,}</div>
+            <div>Working Proxies</div>
+        </div>
+        <div class=\"stat\">
+            <div class=\"stat-number\">{stats['total_proxies']:,}</div>
+            <div>Total Discovered</div>
+        </div>
+        <div class=\"stat\">
+            <div class=\"stat-number\">{stats['success_rate']}%</div>
+            <div>Success Rate</div>
+        </div>
+        <div class=\"stat\">
+            <div class=\"stat-number\">{stats['countries']}</div>
+            <div>Countries</div>
+        </div>
+    </div>
+    
+    <div class=\"downloads\">
+        <h2>📥 Download Proxy Lists</h2>
+        <a href=\"proxies.txt\" class=\"btn\">📄 Text Format</a>
+        <a href=\"proxies.json\" class=\"btn\">📊 JSON Format</a>
+        <a href=\"stats.json\" class=\"btn\">📈 Statistics</a>
+        <p><strong>Note:</strong> Lists are limited to top 5-10k fastest proxies due to GitHub Pages size limits.</p>
+    </div>
+    
+    <div class=\"footer\">
+        <p>Last updated: {datetime.now().strftime(\"%Y-%m-%d %H

@@ -69,11 +69,7 @@ jobs:
             echo "Existing database found:"
             echo "Size: $(du -h proxies.db | cut -f1)"
             
-            sqlite3 proxies.db "SELECT 
-              COUNT(*) as total,
-              COUNT(CASE WHEN is_working=1 THEN 1 END) as working,
-              ROUND(COUNT(CASE WHEN is_working=1 THEN 1 END) * 100.0 / COUNT(*), 2) as success_rate
-              FROM proxies;" 2>/dev/null || echo "Database needs initialization"
+            sqlite3 proxies.db "SELECT COUNT(*) as total, COUNT(CASE WHEN is_working=1 THEN 1 END) as working FROM proxies;" 2>/dev/null || echo "Database needs initialization"
           else
             echo "No existing database found"
           fi
@@ -104,14 +100,7 @@ jobs:
             
             echo "Database size: $(du -h proxies.db | cut -f1)"
             
-            sqlite3 proxies.db "
-              SELECT 
-                'Total proxies: ' || COUNT(*),
-                'Working proxies: ' || COUNT(CASE WHEN is_working=1 THEN 1 END),
-                'Success rate: ' || ROUND(COUNT(CASE WHEN is_working=1 THEN 1 END) * 100.0 / COUNT(*), 2) || '%',
-                'Countries: ' || COUNT(DISTINCT country)
-              FROM proxies;
-            " 2>/dev/null || echo "Database query failed"
+            sqlite3 proxies.db "SELECT 'Total: ' || COUNT(*), 'Working: ' || COUNT(CASE WHEN is_working=1 THEN 1 END) FROM proxies;" 2>/dev/null || echo "Database query failed"
             
             if [ ! -f "proxies.db.gz" ]; then
               gzip -c proxies.db > proxies.db.gz
@@ -134,28 +123,16 @@ jobs:
           find . -name "*.tmp" -delete 2>/dev/null || true
           find . -name "*.log" -delete 2>/dev/null || true
           
-          if [ -d "docs" ]; then
-            if [ -f "docs/proxies.json" ]; then
-              SIZE=$(stat -f%z "docs/proxies.json" 2>/dev/null || stat -c%s "docs/proxies.json" 2>/dev/null || echo 0)
-              if [ "$SIZE" -gt 25000000 ]; then
-                echo "JSON file too large, truncating..."
-                python3 -c "
-import json
-with open('docs/proxies.json', 'r') as f:
-    data = json.load(f)
-data['proxies'] = data['proxies'][:5000]
-data['metadata']['note'] = 'Truncated for GitHub Pages size limits'
-with open('docs/proxies.json', 'w') as f:
-    json.dump(data, f, indent=2)
-"
-              fi
+          if [ -d "docs" ] && [ -f "docs/proxies.json" ]; then
+            SIZE=$(stat -c%s "docs/proxies.json" 2>/dev/null || echo 0)
+            if [ "$SIZE" -gt 25000000 ]; then
+              echo "JSON file too large, truncating..."
+              python3 -c "import json; data=json.load(open('docs/proxies.json')); data['proxies']=data['proxies'][:5000]; json.dump(data, open('docs/proxies.json','w'), indent=2)"
             fi
           fi
           
           echo "=== Final Repository Size ==="
           du -sh .
-          echo "=== Largest Files ==="
-          find . -type f -exec du -h {} + | sort -hr | head -10
       
       - name: 💾 Commit Results
         run: |
@@ -178,8 +155,7 @@ with open('docs/proxies.json', 'w') as f:
           git commit -m "🔍 Proxy discovery update - $TIMESTAMP
 
 📊 Results: $STATS
-🤖 Automated via GitHub Actions
-⏰ Next run: $(date -u -d '+8 hours' +'%Y-%m-%d %H:%M UTC')"
+🤖 Automated via GitHub Actions"
           
           echo "✅ Changes committed successfully"
       
@@ -228,10 +204,3 @@ with open('docs/proxies.json', 'w') as f:
           echo "- [📊 Live Dashboard](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)" >> $GITHUB_STEP_SUMMARY
           echo "- [📄 Proxy List (TXT)](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/proxies.txt)" >> $GITHUB_STEP_SUMMARY
           echo "- [📊 Proxy Data (JSON)](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/proxies.json)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          echo "### ⚡ System Info" >> $GITHUB_STEP_SUMMARY
-          echo "- **Runtime:** ~$(( SECONDS / 60 )) minutes" >> $GITHUB_STEP_SUMMARY
-          echo "- **Repository Size:** $(du -sh . | cut -f1)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Next Run:** $(date -u -d '+8 hours' +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "- **Schedule:** Every 8 hours (free tier optimized)" >> $GITHUB_STEP_SUMMARY

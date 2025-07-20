@@ -82,7 +82,7 @@ jobs:
       
       - name: 🔍 Run Proxy Discovery
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PROXY_GITHUB_TOKEN }}
           MAX_PAGES: ${{ github.event.inputs.max_pages || '3' }}
           MAX_CONCURRENT: ${{ github.event.inputs.max_concurrent || '50' }}
           GITHUB_ACTIONS: 'true'

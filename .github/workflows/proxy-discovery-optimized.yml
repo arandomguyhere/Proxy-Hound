@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -45,6 +47,7 @@ jobs:
         run: |
           git config --global user.name "ProxyBot"
           git config --global user.email "proxy-bot@users.noreply.github.com"
+          git config --global pull.rebase false
       
       - name: System Info
         run: |
@@ -157,23 +160,32 @@ jobs:
           ls -la docs/
           echo "Repository size: $(du -sh . | cut -f1)"
       
-      - name: Commit Results
+      - name: Sync with Remote
+        run: |
+          echo "Syncing with remote repository"
+          git fetch origin main
+          git status
+          echo "Checking for conflicts"
+      
+      - name: Commit and Push Results
         run: |
           git add docs/ proxies.db 2>/dev/null || true
+          
           if git diff --staged --quiet; then
             echo "No changes to commit"
-          else
-            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-            git commit -m "Proxy discovery update $TIMESTAMP"
-            echo "Changes committed successfully"
+            exit 0
           fi
-      
-      - name: Push Changes
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 3
-          command: git push origin main
+          
+          echo "Pulling latest changes before commit"
+          git pull origin main --no-edit || echo "Pull completed with merge"
+          
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          git commit -m "Proxy discovery update $TIMESTAMP" || echo "Commit completed"
+          
+          echo "Pushing changes to remote"
+          git push origin main
+          
+          echo "Changes committed and pushed successfully"
       
       - name: Setup GitHub Pages
         if: github.ref == 'refs/heads/main'

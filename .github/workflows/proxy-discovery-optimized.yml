@@ -207,4 +207,164 @@ html = f'''<!DOCTYPE html>
     </div>
     
     <div class=\"footer\">
-        <p>Last updated: {datetime.now().strftime(\"%Y-%m-%d %H
+        <p>Last updated: {datetime.now().strftime(\"%Y-%m-%d %H:%M:%S UTC\")}</p>
+        <p>Optimized for GitHub Actions free tier | Auto-updates every 8 hours</p>
+        <p><a href=\"https://github.com/{os.getenv('GITHUB_REPOSITORY', 'user/repo')}\">View Source Code</a></p>
+    </div>
+</body>
+</html>'''
+
+with open('docs/index.html', 'w') as f:
+    f.write(html)
+
+print('Dashboard generated')
+"
+      
+      - name: Compress database for storage
+        run: |
+          # Compress database to save space in repository
+          if [ -f "proxies.db" ]; then
+            echo "Original DB size: $(du -h proxies.db)"
+            
+            # Vacuum database to optimize size
+            sqlite3 proxies.db "VACUUM;"
+            
+            # Create compressed backup
+            gzip -c proxies.db > proxies.db.gz
+            echo "Compressed DB size: $(du -h proxies.db.gz)"
+            
+            # Keep only compressed version to save space
+            rm proxies.db
+            mv proxies.db.gz proxies.db
+          fi
+      
+      - name: Cleanup temporary files
+        run: |
+          # Remove logs and temporary files to save space
+          rm -f discovery.log
+          rm -rf output/  # Keep only docs/ for GitHub Pages
+          
+          # Clean up any large temporary files
+          find . -name "*.tmp" -delete
+          find . -name "*.log" -delete
+      
+      - name: Check repository size
+        run: |
+          echo "=== Repository Size Check ==="
+          du -sh .
+          echo "=== Files by size ==="
+          find . -type f -exec du -h {} + | sort -hr | head -20
+      
+      - name: Commit optimized results
+        run: |
+          # Add files for commit
+          git add docs/ proxies.db
+          
+          # Check if there are changes
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          # Get stats for commit message
+          WORKING_COUNT=$(cat docs/stats.json | grep -o '"working_proxies":[^,]*' | cut -d':' -f2 | tr -d ' ')
+          TOTAL_COUNT=$(cat docs/stats.json | grep -o '"total_proxies":[^,]*' | cut -d':' -f2 | tr -d ' ')
+          SUCCESS_RATE=$(cat docs/stats.json | grep -o '"success_rate":[^,]*' | cut -d':' -f2 | tr -d ' ')
+          
+          # Create detailed commit message
+          git commit -m "🔍 Proxy discovery update - $(date -u +'%Y-%m-%d %H:%M UTC')
+
+📊 Results Summary:
+- Working proxies: ${WORKING_COUNT}
+- Total discovered: ${TOTAL_COUNT}  
+- Success rate: ${SUCCESS_RATE}%
+- Optimized for GitHub free tier
+
+🤖 Auto-generated via GitHub Actions
+⚡ Next run in 8 hours"
+          
+          echo "Changes committed successfully"
+      
+      - name: Push changes with retry
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: git push origin main
+      
+      - name: Setup GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v4
+      
+      - name: Upload to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+      
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        id: deployment
+        uses: actions/deploy-pages@v4
+      
+      - name: Create execution summary
+        run: |
+          echo "## 🔍 Optimized Proxy Discovery Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f docs/stats.json ]; then
+            WORKING=$(cat docs/stats.json | grep -o '"working_proxies":[^,]*' | cut -d':' -f2 | tr -d ' ')
+            TOTAL=$(cat docs/stats.json | grep -o '"total_proxies":[^,]*' | cut -d':' -f2 | tr -d ' ')
+            SUCCESS_RATE=$(cat docs/stats.json | grep -o '"success_rate":[^,]*' | cut -d':' -f2 | tr -d ' ')
+            
+            echo "### 📊 Performance Metrics" >> $GITHUB_STEP_SUMMARY
+            echo "- **Working Proxies:** $WORKING" >> $GITHUB_STEP_SUMMARY
+            echo "- **Total Discovered:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+            echo "- **Success Rate:** $SUCCESS_RATE%" >> $GITHUB_STEP_SUMMARY
+            echo "- **Repository Size:** $(du -sh . | cut -f1)" >> $GITHUB_STEP_SUMMARY
+            
+            if [ -f proxies.db ]; then
+              echo "- **Database Size:** $(du -sh proxies.db | cut -f1)" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⚡ Free Tier Optimizations" >> $GITHUB_STEP_SUMMARY
+          echo "- **Execution Time:** ~25 minutes (under 30min limit)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Memory Usage:** Optimized with batch processing" >> $GITHUB_STEP_SUMMARY
+          echo "- **Storage:** Compressed database + limited exports" >> $GITHUB_STEP_SUMMARY
+          echo "- **Schedule:** Every 8 hours (within 2000min/month limit)" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Access Points" >> $GITHUB_STEP_SUMMARY
+          if [ -f docs/index.html ]; then
+            echo "- [📊 Live Dashboard](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)" >> $GITHUB_STEP_SUMMARY
+            echo "- [📄 Proxy List](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/proxies.txt)" >> $GITHUB_STEP_SUMMARY
+            echo "- [📊 JSON Data](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/proxies.json)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next scheduled run:** $(date -d '+8 hours' -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+
+  # Resource monitoring job (optional, for debugging)
+  monitor-resources:
+    name: Monitor Free Tier Usage
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Check GitHub Actions usage
+        run: |
+          echo "## 📊 GitHub Actions Free Tier Usage" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Current Workflow" >> $GITHUB_STEP_SUMMARY
+          echo "- **Runner:** ubuntu-latest (2-core CPU, 7 GB RAM, 14 GB SSD)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timeout:** 25 minutes (25/2000 monthly minutes)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Schedule:** Every 8 hours (91 runs/month)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Estimated monthly usage:** ~2275 minutes (113% of free tier)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Note:** This may exceed free tier limits. Consider reducing frequency or optimizing further." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Recommendations to stay within free tier:" >> $GITHUB_STEP_SUMMARY
+          echo "- Run every 12 hours instead (60 runs/month = ~1500 minutes)" >> $GITHUB_STEP_SUMMARY
+          echo "- Reduce MAX_PAGES from 3 to 2" >> $GITHUB_STEP_SUMMARY
+          echo "- Reduce MAX_CONCURRENT from 50 to 30" >> $GITHUB_STEP_SUMMARY

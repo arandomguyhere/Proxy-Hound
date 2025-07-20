@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Optimized Proxy Discovery System for GitHub Free Tier
-Designed to handle 1M+ proxies with minimal resource usage
+Complete Optimized Proxy Discovery System
+Designed for 1M+ proxies on GitHub Actions Free Tier
 """
 
 import asyncio
@@ -9,18 +9,18 @@ import json
 import logging
 import sqlite3
 import time
-from dataclasses import dataclass
+import gzip
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Set, Optional, AsyncGenerator
 import os
 import sys
 
-# Minimal dependencies for GitHub Actions
+# Minimal imports for GitHub Actions
 import aiohttp
 import aiofiles
+import psutil
 
-# Configure minimal logging for GitHub Actions
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -28,33 +28,23 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-@dataclass
-class ProxyInfo:
-    """Lightweight proxy information"""
-    ip: str
-    port: int
-    source: str
-    country: Optional[str] = None
-    last_checked: Optional[str] = None
-    is_working: bool = False
-    response_time: Optional[float] = None
-
-class OptimizedProxyDatabase:
-    """Memory-efficient SQLite database for large-scale proxy storage"""
+class ProxyDatabase:
+    """Optimized database for millions of proxies"""
     
-    def __init__(self, db_path: str = "proxies.db"):
+    def __init__(self, db_path="proxies.db"):
         self.db_path = db_path
-        self._init_db()
+        self._init_database()
     
-    def _init_db(self):
-        """Initialize database with optimized schema for millions of records"""
+    def _init_database(self):
+        """Initialize optimized database"""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("PRAGMA journal_mode=WAL")  # Better for concurrent access
-            conn.execute("PRAGMA synchronous=NORMAL")  # Faster writes
-            conn.execute("PRAGMA cache_size=10000")  # 10MB cache
-            conn.execute("PRAGMA temp_store=MEMORY")  # Use memory for temp tables
+            # Performance optimizations
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA synchronous=NORMAL") 
+            conn.execute("PRAGMA cache_size=10000")
+            conn.execute("PRAGMA temp_store=MEMORY")
             
-            # Optimized schema with indexes
+            # Create optimized table
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS proxies (
                     id INTEGER PRIMARY KEY,
@@ -70,25 +60,24 @@ class OptimizedProxyDatabase:
                 )
             """)
             
-            # Indexes for performance with millions of records
+            # Performance indexes
             conn.execute("CREATE INDEX IF NOT EXISTS idx_ip_port ON proxies(ip, port)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_working ON proxies(is_working)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_last_checked ON proxies(last_checked)")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_country ON proxies(country)")
             
-            conn.commit()
-    
-    def bulk_insert_proxies(self, proxies: List[ProxyInfo], batch_size: int = 1000):
-        """Efficiently insert millions of proxies in batches"""
-        logger.info(f"Inserting {len(proxies)} proxies in batches of {batch_size}")
+    def add_proxies_batch(self, proxies, batch_size=1000):
+        """Add proxies in optimized batches"""
+        logger.info(f"Adding {len(proxies)} proxies to database")
         
         with sqlite3.connect(self.db_path) as conn:
             conn.execute("BEGIN TRANSACTION")
             
             for i in range(0, len(proxies), batch_size):
                 batch = proxies[i:i + batch_size]
-                proxy_data = [
-                    (p.ip, p.port, p.source, p.country, p.last_checked, p.is_working, p.response_time)
+                data = [
+                    (p['ip'], p['port'], p['source'], p.get('country'), 
+                     p.get('last_checked'), p.get('is_working', False), 
+                     p.get('response_time'))
                     for p in batch
                 ]
                 
@@ -96,16 +85,15 @@ class OptimizedProxyDatabase:
                     INSERT OR REPLACE INTO proxies 
                     (ip, port, source, country, last_checked, is_working, response_time)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, proxy_data)
+                """, data)
                 
-                if i % (batch_size * 10) == 0:  # Log progress every 10k records
-                    logger.info(f"Processed {i + len(batch)} proxies...")
+                if i % 5000 == 0 and i > 0:
+                    logger.info(f"Processed {i} proxies...")
             
             conn.execute("COMMIT")
-            logger.info("Bulk insert completed")
     
-    def get_working_proxies(self, limit: Optional[int] = None) -> List[ProxyInfo]:
-        """Get working proxies efficiently"""
+    def get_working_proxies(self, limit=None):
+        """Get working proxies sorted by speed"""
         query = """
             SELECT ip, port, source, country, last_checked, response_time
             FROM proxies 
@@ -116,17 +104,9 @@ class OptimizedProxyDatabase:
             query += f" LIMIT {limit}"
         
         with sqlite3.connect(self.db_path) as conn:
-            results = conn.execute(query).fetchall()
-            
-        return [
-            ProxyInfo(
-                ip=row[0], port=row[1], source=row[2], country=row[3],
-                last_checked=row[4], is_working=True, response_time=row[5]
-            )
-            for row in results
-        ]
+            return conn.execute(query).fetchall()
     
-    def get_stats(self) -> dict:
+    def get_stats(self):
         """Get database statistics"""
         with sqlite3.connect(self.db_path) as conn:
             total = conn.execute("SELECT COUNT(*) FROM proxies").fetchone()[0]
@@ -139,73 +119,94 @@ class OptimizedProxyDatabase:
             "countries": countries,
             "success_rate": round((working / total * 100) if total > 0 else 0, 2)
         }
-
-class MemoryEfficientDiscovery:
-    """Discover proxies using minimal memory for large-scale operations"""
     
-    def __init__(self, github_token: Optional[str] = None):
+    def compress_database(self):
+        """Compress database to save space"""
+        if os.path.exists(self.db_path):
+            # Vacuum to optimize
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("VACUUM")
+            
+            # Compress with gzip
+            with open(self.db_path, 'rb') as f_in:
+                with gzip.open(f"{self.db_path}.gz", 'wb') as f_out:
+                    f_out.writelines(f_in)
+            
+            # Replace with compressed version
+            os.remove(self.db_path)
+            os.rename(f"{self.db_path}.gz", self.db_path)
+            logger.info(f"Database compressed: {os.path.getsize(self.db_path) / 1024 / 1024:.1f} MB")
+
+class ProxyDiscovery:
+    """Memory-efficient proxy discovery"""
+    
+    def __init__(self, github_token=None):
         self.github_token = github_token
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session = None
         self.discovered_count = 0
     
     async def __aenter__(self):
-        """Async context manager setup"""
-        headers = {"User-Agent": "ProxyDiscovery/1.0"}
+        headers = {"User-Agent": "ProxyIntelligence/1.0"}
         if self.github_token:
             headers["Authorization"] = f"Bearer {self.github_token}"
         
-        timeout = aiohttp.ClientTimeout(total=30, connect=10)
-        self.session = aiohttp.ClientSession(
-            headers=headers,
-            timeout=timeout,
-            connector=aiohttp.TCPConnector(limit=100, limit_per_host=10)
-        )
+        timeout = aiohttp.ClientTimeout(total=30)
+        self.session = aiohttp.ClientSession(headers=headers, timeout=timeout)
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Cleanup session"""
         if self.session:
             await self.session.close()
     
-    async def discover_from_github(self, max_pages: int = 5) -> AsyncGenerator[ProxyInfo, None]:
-        """Memory-efficient GitHub discovery using generators"""
+    async def discover_github_proxies(self, max_pages=3):
+        """Discover proxies from GitHub repositories"""
         logger.info(f"Starting GitHub discovery (max {max_pages} pages)")
         
         queries = [
             "proxy list filetype:txt",
-            "socks proxy filetype:txt", 
-            "http proxy servers",
+            "socks proxy filetype:txt",
+            "http proxy servers", 
             "proxy.txt",
             "proxies.txt"
         ]
         
+        all_proxies = []
+        
         for query in queries:
-            async for proxy in self._search_github_query(query, max_pages):
-                yield proxy
-                self.discovered_count += 1
-                
-                # Log progress every 1000 proxies
-                if self.discovered_count % 1000 == 0:
-                    logger.info(f"Discovered {self.discovered_count} proxies so far...")
+            proxies = await self._search_query(query, max_pages)
+            all_proxies.extend(proxies)
+            logger.info(f"Query '{query}': found {len(proxies)} proxies")
+            
+            if len(all_proxies) > 50000:  # Limit for memory
+                logger.info(f"Reached proxy limit, stopping discovery")
+                break
+        
+        # Remove duplicates
+        unique_proxies = {}
+        for proxy in all_proxies:
+            key = f"{proxy['ip']}:{proxy['port']}"
+            if key not in unique_proxies:
+                unique_proxies[key] = proxy
+        
+        result = list(unique_proxies.values())
+        logger.info(f"Discovery complete: {len(result)} unique proxies found")
+        return result
     
-    async def _search_github_query(self, query: str, max_pages: int) -> AsyncGenerator[ProxyInfo, None]:
-        """Search GitHub with a specific query"""
+    async def _search_query(self, query, max_pages):
+        """Search GitHub with specific query"""
+        proxies = []
+        
         for page in range(1, max_pages + 1):
             try:
-                url = f"https://api.github.com/search/code"
-                params = {
-                    "q": query,
-                    "page": page,
-                    "per_page": 30  # Reduced for rate limiting
-                }
+                url = "https://api.github.com/search/code"
+                params = {"q": query, "page": page, "per_page": 20}
                 
                 async with self.session.get(url, params=params) as response:
-                    if response.status == 403:  # Rate limited
-                        logger.warning("GitHub rate limit hit, stopping search")
+                    if response.status == 403:
+                        logger.warning("GitHub rate limit hit")
                         break
                     
                     if response.status != 200:
-                        logger.warning(f"GitHub API error: {response.status}")
                         continue
                     
                     data = await response.json()
@@ -214,26 +215,22 @@ class MemoryEfficientDiscovery:
                     if not items:
                         break
                     
-                    # Process items concurrently but limit memory usage
-                    tasks = [self._extract_proxies_from_file(item) for item in items[:10]]  # Limit concurrent files
-                    results = await asyncio.gather(*tasks, return_exceptions=True)
-                    
-                    for result in results:
-                        if isinstance(result, list):
-                            for proxy in result:
-                                yield proxy
+                    # Process files
+                    for item in items[:10]:  # Limit files per page
+                        file_proxies = await self._extract_from_file(item)
+                        proxies.extend(file_proxies)
                 
-                # Rate limiting delay
-                await asyncio.sleep(2)
+                await asyncio.sleep(2)  # Rate limiting
                 
             except Exception as e:
-                logger.error(f"Error searching GitHub: {e}")
+                logger.error(f"Search error: {e}")
                 continue
+        
+        return proxies
     
-    async def _extract_proxies_from_file(self, item: dict) -> List[ProxyInfo]:
-        """Extract proxies from a GitHub file efficiently"""
+    async def _extract_from_file(self, item):
+        """Extract proxies from GitHub file"""
         try:
-            # Convert to raw URL
             html_url = item.get("html_url", "")
             raw_url = html_url.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
             
@@ -241,168 +238,137 @@ class MemoryEfficientDiscovery:
                 if response.status != 200:
                     return []
                 
-                # Read content with size limit to prevent memory issues
                 content = await response.text()
-                if len(content) > 1_000_000:  # Skip files larger than 1MB
-                    logger.warning(f"Skipping large file: {raw_url}")
+                if len(content) > 500000:  # Skip large files
                     return []
                 
-                return self._parse_proxy_content(content, source=f"github:{item.get('repository', {}).get('full_name', 'unknown')}")
+                return self._parse_content(content, item.get('repository', {}).get('full_name', 'unknown'))
         
         except Exception as e:
-            logger.debug(f"Error extracting from file: {e}")
+            logger.debug(f"File extraction error: {e}")
             return []
     
-    def _parse_proxy_content(self, content: str, source: str) -> List[ProxyInfo]:
+    def _parse_content(self, content, source):
         """Parse proxy content efficiently"""
         proxies = []
-        lines = content.splitlines()
         
-        for line in lines[:10000]:  # Limit lines processed per file
+        for line in content.splitlines()[:5000]:  # Limit lines
             line = line.strip()
             
-            # Skip comments and empty lines
             if not line or line.startswith(('#', '//', ';')):
                 continue
             
-            # Look for IP:port pattern
             if ':' in line and '.' in line:
-                parts = line.split(':')
-                if len(parts) >= 2:
-                    try:
+                try:
+                    parts = line.split(':')
+                    if len(parts) >= 2:
                         ip = parts[0].strip()
                         port = int(parts[1].strip())
                         
-                        # Basic IP validation
                         if self._is_valid_ip(ip) and 1 <= port <= 65535:
-                            proxies.append(ProxyInfo(ip=ip, port=port, source=source))
-                            
-                    except (ValueError, IndexError):
-                        continue
+                            proxies.append({
+                                'ip': ip,
+                                'port': port,
+                                'source': f"github:{source}"
+                            })
+                except (ValueError, IndexError):
+                    continue
         
         return proxies
     
-    def _is_valid_ip(self, ip: str) -> bool:
-        """Quick IP validation"""
+    def _is_valid_ip(self, ip):
+        """Validate IP address"""
         try:
             parts = ip.split('.')
             return len(parts) == 4 and all(0 <= int(part) <= 255 for part in parts)
-        except (ValueError, AttributeError):
+        except:
             return False
 
-class FastProxyValidator:
-    """High-speed proxy validation optimized for GitHub Actions"""
+class ProxyValidator:
+    """High-speed proxy validation"""
     
-    def __init__(self, max_concurrent: int = 100, timeout: float = 5.0):
+    def __init__(self, max_concurrent=50, timeout=5.0):
         self.max_concurrent = max_concurrent
         self.timeout = timeout
         self.semaphore = asyncio.Semaphore(max_concurrent)
-        self.validated_count = 0
     
-    async def validate_proxies_batch(self, proxies: List[ProxyInfo]) -> List[ProxyInfo]:
-        """Validate proxies in efficient batches"""
-        logger.info(f"Validating {len(proxies)} proxies with {self.max_concurrent} concurrent connections")
+    async def validate_batch(self, proxies):
+        """Validate proxies in batches"""
+        logger.info(f"Validating {len(proxies)} proxies")
         
-        # Create validation tasks
-        tasks = [self._validate_single_proxy(proxy) for proxy in proxies]
+        tasks = [self._validate_single(proxy) for proxy in proxies]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
         
-        # Process in batches to manage memory
-        batch_size = 1000
-        validated_proxies = []
+        validated = [r for r in results if isinstance(r, dict) and r.get('is_working')]
+        logger.info(f"Validation complete: {len(validated)}/{len(proxies)} working")
         
-        for i in range(0, len(tasks), batch_size):
-            batch_tasks = tasks[i:i + batch_size]
-            batch_results = await asyncio.gather(*batch_tasks, return_exceptions=True)
-            
-            for result in batch_results:
-                if isinstance(result, ProxyInfo) and result.is_working:
-                    validated_proxies.append(result)
-                    self.validated_count += 1
-            
-            # Log progress
-            logger.info(f"Validated {min(i + batch_size, len(tasks))}/{len(tasks)} proxies, {self.validated_count} working")
-            
-            # Small delay to prevent overwhelming the system
-            if i + batch_size < len(tasks):
-                await asyncio.sleep(0.1)
-        
-        logger.info(f"Validation complete: {self.validated_count}/{len(proxies)} proxies working")
-        return validated_proxies
+        return validated
     
-    async def _validate_single_proxy(self, proxy: ProxyInfo) -> ProxyInfo:
-        """Validate a single proxy with timeout and error handling"""
+    async def _validate_single(self, proxy):
+        """Validate single proxy"""
         async with self.semaphore:
             start_time = time.time()
             
             try:
-                proxy_url = f"http://{proxy.ip}:{proxy.port}"
+                proxy_url = f"http://{proxy['ip']}:{proxy['port']}"
                 timeout = aiohttp.ClientTimeout(total=self.timeout)
                 
                 async with aiohttp.ClientSession(timeout=timeout) as session:
-                    async with session.get(
-                        "http://httpbin.org/ip",
-                        proxy=proxy_url,
-                        timeout=timeout
-                    ) as response:
+                    async with session.get("http://httpbin.org/ip", proxy=proxy_url) as response:
                         if response.status == 200:
-                            response_time = time.time() - start_time
-                            proxy.is_working = True
-                            proxy.response_time = round(response_time * 1000, 2)  # ms
-                            proxy.last_checked = datetime.now(timezone.utc).isoformat()
-                            
-                            # Try to get country info from response
-                            try:
-                                data = await response.json()
-                                # This is a basic example - in production you'd use a proper geolocation service
-                                proxy.country = "Unknown"
-                            except:
-                                proxy.country = "Unknown"
-                        
-                        return proxy
+                            response_time = (time.time() - start_time) * 1000
+                            proxy.update({
+                                'is_working': True,
+                                'response_time': round(response_time, 2),
+                                'last_checked': datetime.now(timezone.utc).isoformat(),
+                                'country': 'Unknown'
+                            })
+                            return proxy
+            except:
+                pass
             
-            except Exception:
-                # Proxy failed validation
-                proxy.is_working = False
-                proxy.last_checked = datetime.now(timezone.utc).isoformat()
-                return proxy
+            proxy.update({
+                'is_working': False,
+                'last_checked': datetime.now(timezone.utc).isoformat()
+            })
+            return proxy
 
-async def export_proxy_files(db: OptimizedProxyDatabase, output_dir: str = "output"):
-    """Export proxy files efficiently for GitHub Pages"""
+async def export_files(db, output_dir="docs"):
+    """Export proxy files for GitHub Pages"""
     os.makedirs(output_dir, exist_ok=True)
     
-    # Get working proxies
-    working_proxies = db.get_working_proxies(limit=50000)  # Limit for GitHub Pages size
+    working_proxies = db.get_working_proxies(limit=10000)  # Limit for GitHub Pages
     stats = db.get_stats()
     
     logger.info(f"Exporting {len(working_proxies)} working proxies")
     
-    # Export simple text format
+    # Export TXT format
     txt_path = Path(output_dir) / "proxies.txt"
     async with aiofiles.open(txt_path, 'w') as f:
         await f.write(f"# Proxy List - {datetime.now(timezone.utc).isoformat()}\n")
-        await f.write(f"# Total working proxies: {stats['working_proxies']}\n")
+        await f.write(f"# Working proxies: {stats['working_proxies']}\n")
         await f.write(f"# Success rate: {stats['success_rate']}%\n")
         await f.write("# Format: IP:PORT\n\n")
         
         for proxy in working_proxies:
-            await f.write(f"{proxy.ip}:{proxy.port}\n")
+            await f.write(f"{proxy[0]}:{proxy[1]}\n")
     
-    # Export JSON format with metadata
+    # Export JSON format
     json_data = {
         "metadata": {
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "total_proxies": len(working_proxies),
             "database_stats": stats,
-            "format_version": "1.0"
+            "version": "1.0"
         },
         "proxies": [
             {
-                "ip": p.ip,
-                "port": p.port,
-                "country": p.country,
-                "response_time_ms": p.response_time,
-                "source": p.source,
-                "last_checked": p.last_checked
+                "ip": p[0],
+                "port": p[1],
+                "country": p[3],
+                "response_time_ms": p[5],
+                "source": p[2],
+                "last_checked": p[4]
             }
             for p in working_proxies
         ]
@@ -412,96 +378,221 @@ async def export_proxy_files(db: OptimizedProxyDatabase, output_dir: str = "outp
     async with aiofiles.open(json_path, 'w') as f:
         await f.write(json.dumps(json_data, indent=2))
     
-    # Export statistics
+    # Export stats
     stats_path = Path(output_dir) / "stats.json"
     async with aiofiles.open(stats_path, 'w') as f:
         await f.write(json.dumps(stats, indent=2))
     
-    logger.info(f"Export completed: {len(working_proxies)} proxies exported to {output_dir}")
+    # Create dashboard
+    await create_dashboard(stats, output_dir)
+    
     return len(working_proxies)
 
-async def main():
-    """Main execution function optimized for GitHub Actions"""
-    start_time = time.time()
-    logger.info("Starting optimized proxy discovery system")
+async def create_dashboard(stats, output_dir):
+    """Create HTML dashboard"""
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy Intelligence Dashboard</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }}
+        .header {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }}
+        .stats {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }}
+        .stat {{
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .stat-number {{
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }}
+        .downloads {{
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }}
+        .btn {{
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 5px;
+        }}
+        .btn:hover {{
+            background: #218838;
+        }}
+        .footer {{
+            text-align: center;
+            margin-top: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Proxy Intelligence Dashboard</h1>
+        <p>Automated proxy discovery and validation system</p>
+    </div>
     
-    # Configuration from environment
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-number">{stats['working_proxies']:,}</div>
+            <div>Working Proxies</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">{stats['total_proxies']:,}</div>
+            <div>Total Discovered</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">{stats['success_rate']}%</div>
+            <div>Success Rate</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">{stats['countries']}</div>
+            <div>Countries</div>
+        </div>
+    </div>
+    
+    <div class="downloads">
+        <h2>📥 Download Proxy Lists</h2>
+        <p>Choose your preferred format:</p>
+        <a href="proxies.txt" class="btn">📄 Text Format</a>
+        <a href="proxies.json" class="btn">📊 JSON Format</a>
+        <a href="stats.json" class="btn">📈 Statistics</a>
+        <p><strong>Note:</strong> Limited to top 10,000 fastest proxies for optimal performance.</p>
+    </div>
+    
+    <div class="footer">
+        <p>Last updated: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")}</p>
+        <p>🤖 Automatically updated every 8 hours via GitHub Actions</p>
+        <p>⚡ Optimized for GitHub Actions free tier</p>
+    </div>
+</body>
+</html>"""
+    
+    html_path = Path(output_dir) / "index.html"
+    async with aiofiles.open(html_path, 'w') as f:
+        await f.write(html)
+
+async def main():
+    """Main execution function"""
+    start_time = time.time()
+    logger.info("🚀 Starting Proxy Intelligence System")
+    
+    # Configuration
     github_token = os.getenv("GITHUB_TOKEN")
     max_pages = int(os.getenv("MAX_PAGES", "3"))
-    max_concurrent = int(os.getenv("MAX_CONCURRENT", "50"))  # Reduced for free tier
+    max_concurrent = int(os.getenv("MAX_CONCURRENT", "50"))
     
     if not github_token:
-        logger.warning("GITHUB_TOKEN not provided - API rate limits will be very restrictive")
+        logger.warning("⚠️  GITHUB_TOKEN not found - limited API access")
     
-    # Initialize database
-    db = OptimizedProxyDatabase()
-    
-    # Discover proxies
-    discovered_proxies = []
-    async with MemoryEfficientDiscovery(github_token) as discovery:
-        async for proxy in discovery.discover_from_github(max_pages):
-            discovered_proxies.append(proxy)
+    try:
+        # Initialize database
+        db = ProxyDatabase()
+        
+        # Discover proxies
+        logger.info("🔍 Starting proxy discovery...")
+        async with ProxyDiscovery(github_token) as discovery:
+            proxies = await discovery.discover_github_proxies(max_pages)
+        
+        if not proxies:
+            logger.error("❌ No proxies discovered")
+            return
+        
+        # Validate proxies in batches
+        logger.info("✅ Starting proxy validation...")
+        validator = ProxyValidator(max_concurrent=max_concurrent)
+        
+        batch_size = 2000
+        all_validated = []
+        
+        for i in range(0, len(proxies), batch_size):
+            batch = proxies[i:i + batch_size]
+            logger.info(f"Validating batch {i//batch_size + 1}/{(len(proxies)-1)//batch_size + 1}")
             
-            # Process in batches to manage memory
-            if len(discovered_proxies) >= 5000:
-                logger.info(f"Processing batch of {len(discovered_proxies)} proxies")
-                
-                # Validate batch
-                validator = FastProxyValidator(max_concurrent=max_concurrent)
-                validated = await validator.validate_proxies_batch(discovered_proxies)
-                
-                # Store in database
-                db.bulk_insert_proxies(validated)
-                
-                # Clear memory
-                discovered_proxies.clear()
-                
-                # Log memory usage (approximate)
-                import psutil
-                process = psutil.Process()
-                memory_mb = process.memory_info().rss / 1024 / 1024
-                logger.info(f"Memory usage: {memory_mb:.1f} MB")
-    
-    # Process remaining proxies
-    if discovered_proxies:
-        logger.info(f"Processing final batch of {len(discovered_proxies)} proxies")
-        validator = FastProxyValidator(max_concurrent=max_concurrent)
-        validated = await validator.validate_proxies_batch(discovered_proxies)
-        db.bulk_insert_proxies(validated)
-    
-    # Export results
-    exported_count = await export_proxy_files(db)
-    
-    # Final statistics
-    stats = db.get_stats()
-    execution_time = time.time() - start_time
-    
-    logger.info("="*50)
-    logger.info("EXECUTION SUMMARY")
-    logger.info("="*50)
-    logger.info(f"Total execution time: {execution_time:.1f} seconds")
-    logger.info(f"Total proxies discovered: {stats['total_proxies']}")
-    logger.info(f"Working proxies: {stats['working_proxies']}")
-    logger.info(f"Success rate: {stats['success_rate']}%")
-    logger.info(f"Proxies exported: {exported_count}")
-    logger.info(f"Countries detected: {stats['countries']}")
-    
-    # Set GitHub Actions output
-    if os.getenv("GITHUB_ACTIONS"):
-        with open(os.getenv("GITHUB_OUTPUT", "/dev/stdout"), "a") as f:
-            f.write(f"working_proxies={stats['working_proxies']}\n")
-            f.write(f"success_rate={stats['success_rate']}\n")
-            f.write(f"total_discovered={stats['total_proxies']}\n")
+            validated = await validator.validate_batch(batch)
+            all_validated.extend(validated)
+            
+            # Add to database
+            db.add_proxies_batch(batch)
+            
+            # Memory cleanup
+            process = psutil.Process()
+            memory_mb = process.memory_info().rss / 1024 / 1024
+            logger.info(f"Memory usage: {memory_mb:.1f} MB")
+        
+        # Export results
+        logger.info("📤 Exporting results...")
+        exported_count = await export_files(db)
+        
+        # Compress database
+        db.compress_database()
+        
+        # Final statistics
+        stats = db.get_stats()
+        execution_time = time.time() - start_time
+        
+        logger.info("=" * 50)
+        logger.info("🎉 EXECUTION SUMMARY")
+        logger.info("=" * 50)
+        logger.info(f"⏱️  Execution time: {execution_time:.1f} seconds")
+        logger.info(f"🔍 Total discovered: {stats['total_proxies']:,}")
+        logger.info(f"✅ Working proxies: {stats['working_proxies']:,}")
+        logger.info(f"📊 Success rate: {stats['success_rate']}%")
+        logger.info(f"📤 Exported: {exported_count:,}")
+        logger.info(f"🌍 Countries: {stats['countries']}")
+        
+        # GitHub Actions output
+        if os.getenv("GITHUB_ACTIONS"):
+            with open(os.getenv("GITHUB_OUTPUT", "/dev/stdout"), "a") as f:
+                f.write(f"working_proxies={stats['working_proxies']}\n")
+                f.write(f"total_proxies={stats['total_proxies']}\n")
+                f.write(f"success_rate={stats['success_rate']}\n")
+        
+        logger.info("🚀 System completed successfully!")
+        
+    except Exception as e:
+        logger.error(f"❌ System failed: {e}")
+        raise
 
 if __name__ == "__main__":
-    # Ensure proper event loop for Windows compatibility
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
     
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        logger.info("Process interrupted by user")
+        logger.info("⏹️  Process interrupted")
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+        logger.error(f"💥 Unexpected error: {e}")
         sys.exit(1)

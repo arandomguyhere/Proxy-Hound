@@ -2,7 +2,6 @@ name: Proxy Intelligence System
 
 on:
   schedule:
-    # Run every 8 hours to stay within free tier
     - cron: '0 */8 * * *'
   workflow_dispatch:
     inputs:
@@ -61,7 +60,6 @@ jobs:
       - name: 🗄️ Restore Database
         run: |
           if [ -f "proxies.db" ]; then
-            # Decompress if needed
             if file proxies.db | grep -q "gzip"; then
               echo "Decompressing database..."
               mv proxies.db proxies.db.gz
@@ -71,7 +69,6 @@ jobs:
             echo "Existing database found:"
             echo "Size: $(du -h proxies.db | cut -f1)"
             
-            # Quick stats
             sqlite3 proxies.db "SELECT 
               COUNT(*) as total,
               COUNT(CASE WHEN is_working=1 THEN 1 END) as working,
@@ -100,7 +97,6 @@ jobs:
           echo "=== Results Summary ==="
           
           if [ -f "proxies.db" ]; then
-            # Decompress if compressed
             if file proxies.db | grep -q "gzip"; then
               cp proxies.db proxies.db.gz
               gunzip proxies.db.gz
@@ -108,7 +104,6 @@ jobs:
             
             echo "Database size: $(du -h proxies.db | cut -f1)"
             
-            # Get detailed stats
             sqlite3 proxies.db "
               SELECT 
                 'Total proxies: ' || COUNT(*),
@@ -118,7 +113,6 @@ jobs:
               FROM proxies;
             " 2>/dev/null || echo "Database query failed"
             
-            # Recompress for storage
             if [ ! -f "proxies.db.gz" ]; then
               gzip -c proxies.db > proxies.db.gz
               rm proxies.db
@@ -137,22 +131,19 @@ jobs:
       
       - name: 🧹 Cleanup & Optimize
         run: |
-          # Remove any temporary files
           find . -name "*.tmp" -delete 2>/dev/null || true
           find . -name "*.log" -delete 2>/dev/null || true
           
-          # Optimize docs for GitHub Pages
           if [ -d "docs" ]; then
-            # Ensure files aren't too large for GitHub Pages
             if [ -f "docs/proxies.json" ]; then
               SIZE=$(stat -f%z "docs/proxies.json" 2>/dev/null || stat -c%s "docs/proxies.json" 2>/dev/null || echo 0)
-              if [ "$SIZE" -gt 25000000 ]; then  # 25MB limit
+              if [ "$SIZE" -gt 25000000 ]; then
                 echo "JSON file too large, truncating..."
                 python3 -c "
 import json
 with open('docs/proxies.json', 'r') as f:
     data = json.load(f)
-data['proxies'] = data['proxies'][:5000]  # Keep top 5000
+data['proxies'] = data['proxies'][:5000]
 data['metadata']['note'] = 'Truncated for GitHub Pages size limits'
 with open('docs/proxies.json', 'w') as f:
     json.dump(data, f, indent=2)
@@ -168,16 +159,13 @@ with open('docs/proxies.json', 'w') as f:
       
       - name: 💾 Commit Results
         run: |
-          # Add generated files
           git add docs/ proxies.db 2>/dev/null || true
           
-          # Check if there are changes
           if git diff --staged --quiet; then
             echo "ℹ️ No changes to commit"
             exit 0
           fi
           
-          # Get stats for commit message
           STATS=""
           if [ -f "docs/stats.json" ]; then
             WORKING=$(grep -o '"working_proxies":[^,]*' docs/stats.json | cut -d':' -f2 | tr -d ' ' 2>/dev/null || echo "0")
@@ -186,7 +174,6 @@ with open('docs/proxies.json', 'w') as f:
             STATS="Working: $WORKING | Total: $TOTAL | Success: $SUCCESS%"
           fi
           
-          # Create commit
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
           git commit -m "🔍 Proxy discovery update - $TIMESTAMP
 

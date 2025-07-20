@@ -80,97 +80,62 @@ jobs:
           echo "MAX_PAGES: $MAX_PAGES"
           echo "MAX_CONCURRENT: $MAX_CONCURRENT"
           echo "GitHub Token configured: $(echo $GITHUB_TOKEN | head -c 10)"
-          
           python proxy_discovery_optimized.py
-          
-          echo "Script execution completed"
-          echo "Exit code: $?"
+          echo "Script execution completed with exit code: $?"
       
       - name: Check Script Results
         run: |
           echo "Checking script results:"
-          
           echo "Files in repository:"
           ls -la
           
-          echo "Database status:"
           if [ -f "proxies.db" ]; then
             echo "Database exists: $(du -h proxies.db | cut -f1)"
-            if file proxies.db | grep -q "gzip"; then
-              echo "Database is compressed"
-            else
-              echo "Database is uncompressed"
-              sqlite3 proxies.db "SELECT COUNT(*) as total_proxies FROM proxies;" 2>/dev/null || echo "Database query failed"
-            fi
           else
             echo "No database file found"
           fi
           
-          echo "Docs directory status:"
           if [ -d "docs" ]; then
             echo "Docs directory exists"
             ls -la docs/
           else
-            echo "Docs directory missing - creating it"
+            echo "Docs directory missing"
             mkdir -p docs
-            echo "Created empty docs directory"
           fi
       
       - name: Create Fallback Pages
         run: |
-          if [ ! -d "docs" ]; then
-            mkdir -p docs
-          fi
+          mkdir -p docs
           
           if [ ! -f "docs/index.html" ]; then
             echo "Creating fallback dashboard"
-            cat > docs/index.html << 'EOF'
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Proxy Intelligence Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .header { background: #f0f0f0; padding: 20px; border-radius: 8px; text-align: center; }
-        .status { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>Proxy Intelligence System</h1>
-        <p>Automated proxy discovery and validation</p>
-    </div>
-    <div class="status">
-        <h2>System Status</h2>
-        <p>The proxy discovery system is initializing. Results will appear after the first successful run.</p>
-        <p>Check back in a few minutes for updated proxy lists.</p>
-    </div>
-</body>
-</html>
-EOF
+            echo '<!DOCTYPE html>' > docs/index.html
+            echo '<html><head><title>Proxy Intelligence Dashboard</title>' >> docs/index.html
+            echo '<style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:20px}' >> docs/index.html
+            echo '.header{background:#f0f0f0;padding:20px;border-radius:8px;text-align:center}' >> docs/index.html
+            echo '.status{background:#fff3cd;padding:15px;border-radius:5px;margin:20px 0}</style>' >> docs/index.html
+            echo '</head><body><div class="header"><h1>Proxy Intelligence System</h1>' >> docs/index.html
+            echo '<p>Automated proxy discovery and validation</p></div>' >> docs/index.html
+            echo '<div class="status"><h2>System Status</h2>' >> docs/index.html
+            echo '<p>The proxy discovery system is initializing. Results will appear after the first successful run.</p>' >> docs/index.html
+            echo '<p>Check back in a few minutes for updated proxy lists.</p></div></body></html>' >> docs/index.html
           fi
           
           if [ ! -f "docs/proxies.txt" ]; then
-            echo "Creating placeholder proxy list"
-            cat > docs/proxies.txt << 'EOF'
-# Proxy List - System Initializing
-# No proxies discovered yet
-# Check back after the first run completes
-EOF
+            echo "# Proxy List - System Initializing" > docs/proxies.txt
+            echo "# No proxies discovered yet" >> docs/proxies.txt
+            echo "# Check back after the first run completes" >> docs/proxies.txt
           fi
           
           if [ ! -f "docs/stats.json" ]; then
-            echo "Creating placeholder stats"
-            cat > docs/stats.json << 'EOF'
-{
-  "total_proxies": 0,
-  "working_proxies": 0,
-  "success_rate": 0,
-  "countries": 0,
-  "last_updated": "System initializing",
-  "status": "first_run"
-}
-EOF
+            echo '{' > docs/stats.json
+            echo '  "total_proxies": 0,' >> docs/stats.json
+            echo '  "working_proxies": 0,' >> docs/stats.json
+            echo '  "success_rate": 0,' >> docs/stats.json
+            echo '  "countries": 0,' >> docs/stats.json
+            echo '  "last_updated": "System initializing",' >> docs/stats.json
+            echo '  "status": "first_run"' >> docs/stats.json
+            echo '}' >> docs/stats.json
           fi
       
       - name: Verify Results
@@ -190,13 +155,11 @@ EOF
           
           echo "Docs directory contents:"
           ls -la docs/
-          
           echo "Repository size: $(du -sh . | cut -f1)"
       
       - name: Commit Results
         run: |
           git add docs/ proxies.db 2>/dev/null || true
-          
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
@@ -230,7 +193,6 @@ EOF
         run: |
           echo "## Proxy Intelligence Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
           if [ -f docs/stats.json ]; then
             WORKING=$(grep -o '"working_proxies":[^,]*' docs/stats.json | cut -d':' -f2 | tr -d ' ')
             TOTAL=$(grep -o '"total_proxies":[^,]*' docs/stats.json | cut -d':' -f2 | tr -d ' ')
@@ -239,9 +201,7 @@ EOF
           else
             echo "- Status: No stats file found" >> $GITHUB_STEP_SUMMARY
           fi
-          
           echo "- Dashboard: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
-          
           if [ -f "docs/proxies.txt" ]; then
             echo "- Proxy List: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/proxies.txt" >> $GITHUB_STEP_SUMMARY
           fi

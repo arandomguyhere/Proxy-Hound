@@ -1,37 +1,37 @@
 # Proxy Hunt Report
 
-Generated: 2025-07-21T11:38:33.368594+00:00
+Generated: 2025-07-21T13:22:53.888784+00:00
 
 ## 📊 Hunt Statistics
 
 | Metric | Value |
 |--------|-------|
 | **Total Sources** | 1 |
-| **Total Discovered** | 38,134 |
-| **Total Tested** | 38,134 |
-| **Working Proxies** | 230 |
-| **Failed Proxies** | 37,904 |
+| **Total Discovered** | 38,093 |
+| **Total Tested** | 38,093 |
+| **Working Proxies** | 227 |
+| **Failed Proxies** | 37,866 |
 | **Success Rate** | 0.60% |
-| **Average Response Time** | 6.57s |
-| **Hunt Duration** | 911.02s |
+| **Average Response Time** | 6.60s |
+| **Hunt Duration** | 912.85s |
 
 ## 🌍 Geographic Distribution
 
-- **Unknown**: 230 proxies
+- **Unknown**: 227 proxies
 
 
 ## 🔒 Security Analysis
 
-- **SSL Support**: 35 proxies
+- **SSL Support**: 36 proxies
 - **Authentication Required**: 0 proxies
-- **Average Response Time**: 6.57s
+- **Average Response Time**: 6.60s
 
 ## 📈 Performance Metrics
 
 ### Response Time Distribution
-- **Fastest**: 0.51s
-- **Slowest**: 10.85s
-- **Median**: 6.53s
+- **Fastest**: 2.48s
+- **Slowest**: 10.52s
+- **Median**: 6.63s
 
 
 ## 🚀 Usage

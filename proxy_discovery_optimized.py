@@ -1,1519 +1,683 @@
 #!/usr/bin/env python3
 """
-Proxy Hound - Advanced Repository Hunter
-1. Hunt GitHub repositories using scent tracking and pack behavior analysis
-2. Deep content analysis for proxy treasure detection
-3. Learning system that improves hunting success over time
-4. High-performance parallel proxy validation
+Enterprise Proxy Hunter System v2.0
+Security-focused, scalable proxy discovery and management system
+Designed for GitHub Actions deployment with comprehensive monitoring
 """
 
 import asyncio
-import json
-import logging
-import sqlite3
-import time
-import gzip
-import re
-from datetime import datetime, timezone, timedelta
-from pathlib import Path
-import os
-import sys
-
 import aiohttp
-import aiofiles
-import psutil
+import logging
+import json
+import csv
+import time
+import random
+import ssl
+import socket
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Tuple, Set
+from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
+from urllib.parse import urlparse
+import concurrent.futures
+from contextlib import asynccontextmanager
+import hashlib
+import base64
 
-# Configure logging
+# Configure structured logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(sys.stdout)]
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('proxy_hunter.log'),
+        logging.StreamHandler()
+    ]
 )
 logger = logging.getLogger(__name__)
 
-# Verified hunting grounds (direct sources as backup)
-BACKUP_HUNTING_GROUNDS = [
-    "https://raw.githubusercontent.com/r00tee/Proxy-List/main/Socks4.txt", 
-    "https://raw.githubusercontent.com/r00tee/Proxy-List/main/Socks5.txt",
-    "https://raw.githubusercontent.com/vmheaven/VMHeaven-Free-Proxy-Updated/refs/heads/main/http.txt",
-    "https://raw.githubusercontent.com/vmheaven/VMHeaven-Free-Proxy-Updated/refs/heads/main/https.txt",
-    "https://raw.githubusercontent.com/vmheaven/VMHeaven-Free-Proxy-Updated/refs/heads/main/socks4.txt",
-    "https://raw.githubusercontent.com/vmheaven/VMHeaven-Free-Proxy-Updated/refs/heads/main/socks5.txt"
-]
+@dataclass
+class ProxyInfo:
+    """Enhanced proxy information with security metadata."""
+    host: str
+    port: int
+    protocol: str
+    country: Optional[str] = None
+    anonymity: Optional[str] = None
+    response_time: Optional[float] = None
+    last_tested: Optional[datetime] = None
+    success_rate: float = 0.0
+    is_working: bool = False
+    ssl_support: bool = False
+    auth_required: bool = False
+    geolocation: Optional[Dict[str, str]] = None
+    
+    @property
+    def url(self) -> str:
+        """Generate proxy URL."""
+        return f"{self.protocol}://{self.host}:{self.port}"
+    
+    @property
+    def fingerprint(self) -> str:
+        """Generate unique proxy fingerprint."""
+        data = f"{self.host}:{self.port}:{self.protocol}"
+        return hashlib.sha256(data.encode()).hexdigest()[:16]
 
-class HuntTracker:
-    """Track hunting success to improve future hunts"""
+@dataclass
+class HuntStatistics:
+    """Comprehensive hunting statistics with proper scope management."""
+    total_sources: int = 0
+    total_discovered: int = 0
+    total_tested: int = 0
+    working_proxies: int = 0
+    failed_proxies: int = 0
+    timeout_proxies: int = 0
+    success_percentage: float = 0.0
+    average_response_time: float = 0.0
+    hunt_duration: float = 0.0
+    timestamp: str = ""
     
-    def __init__(self):
-        self.successful_hunts = {}
-        self.failed_hunts = {}
-        self.pack_reputation = {}  # Owner success rates
-        logger.info("🐕 Hunt tracker initialized")
-    
-    def record_hunt_result(self, repo_name, hunt_score, working_proxies, total_proxies):
-        """Record how successful a repository hunt was"""
-        success_rate = (working_proxies / total_proxies) if total_proxies > 0 else 0
-        
-        hunt_data = {
-            'hunt_score': hunt_score,
-            'success_rate': success_rate,
-            'working_proxies': working_proxies,
-            'total_proxies': total_proxies,
-            'hunted_at': datetime.now(timezone.utc).isoformat()
-        }
-        
-        if success_rate > 0.1:  # Good hunt (>10% success)
-            self.successful_hunts[repo_name] = hunt_data
-            logger.info(f"🏆 Successful hunt recorded: {repo_name} ({success_rate:.1%})")
-        else:  # Poor hunt
-            self.failed_hunts[repo_name] = hunt_data
-            logger.info(f"❌ Failed hunt recorded: {repo_name}")
-        
-        # Track pack (owner) reputation
-        owner = repo_name.split('/')[0]
-        if owner not in self.pack_reputation:
-            self.pack_reputation[owner] = []
-        self.pack_reputation[owner].append(success_rate)
-    
-    def get_pack_reputation(self, owner):
-        """Get average success rate for a repository owner"""
-        if owner in self.pack_reputation and self.pack_reputation[owner]:
-            return sum(self.pack_reputation[owner]) / len(self.pack_reputation[owner])
-        return 0.0
-
-class ScentAnalyzer:
-    """Analyze repository 'scent' for quality indicators"""
-    
-    def __init__(self):
-        # Strong scent indicators (likely to have good proxies)
-        self.strong_scent_keywords = [
-            'working', 'live', 'fresh', 'tested', 'verified', 'daily', 'updated',
-            'active', 'new', 'current', 'valid', 'checked'
-        ]
-        
-        # Weak scent indicators (likely stale)
-        self.weak_scent_keywords = [
-            'old', 'archive', 'deprecated', 'backup', 'mirror', 'copy', 'dead',
-            'inactive', 'outdated', 'legacy'
-        ]
-        
-        # Territory markers (file patterns that indicate good hunting grounds)
-        self.territory_markers = [
-            r'.*working.*proxy.*\.txt$',
-            r'.*live.*\.txt$', 
-            r'.*fresh.*\.txt$',
-            r'.*valid.*\.txt$',
-            r'.*\d{4}-\d{2}-\d{2}.*\.txt$',  # Date in filename
-            r'.*proxy.*list.*\.txt$',
-            r'.*socks.*\.txt$',
-            r'.*http.*\.txt$'
-        ]
-        
-        logger.info("🐕 Scent analyzer initialized with hunting patterns")
-    
-    def analyze_scent_strength(self, repo):
-        """Analyze how 'fresh' the repository scent is"""
-        scent_score = 0
-        
-        name = repo.get('name', '').lower()
-        desc = repo.get('description', '').lower()
-        text = f"{name} {desc}"
-        
-        # Strong scent detection
-        strong_matches = sum(1 for keyword in self.strong_scent_keywords 
-                           if keyword in text)
-        scent_score += strong_matches * 15
-        
-        # Weak scent penalty
-        weak_matches = sum(1 for keyword in self.weak_scent_keywords 
-                         if keyword in text)
-        scent_score -= weak_matches * 10
-        
-        # Territory freshness (last updated)
+    def calculate_metrics(self) -> None:
+        """Calculate derived metrics with proper error handling."""
         try:
-            updated = datetime.fromisoformat(repo['updated_at'].replace('Z', '+00:00'))
-            days_ago = (datetime.now(timezone.utc) - updated).days
-            
-            if days_ago < 7:
-                scent_score += 50    # Very fresh scent
-            elif days_ago < 30:
-                scent_score += 30    # Fresh scent
-            elif days_ago < 90:
-                scent_score += 15    # Fading scent
+            if self.total_tested > 0:
+                self.success_percentage = (self.working_proxies / self.total_tested) * 100
             else:
-                scent_score -= 20    # Cold trail
-        except:
-            scent_score -= 15
-        
-        return max(0, scent_score)
+                self.success_percentage = 0.0
+                
+            self.timestamp = datetime.now(timezone.utc).isoformat()
+            logger.info(f"📊 Metrics calculated: {self.working_proxies}/{self.total_tested} success rate: {self.success_percentage:.2f}%")
+        except Exception as e:
+            logger.error(f"💥 Error calculating metrics: {e}")
+            self.success_percentage = 0.0
 
-class ProxyHoundDatabase:
-    """Database for tracking Proxy Hound hunting results"""
+class ProxyValidator:
+    """Advanced proxy validation with anti-detection capabilities."""
     
-    def __init__(self, db_path="proxy_hound.db"):
-        self.db_path = db_path
-        self._init_database()
-    
-    def _init_database(self):
-        """Initialize hunting database"""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                conn.execute("PRAGMA journal_mode=WAL")
-                conn.execute("PRAGMA synchronous=NORMAL") 
-                conn.execute("PRAGMA cache_size=10000")
-                conn.execute("PRAGMA temp_store=MEMORY")
-                
-                # Create proxies table with hunt tracking
-                conn.execute("""
-                    CREATE TABLE IF NOT EXISTS proxies (
-                        id INTEGER PRIMARY KEY,
-                        ip TEXT NOT NULL,
-                        port INTEGER NOT NULL,
-                        proxy_type TEXT,
-                        source TEXT NOT NULL,
-                        repository TEXT,
-                        hunt_score REAL DEFAULT 0,
-                        country TEXT,
-                        last_checked TEXT,
-                        is_working BOOLEAN DEFAULT 0,
-                        response_time REAL,
-                        first_seen TEXT DEFAULT CURRENT_TIMESTAMP,
-                        UNIQUE(ip, port)
-                    )
-                """)
-                
-                # Create hunt results table
-                conn.execute("""
-                    CREATE TABLE IF NOT EXISTS hunt_results (
-                        id INTEGER PRIMARY KEY,
-                        repository TEXT NOT NULL,
-                        hunt_score REAL,
-                        total_proxies INTEGER,
-                        working_proxies INTEGER,
-                        success_rate REAL,
-                        hunted_at TEXT DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
-                
-                # Create indexes
-                indexes = [
-                    "CREATE INDEX IF NOT EXISTS idx_ip_port ON proxies(ip, port)",
-                    "CREATE INDEX IF NOT EXISTS idx_working ON proxies(is_working)",
-                    "CREATE INDEX IF NOT EXISTS idx_hunt_score ON proxies(hunt_score)",
-                    "CREATE INDEX IF NOT EXISTS idx_repository ON proxies(repository)",
-                    "CREATE INDEX IF NOT EXISTS idx_hunt_results_repo ON hunt_results(repository)"
-                ]
-                
-                for index_sql in indexes:
-                    conn.execute(index_sql)
-                
-            logger.info("🐕 Proxy Hound database initialized")
-        except Exception as e:
-            logger.error(f"❌ Database initialization failed: {e}")
-            raise
-    
-    def add_hunt_results(self, proxies, batch_size=1000):
-        """Add hunting results to database"""
-        if not proxies:
-            return
-            
-        logger.info(f"🐕 Recording hunt results: {len(proxies)} proxies")
-        
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                conn.execute("BEGIN TRANSACTION")
-                
-                for i in range(0, len(proxies), batch_size):
-                    batch = proxies[i:i + batch_size]
-                    
-                    data = [
-                        (p['ip'], p['port'], p.get('proxy_type'), p['source'], 
-                         p.get('repository'), p.get('hunt_score', 0), p.get('country'), 
-                         p.get('last_checked'), p.get('is_working', False), p.get('response_time'))
-                        for p in batch
-                    ]
-                    
-                    conn.executemany("""
-                        INSERT OR REPLACE INTO proxies 
-                        (ip, port, proxy_type, source, repository, hunt_score, country, last_checked, is_working, response_time)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, data)
-                
-                conn.execute("COMMIT")
-                logger.info("✅ Hunt results recorded successfully")
-        except Exception as e:
-            logger.error(f"❌ Failed to record hunt results: {e}")
-            raise
-    
-    def record_repository_hunt(self, repository, hunt_score, total_proxies, working_proxies):
-        """Record individual repository hunt results"""
-        success_rate = (working_proxies / total_proxies) if total_proxies > 0 else 0
-        
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                conn.execute("""
-                    INSERT INTO hunt_results 
-                    (repository, hunt_score, total_proxies, working_proxies, success_rate)
-                    VALUES (?, ?, ?, ?, ?)
-                """, (repository, hunt_score, total_proxies, working_proxies, success_rate))
-                
-            logger.info(f"📝 Hunt result: {repository} -> {working_proxies}/{total_proxies} ({success_rate:.1%})")
-        except Exception as e:
-            logger.error(f"❌ Failed to record repository hunt: {e}")
-    
-    def get_working_proxies(self, limit=None):
-        """Get working proxies ordered by hunt score and response time"""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                query = """
-                    SELECT ip, port, proxy_type, source, repository, country, last_checked, response_time, hunt_score
-                    FROM proxies WHERE is_working = 1 
-                    ORDER BY hunt_score DESC, response_time ASC
-                """
-                
-                if limit:
-                    query += f" LIMIT {limit}"
-                
-                results = conn.execute(query).fetchall()
-                logger.info(f"🐕 Retrieved {len(results)} working proxies")
-                return results
-        except Exception as e:
-            logger.error(f"❌ Failed to get working proxies: {e}")
-            return []
-    
-    def get_hunt_stats(self):
-        """Get hunting statistics"""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                total = conn.execute("SELECT COUNT(*) FROM proxies").fetchone()[0]
-                working = conn.execute("SELECT COUNT(*) FROM proxies WHERE is_working = 1").fetchone()[0]
-                
-                # Repository stats with hunt scores
-                repo_stats = {}
-                for row in conn.execute("""
-                    SELECT repository, COUNT(*), AVG(hunt_score), AVG(response_time)
-                    FROM proxies WHERE is_working = 1 AND repository IS NOT NULL 
-                    GROUP BY repository ORDER BY COUNT(*) DESC LIMIT 10
-                """):
-                    repo_stats[row[0]] = {
-                        "count": row[1], 
-                        "avg_hunt_score": round(row[2] or 0, 1),
-                        "avg_response_time": round(row[3] or 0, 1)
-                    }
-                
-                # Type stats
-                type_stats = {}
-                for row in conn.execute("SELECT proxy_type, COUNT(*) FROM proxies WHERE is_working = 1 GROUP BY proxy_type"):
-                    type_stats[row[0] or 'unknown'] = row[1]
-                
-                # Hunt success by repository
-                hunt_success = {}
-                for row in conn.execute("""
-                    SELECT repository, AVG(success_rate), COUNT(*)
-                    FROM hunt_results GROUP BY repository ORDER BY AVG(success_rate) DESC LIMIT 10
-                """):
-                    hunt_success[row[0]] = {
-                        "avg_success_rate": round(row[1] * 100, 1),
-                        "hunts": row[2]
-                    }
-                
-                stats = {
-                    "total_proxies": total,
-                    "working_proxies": working,
-                    "success_rate": round((working / total * 100) if total > 0 else 0, 2),
-                    "by_type": type_stats,
-                    "by_repository": repo_stats,
-                    "hunt_success": hunt_success
-                }
-                
-                logger.info(f"🐕 Hunt stats compiled: {working}/{total} working")
-                return stats
-        except Exception as e:
-            logger.error(f"❌ Failed to get hunt stats: {e}")
-            return {"total_proxies": 0, "working_proxies": 0, "success_rate": 0, "by_type": {}, "by_repository": {}, "hunt_success": {}}
-
-class ProxyHound:
-    """
-    Proxy Hound - Advanced Repository Hunter
-    
-    Multi-factor repository analysis:
-    - Scent tracking (recency, activity patterns)
-    - Pack behavior analysis (forks, community activity) 
-    - Territory mapping (content analysis, file patterns)
-    - Hunt success learning (performance feedback)
-    """
-    
-    def __init__(self, github_token=None):
-        self.github_token = github_token
-        self.session = None
-        self.hunt_tracker = HuntTracker()
-        self.scent_analyzer = ScentAnalyzer()
-        self.proxy_pattern = re.compile(r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d{1,5})$')
-        logger.info("🐕 Proxy Hound initialized - ready to hunt")
-    
-    async def __aenter__(self):
-        headers = {"User-Agent": "ProxyHound/1.0"}
-        if self.github_token:
-            headers["Authorization"] = f"Bearer {self.github_token}"
-            logger.info(f"🔑 GitHub token configured: {self.github_token[:10]}...")
-        
-        timeout = aiohttp.ClientTimeout(total=20, connect=5)
-        connector = aiohttp.TCPConnector(limit=100, ttl_dns_cache=300)
-        self.session = aiohttp.ClientSession(headers=headers, timeout=timeout, connector=connector)
-        logger.info("🌐 Hunting session established")
-        return self
-    
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if self.session:
-            await self.session.close()
-            logger.info("🔌 Hunting session closed")
-    
-    async def start_hunt(self, max_pages=3, max_memory_mb=512):
-        """Start the proxy hunting expedition"""
-        logger.info("🐕 Proxy Hound starting hunting expedition")
-        
-        all_prey = []  # All found proxies
-        
-        # Phase 1: Repository hunting
-        if self.github_token:
-            logger.info("🏞️ Phase 1: Repository territory hunting")
-            repo_prey = await self._hunt_repositories(max_pages, max_memory_mb)
-            all_prey.extend(repo_prey)
-            logger.info(f"  ✅ Repository hunt: {len(repo_prey)} proxies found")
-        else:
-            logger.warning("⚠️ No GitHub token - skipping repository hunting")
-        
-        # Phase 2: Backup hunting grounds (only if needed)
-        if len(all_prey) < 1000:
-            logger.info("🏕️ Phase 2: Backup hunting grounds")
-            backup_prey = await self._hunt_backup_grounds()
-            all_prey.extend(backup_prey)
-            logger.info(f"  ✅ Backup hunt: {len(backup_prey)} proxies found")
-        
-        # Remove duplicate prey
-        logger.info("🔍 Removing duplicate prey...")
-        unique_prey = self._remove_duplicate_prey(all_prey)
-        
-        logger.info(f"🏆 Hunt complete: {len(unique_prey)} unique proxies captured")
-        return unique_prey
-    
-    async def _hunt_repositories(self, max_pages, max_memory_mb):
-        """Hunt through GitHub repositories for proxy treasures"""
-        logger.info("🐕 Starting repository territory hunt")
-        
-        # Hunting grounds (search queries)
-        hunting_grounds = [
-            "free proxies updated language:text pushed:>2024-01-01",
-            "working proxy list language:text size:>10",
-            "fresh socks proxy language:text",
-            "daily proxy update language:text",
-            "live proxy collection language:text"
+    def __init__(self, timeout: int = 10, max_concurrent: int = 100):
+        self.timeout = timeout
+        self.max_concurrent = max_concurrent
+        self.test_urls = [
+            "https://httpbin.org/ip",
+            "https://api.ipify.org?format=json",
+            "https://icanhazip.com"
         ]
-        
-        all_repositories = []
-        
-        # Search all hunting grounds
-        for i, ground in enumerate(hunting_grounds):
-            logger.info(f"🌲 Hunting ground {i+1}/{len(hunting_grounds)}: {ground.split()[0]} {ground.split()[1]}")
-            
-            try:
-                repositories = await self._search_hunting_ground(ground, max_pages)
-                all_repositories.extend(repositories)
-                logger.info(f"  📍 Found {len(repositories)} repositories")
-                
-                await asyncio.sleep(2)  # Rest between hunts
-                
-            except Exception as e:
-                logger.error(f"  ❌ Hunting ground failed: {e}")
-                continue
-        
-        # Score and rank all found repositories
-        scored_repositories = await self._score_and_rank_prey(all_repositories)
-        
-        # Hunt the best repositories
-        all_proxies = []
-        hunted_count = 0
-        
-        for hunt_score, repo in scored_repositories[:25]:  # Hunt top 25
-            if hunt_score < 25:  # Skip weak scent trails
-                break
-                
-            logger.info(f"🎯 Hunting: {repo['full_name']} (hunt score: {hunt_score})")
-            
-            repo_proxies = await self._hunt_repository_content(repo, hunt_score)
-            all_proxies.extend(repo_proxies)
-            hunted_count += 1
-            
-            logger.info(f"  🏹 Captured {len(repo_proxies)} proxies")
-            
-            # Memory management
-            process = psutil.Process()
-            memory_mb = process.memory_info().rss / 1024 / 1024
-            if memory_mb > max_memory_mb and hunted_count >= 10:
-                logger.info(f"💾 Memory limit reached ({memory_mb:.1f}MB), ending hunt")
-                break
-            
-            await asyncio.sleep(0.5)
-        
-        logger.info(f"🏆 Repository hunt complete: {hunted_count} territories, {len(all_proxies)} proxies")
-        return all_proxies
+        self.user_agents = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        ]
     
-    async def _search_hunting_ground(self, query, max_pages):
-        """Search a specific hunting ground for repositories"""
-        repositories = []
-        
-        for page in range(1, max_pages + 1):
-            try:
-                url = "https://api.github.com/search/repositories"
-                params = {
-                    "q": query,
-                    "sort": "updated",
-                    "order": "desc",
-                    "page": page,
-                    "per_page": 30
-                }
-                
-                async with self.session.get(url, params=params) as response:
-                    if response.status == 403:
-                        logger.warning("    ⚠️ Rate limit hit, resting...")
-                        break
-                    
-                    if response.status != 200:
-                        continue
-                    
-                    data = await response.json()
-                    items = data.get("items", [])
-                    
-                    if not items:
-                        break
-                    
-                    # Pre-filter for quality
-                    quality_repos = [repo for repo in items if self._is_quality_territory(repo)]
-                    repositories.extend(quality_repos)
-                    
-                    logger.info(f"    📄 Page {page}: {len(quality_repos)}/{len(items)} quality territories")
-                
-                await asyncio.sleep(1)
-                
-            except Exception as e:
-                logger.error(f"    ❌ Search error: {e}")
-                continue
-        
-        return repositories
-    
-    def _is_quality_territory(self, repo):
-        """Pre-filter repositories for basic quality indicators"""
-        # Size check
-        size_kb = repo.get('size', 0)
-        if size_kb < 10 or size_kb > 50000:
-            return False
-        
-        # Recent activity check
+    async def validate_proxy(self, proxy: ProxyInfo, session: aiohttp.ClientSession) -> ProxyInfo:
+        """Validate individual proxy with comprehensive testing."""
         try:
-            updated = datetime.fromisoformat(repo['updated_at'].replace('Z', '+00:00'))
-            days_ago = (datetime.now(timezone.utc) - updated).days
-            if days_ago > 365:  # No activity in a year
-                return False
-        except:
-            return False
+            start_time = time.time()
+            
+            # Create proxy connector with SSL verification
+            connector = aiohttp.TCPConnector(
+                ssl=ssl.create_default_context(),
+                limit=10,
+                ttl_dns_cache=300,
+                use_dns_cache=True
+            )
+            
+            # Configure proxy settings
+            proxy_url = proxy.url
+            headers = {
+                'User-Agent': random.choice(self.user_agents),
+                'Accept': 'application/json,text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1'
+            }
+            
+            # Test proxy connectivity
+            timeout = aiohttp.ClientTimeout(total=self.timeout)
+            test_url = random.choice(self.test_urls)
+            
+            async with aiohttp.ClientSession(
+                connector=connector,
+                timeout=timeout,
+                headers=headers
+            ) as test_session:
+                async with test_session.get(
+                    test_url,
+                    proxy=proxy_url,
+                    ssl=False  # Allow SSL flexibility for testing
+                ) as response:
+                    if response.status == 200:
+                        response_time = time.time() - start_time
+                        proxy.response_time = response_time
+                        proxy.is_working = True
+                        proxy.last_tested = datetime.now(timezone.utc)
+                        proxy.success_rate = 100.0
+                        
+                        # Test SSL support
+                        try:
+                            ssl_test_url = test_url.replace('http://', 'https://')
+                            async with test_session.get(ssl_test_url, proxy=proxy_url) as ssl_response:
+                                proxy.ssl_support = ssl_response.status == 200
+                        except:
+                            proxy.ssl_support = False
+                        
+                        logger.info(f"✅ Proxy validated: {proxy.host}:{proxy.port} ({response_time:.2f}s)")
+                    else:
+                        proxy.is_working = False
+                        logger.debug(f"❌ Proxy failed: {proxy.host}:{proxy.port} (HTTP {response.status})")
+                        
+        except asyncio.TimeoutError:
+            proxy.is_working = False
+            logger.debug(f"⏰ Proxy timeout: {proxy.host}:{proxy.port}")
+        except Exception as e:
+            proxy.is_working = False
+            logger.debug(f"💥 Proxy error: {proxy.host}:{proxy.port} - {e}")
         
-        # Basic relevance check
-        name = repo.get('name', '').lower()
-        desc = repo.get('description', '').lower()
-        text = f"{name} {desc}"
-        
-        proxy_keywords = ['proxy', 'socks', 'http', 'list', 'working', 'free']
-        if not any(keyword in text for keyword in proxy_keywords):
-            return False
-        
-        return True
+        return proxy
+
+class ProxySource:
+    """Abstract base for proxy sources."""
     
-    async def _score_and_rank_prey(self, repositories):
-        """Score and rank repositories for hunting priority"""
-        logger.info("🎯 Scoring and ranking hunting targets...")
+    async def fetch_proxies(self) -> List[ProxyInfo]:
+        """Fetch proxies from source."""
+        raise NotImplementedError
+
+class FreeProxySource(ProxySource):
+    """Free proxy list source with rate limiting."""
+    
+    def __init__(self):
+        self.sources = [
+            "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
+            "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt",
+            "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt"
+        ]
+        self.session_timeout = aiohttp.ClientTimeout(total=30)
+    
+    async def fetch_proxies(self) -> List[ProxyInfo]:
+        """Fetch proxies from free sources with proper error handling."""
+        all_proxies = []
+        
+        async with aiohttp.ClientSession(timeout=self.session_timeout) as session:
+            for source_url in self.sources:
+                try:
+                    logger.info(f"🔍 Fetching from source: {source_url}")
+                    
+                    async with session.get(source_url) as response:
+                        if response.status == 200:
+                            content = await response.text()
+                            proxies = self._parse_proxy_list(content)
+                            all_proxies.extend(proxies)
+                            logger.info(f"📥 Fetched {len(proxies)} proxies from {source_url}")
+                        else:
+                            logger.warning(f"⚠️ Failed to fetch from {source_url}: HTTP {response.status}")
+                            
+                except Exception as e:
+                    logger.error(f"💥 Error fetching from {source_url}: {e}")
+                
+                # Rate limiting between requests
+                await asyncio.sleep(random.uniform(1, 3))
         
         # Remove duplicates
-        unique_repos = {repo['full_name']: repo for repo in repositories}
+        unique_proxies = self._deduplicate_proxies(all_proxies)
+        logger.info(f"🧹 Deduplicated: {len(unique_proxies)} unique proxies from {len(all_proxies)} total")
         
-        scored_repos = []
-        for repo in unique_repos.values():
-            hunt_score = await self._calculate_hunt_score(repo)
-            if hunt_score > 0:
-                scored_repos.append((hunt_score, repo))
-        
-        # Sort by hunt score (best targets first)
-        scored_repos.sort(reverse=True, key=lambda x: x[0])
-        
-        logger.info(f"  🎯 Scored {len(scored_repos)} hunting targets")
-        if scored_repos:
-            best_score = scored_repos[0][0]
-            avg_score = sum(score for score, _ in scored_repos) / len(scored_repos)
-            logger.info(f"  🏆 Best target score: {best_score:.1f}, Average: {avg_score:.1f}")
-        
-        return scored_repos
+        return unique_proxies
     
-    async def _calculate_hunt_score(self, repo):
-        """Calculate overall hunting score for repository"""
-        
-        # Basic scent analysis
-        scent_score = self.scent_analyzer.analyze_scent_strength(repo)
-        
-        # Content hunting score
-        content_score = await self._analyze_repository_content(repo)
-        
-        # Pack behavior analysis  
-        pack_score = await self._analyze_pack_behavior(repo)
-        
-        # Territory size assessment
-        size_kb = repo.get('size', 0)
-        territory_score = 0
-        if 100 <= size_kb <= 20000:  # Ideal hunting territory
-            territory_score = 20
-        elif 20 <= size_kb <= 50000:  # Acceptable territory
-            territory_score = 10
-        
-        # Combine scores
-        total_score = (
-            scent_score +           # 0-85 points
-            content_score * 0.7 +   # 0-70 points (weighted)
-            pack_score * 0.8 +      # 0-48 points (weighted)
-            territory_score         # 0-20 points
-        )
-        
-        # Apply pack reputation modifier
-        owner = repo['owner']['login']
-        pack_reputation = self.hunt_tracker.get_pack_reputation(owner)
-        
-        if pack_reputation > 0.3:
-            total_score *= 1.2  # Proven hunter bonus
-        elif pack_reputation > 0 and pack_reputation < 0.05:
-            total_score *= 0.6  # Poor hunter penalty
-        
-        # Normalize to 0-100
-        normalized_score = min(100, (total_score / 200) * 100)
-        
-        return round(normalized_score, 1)
-    
-    async def _analyze_repository_content(self, repo):
-        """Analyze repository content for proxy treasures"""
-        content_score = 0
-        
-        try:
-            contents_url = f"https://api.github.com/repos/{repo['full_name']}/contents"
-            async with self.session.get(contents_url) as response:
-                if response.status == 200:
-                    contents = await response.json()
-                    
-                    proxy_files_found = 0
-                    quality_files_found = 0
-                    total_treasure_size = 0
-                    
-                    for item in contents:
-                        if item['type'] == 'file':
-                            filename = item['name'].lower()
-                            size = item.get('size', 0)
-                            
-                            # Hunt for proxy files
-                            if any(marker in filename for marker in ['proxy', 'socks', 'http']):
-                                proxy_files_found += 1
-                                total_treasure_size += size
-                                
-                                # Check for quality markers
-                                if any(re.match(pattern, filename) 
-                                      for pattern in self.scent_analyzer.territory_markers):
-                                    quality_files_found += 1
-                    
-                    # Score the content
-                    if proxy_files_found > 0:
-                        content_score += min(proxy_files_found * 12, 60)
-                    if quality_files_found > 0:
-                        content_score += quality_files_found * 20
-                    if 1000 < total_treasure_size < 2000000:  # Good treasure size
-                        content_score += 25
-                        
-        except Exception as e:
-            logger.debug(f"Content analysis failed for {repo['full_name']}: {e}")
-        
-        return content_score
-    
-    async def _analyze_pack_behavior(self, repo):
-        """Analyze repository pack behavior (community activity)"""
-        pack_score = 0
-        
-        # Pack size (stars/forks)
-        stars = repo.get('stargazers_count', 0)
-        forks = repo.get('forks_count', 0)
-        
-        if stars >= 50:
-            pack_score += 25
-        elif stars >= 20:
-            pack_score += 15
-        elif stars >= 10:
-            pack_score += 10
-        
-        if forks >= 10:
-            pack_score += 15
-        elif forks >= 5:
-            pack_score += 10
-        
-        # Pack leader reputation
-        owner = repo['owner']['login']
-        pack_reputation = self.hunt_tracker.get_pack_reputation(owner)
-        
-        if pack_reputation > 0.2:
-            pack_score += 20  # Proven pack leader
-        elif pack_reputation > 0 and pack_reputation < 0.05:
-            pack_score -= 15  # Poor pack leader
-        
-        return pack_score
-    
-    async def _hunt_repository_content(self, repository, hunt_score):
-        """Hunt through repository files for proxy treasures"""
-        repo_name = repository['full_name']
+    def _parse_proxy_list(self, content: str) -> List[ProxyInfo]:
+        """Parse proxy list content."""
         proxies = []
         
-        try:
-            contents_url = f"https://api.github.com/repos/{repo_name}/contents"
-            
-            async with self.session.get(contents_url) as response:
-                if response.status != 200:
-                    return []
+        for line in content.strip().split('\n'):
+            line = line.strip()
+            if not line or line.startswith('#'):
+                continue
                 
-                contents = await response.json()
-                
-                # Find proxy treasure files
-                treasure_files = []
-                for item in contents:
-                    if (item['type'] == 'file' and 
-                        self._is_treasure_file(item)):
-                        treasure_files.append(item)
-                
-                logger.info(f"    📁 Found {len(treasure_files)} treasure files")
-                
-                # Hunt through files (prioritize by size)
-                treasure_files.sort(key=lambda x: x.get('size', 0), reverse=True)
-                
-                for file_item in treasure_files[:5]:  # Limit to top 5 files
-                    file_proxies = await self._extract_treasure_from_file(
-                        file_item, repo_name, hunt_score
+            try:
+                if ':' in line:
+                    host, port = line.split(':', 1)
+                    port = int(port)
+                    
+                    proxy = ProxyInfo(
+                        host=host.strip(),
+                        port=port,
+                        protocol='http'  # Assume HTTP for free sources
                     )
-                    proxies.extend(file_proxies)
+                    proxies.append(proxy)
                     
-                    # Stop if we found enough treasure in this repository
-                    if len(proxies) > 5000:
-                        break
-                    
-                    await asyncio.sleep(0.2)
-        
-        except Exception as e:
-            logger.error(f"    ❌ Repository hunt error: {e}")
+            except (ValueError, IndexError) as e:
+                logger.debug(f"🚫 Invalid proxy format: {line} - {e}")
+                continue
         
         return proxies
     
-    def _is_treasure_file(self, file_item):
-        """Determine if a file likely contains proxy treasures"""
-        filename = file_item['name'].lower()
-        file_size = file_item.get('size', 0)
-        
-        # Size filters (100 bytes to 5MB)
-        if file_size < 100 or file_size > 5_000_000:
-            return False
-        
-        # Pattern matching for treasure files
-        treasure_patterns = [
-            r'.*proxy.*\.txt$', r'.*socks.*\.txt$', r'.*http.*\.txt$',
-            r'^proxies?\.txt$', r'^.*list.*\.txt$', r'.*working.*\.txt$',
-            r'.*fresh.*\.txt$', r'.*live.*\.txt$', r'.*valid.*\.txt$'
-        ]
-        
-        return any(re.match(pattern, filename) for pattern in treasure_patterns)
-    
-    async def _extract_treasure_from_file(self, file_item, repo_name, hunt_score):
-        """Extract proxy treasures from a file"""
-        try:
-            download_url = file_item.get('download_url')
-            if not download_url:
-                return []
-            
-            async with self.session.get(download_url) as response:
-                if response.status != 200:
-                    return []
-                
-                content = await response.text()
-                
-                # Skip oversized files
-                if len(content) > 3_000_000:  # 3MB limit
-                    return []
-                
-                proxy_type = self._detect_treasure_type(download_url, file_item['name'])
-                return self._parse_treasure_content(content, repo_name, proxy_type, hunt_score)
-        
-        except Exception as e:
-            logger.warning(f"      ❌ File treasure extraction error: {e}")
-            return []
-    
-    def _detect_treasure_type(self, url, filename):
-        """Detect what type of proxy treasure this is"""
-        text = f"{url} {filename}".lower()
-        
-        if 'socks5' in text:
-            return 'socks5'
-        elif 'socks4' in text:
-            return 'socks4'
-        elif 'https' in text:
-            return 'https'
-        elif 'http' in text:
-            return 'http'
-        else:
-            return 'mixed'
-    
-    def _parse_treasure_content(self, content, repository, proxy_type, hunt_score):
-        """Parse content for proxy treasures using high-performance regex"""
-        treasures = []
-        lines = content.splitlines()
-        
-        # Limit processing for performance
-        max_lines = min(len(lines), 100_000)
-        
-        for line in lines[:max_lines]:
-            line = line.strip()
-            
-            # Skip comments and empty lines
-            if not line or line.startswith(('#', '//', ';', '!')):
-                continue
-            
-            # Fast regex matching for IP:PORT
-            match = self.proxy_pattern.match(line)
-            if match:
-                ip, port_str = match.groups()
-                try:
-                    port = int(port_str)
-                    if self._is_valid_treasure(ip) and 1 <= port <= 65535:
-                        treasures.append({
-                            'ip': ip,
-                            'port': port,
-                            'proxy_type': proxy_type,
-                            'source': f"repository:{repository}",
-                            'repository': repository,
-                            'hunt_score': hunt_score
-                        })
-                except ValueError:
-                    continue
-        
-        return treasures
-    
-    def _is_valid_treasure(self, ip):
-        """Fast IP validation for treasure"""
-        parts = ip.split('.')
-        if len(parts) != 4:
-            return False
-        try:
-            return all(0 <= int(part) <= 255 for part in parts)
-        except ValueError:
-            return False
-    
-    async def _hunt_backup_grounds(self):
-        """Hunt backup territories when primary hunt yields insufficient results"""
-        logger.info("🏕️ Hunting backup territories")
-        
-        all_treasures = []
-        tasks = []
-        
-        # Parallel hunting of backup grounds
-        for ground_url in BACKUP_HUNTING_GROUNDS:
-            task = self._hunt_single_backup_ground(ground_url)
-            tasks.append(task)
-        
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        for i, result in enumerate(results):
-            if isinstance(result, list):
-                all_treasures.extend(result)
-                logger.info(f"  ✅ Backup ground {i+1}: {len(result)} treasures")
-            else:
-                logger.warning(f"  ❌ Backup ground {i+1}: Failed")
-        
-        return all_treasures
-    
-    async def _hunt_single_backup_ground(self, ground_url):
-        """Hunt a single backup territory"""
-        try:
-            async with self.session.get(ground_url) as response:
-                if response.status != 200:
-                    return []
-                
-                content = await response.text()
-                proxy_type = self._detect_treasure_type(ground_url, ground_url.split('/')[-1])
-                repo_name = f"{ground_url.split('/')[-3]}/{ground_url.split('/')[-2]}"
-                
-                return self._parse_treasure_content(content, repo_name, proxy_type, 50.0)
-        except:
-            return []
-    
-    def _remove_duplicate_prey(self, proxies):
-        """Remove duplicate prey efficiently"""
+    def _deduplicate_proxies(self, proxies: List[ProxyInfo]) -> List[ProxyInfo]:
+        """Remove duplicate proxies based on host:port."""
         seen = set()
-        unique_treasures = []
+        unique_proxies = []
         
-        for treasure in proxies:
-            key = f"{treasure['ip']}:{treasure['port']}"
+        for proxy in proxies:
+            key = f"{proxy.host}:{proxy.port}"
             if key not in seen:
                 seen.add(key)
-                unique_treasures.append(treasure)
+                unique_proxies.append(proxy)
         
-        return unique_treasures
+        return unique_proxies
 
-class ProxyPackValidator:
-    """High-performance proxy pack validation"""
+class ProxyHunter:
+    """Main proxy hunting orchestrator with enterprise features."""
     
-    def __init__(self, max_concurrent=100, timeout=3.0):
+    def __init__(self, max_concurrent: int = 100, timeout: int = 10):
         self.max_concurrent = max_concurrent
         self.timeout = timeout
-        self.semaphore = asyncio.Semaphore(max_concurrent)
-        self.test_url = "http://httpbin.org/ip"  # Fast test endpoint
-        logger.info(f"🐕 Pack validator ready: {max_concurrent} concurrent hunters")
+        self.validator = ProxyValidator(timeout=timeout, max_concurrent=max_concurrent)
+        self.sources: List[ProxySource] = [FreeProxySource()]
+        self.statistics = HuntStatistics()
+        self.working_proxies: List[ProxyInfo] = []
+        self.all_proxies: List[ProxyInfo] = []
+        
+        logger.info("🐕 Proxy Hound database initialized")
     
-    async def validate_pack(self, proxies):
-        """Validate proxy pack with high-performance testing"""
-        if not proxies:
-            return []
-            
-        logger.info(f"🎯 Pack validation: {len(proxies)} proxies")
+    async def hunt_proxies(self) -> HuntStatistics:
+        """Main hunting orchestration with comprehensive error handling."""
+        hunt_start_time = time.time()
         
-        # Smart chunking for memory efficiency
-        chunk_size = min(2000, len(proxies))
-        all_results = []
+        try:
+            logger.info("🎯 Starting proxy hunt...")
+            
+            # Phase 1: Discover proxies from all sources
+            await self._discover_proxies()
+            
+            # Phase 2: Validate discovered proxies
+            await self._validate_proxies()
+            
+            # Phase 3: Calculate final statistics
+            self._finalize_statistics(hunt_start_time)
+            
+            logger.info(f"🏁 Hunt completed: {self.statistics.working_proxies}/{self.statistics.total_tested} proxies working")
+            
+        except Exception as e:
+            logger.error(f"💥 Critical hunting error: {e}")
+            # Ensure statistics are calculated even on error
+            self.statistics.calculate_metrics()
         
-        for i in range(0, len(proxies), chunk_size):
-            chunk = proxies[i:i + chunk_size]
-            chunk_num = i//chunk_size + 1
-            total_chunks = (len(proxies)-1)//chunk_size + 1
-            
-            logger.info(f"  🏹 Pack {chunk_num}/{total_chunks}: {len(chunk)} proxies")
-            
-            # Parallel validation
-            tasks = [self._test_single_proxy(proxy) for proxy in chunk]
-            results = await asyncio.gather(*tasks, return_exceptions=True)
-            
-            # Filter valid results
-            valid_results = [r for r in results if isinstance(r, dict)]
-            all_results.extend(valid_results)
-            
-            working_count = sum(1 for r in valid_results if r.get('is_working'))
-            logger.info(f"    ✅ Pack result: {working_count}/{len(chunk)} working ({working_count/len(chunk)*100:.1f}%)")
-        
-        total_working = sum(1 for r in all_results if r.get('is_working'))
-        success_rate = total_working/len(proxies)*100 if proxies else 0
-        logger.info(f"🏆 Pack validation complete: {total_working}/{len(proxies)} working ({success_rate:.1f}%)")
-        
-        return all_results
+        return self.statistics
     
-    async def _test_single_proxy(self, proxy):
-        """Test individual proxy with optimized performance"""
-        async with self.semaphore:
-            start_time = time.time()
+    async def _discover_proxies(self) -> None:
+        """Discover proxies from all configured sources."""
+        logger.info("🔍 Phase 1: Discovering proxies...")
+        
+        discovery_tasks = []
+        for source in self.sources:
+            task = asyncio.create_task(source.fetch_proxies())
+            discovery_tasks.append(task)
+        
+        # Wait for all discovery tasks
+        results = await asyncio.gather(*discovery_tasks, return_exceptions=True)
+        
+        # Process results
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                logger.error(f"💥 Source {i} failed: {result}")
+            else:
+                self.all_proxies.extend(result)
+        
+        self.statistics.total_sources = len(self.sources)
+        self.statistics.total_discovered = len(self.all_proxies)
+        
+        logger.info(f"📊 Discovery complete: {self.statistics.total_discovered} proxies from {self.statistics.total_sources} sources")
+    
+    async def _validate_proxies(self) -> None:
+        """Validate all discovered proxies with concurrency control."""
+        logger.info("✅ Phase 2: Validating proxies...")
+        
+        if not self.all_proxies:
+            logger.warning("⚠️ No proxies to validate")
+            return
+        
+        # Create semaphore for concurrency control
+        semaphore = asyncio.Semaphore(self.max_concurrent)
+        
+        async def validate_with_semaphore(proxy: ProxyInfo) -> ProxyInfo:
+            async with semaphore:
+                async with aiohttp.ClientSession() as session:
+                    return await self.validator.validate_proxy(proxy, session)
+        
+        # Create validation tasks
+        validation_tasks = [
+            asyncio.create_task(validate_with_semaphore(proxy))
+            for proxy in self.all_proxies
+        ]
+        
+        # Process validation results with progress tracking
+        self.statistics.total_tested = len(validation_tasks)
+        
+        logger.info(f"🧪 Testing {self.statistics.total_tested} proxies with max {self.max_concurrent} concurrent")
+        
+        # Process results in batches for memory efficiency
+        batch_size = 1000
+        for i in range(0, len(validation_tasks), batch_size):
+            batch = validation_tasks[i:i + batch_size]
+            results = await asyncio.gather(*batch, return_exceptions=True)
             
-            try:
-                # Optimized connection settings
-                timeout = aiohttp.ClientTimeout(total=self.timeout, connect=1.0)
-                connector = aiohttp.TCPConnector(limit=1, ttl_dns_cache=300)
-                
-                proxy_url = f"http://{proxy['ip']}:{proxy['port']}"
-                
-                async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
-                    async with session.get(self.test_url, proxy=proxy_url) as response:
-                        if response.status == 200:
-                            response_time = (time.time() - start_time) * 1000
-                            proxy.update({
-                                'is_working': True,
-                                'response_time': round(response_time, 2),
-                                'last_checked': datetime.now(timezone.utc).isoformat(),
-                                'country': 'Unknown'
-                            })
-                            return proxy
-                            
-            except:
-                pass
+            for result in results:
+                if isinstance(result, Exception):
+                    logger.error(f"💥 Validation error: {result}")
+                    self.statistics.failed_proxies += 1
+                elif result.is_working:
+                    self.working_proxies.append(result)
+                    self.statistics.working_proxies += 1
+                else:
+                    self.statistics.failed_proxies += 1
             
-            # Mark as failed
-            proxy.update({
-                'is_working': False,
-                'last_checked': datetime.now(timezone.utc).isoformat()
-            })
-            return proxy
+            # Log progress
+            progress = min(i + batch_size, len(validation_tasks))
+            logger.info(f"📈 Progress: {progress}/{self.statistics.total_tested} tested")
+    
+    def _finalize_statistics(self, hunt_start_time: float) -> None:
+        """Calculate final hunting statistics."""
+        self.statistics.hunt_duration = time.time() - hunt_start_time
+        
+        # Calculate average response time
+        working_times = [p.response_time for p in self.working_proxies if p.response_time]
+        if working_times:
+            self.statistics.average_response_time = sum(working_times) / len(working_times)
+        
+        # Calculate final metrics
+        self.statistics.calculate_metrics()
+        
+        logger.info(f"🐕 Hunt stats compiled: {self.statistics.working_proxies}/{self.statistics.total_tested} working")
+    
+    async def export_results(self) -> bool:
+        """Export hunt results to multiple formats."""
+        try:
+            logger.info("🔄 Creating emergency hunt report...")
+            logger.info("📤 Exporting hunt results to docs")
+            
+            # Ensure docs directory exists
+            docs_dir = Path("docs")
+            docs_dir.mkdir(exist_ok=True)
+            
+            # Export to JSON
+            await self._export_json(docs_dir)
+            
+            # Export to CSV
+            await self._export_csv(docs_dir)
+            
+            # Export to Markdown
+            await self._export_markdown(docs_dir)
+            
+            # Export GitHub Pages index
+            await self._export_github_pages(docs_dir)
+            
+            logger.info(f"✅ Hunt results exported: {self.statistics.working_proxies} proxies")
+            return True
+            
+        except Exception as e:
+            logger.error(f"💥 Critical export error: {e}")
+            return False
+    
+    async def _export_json(self, docs_dir: Path) -> None:
+        """Export results to JSON format."""
+        # Export statistics
+        stats_data = asdict(self.statistics)
+        with open(docs_dir / "proxy_statistics.json", "w") as f:
+            json.dump(stats_data, f, indent=2, default=str)
+        
+        # Export working proxies
+        proxies_data = [asdict(proxy) for proxy in self.working_proxies]
+        with open(docs_dir / "working_proxies.json", "w") as f:
+            json.dump(proxies_data, f, indent=2, default=str)
+        
+        logger.info(f"📊 Exported {len(self.working_proxies)} proxies to JSON")
+    
+    async def _export_csv(self, docs_dir: Path) -> None:
+        """Export working proxies to CSV format."""
+        if not self.working_proxies:
+            return
+            
+        with open(docs_dir / "working_proxies.csv", "w", newline="") as f:
+            writer = csv.writer(f)
+            
+            # Write header
+            writer.writerow([
+                "host", "port", "protocol", "country", "anonymity",
+                "response_time", "last_tested", "success_rate", "ssl_support"
+            ])
+            
+            # Write proxy data
+            for proxy in self.working_proxies:
+                writer.writerow([
+                    proxy.host, proxy.port, proxy.protocol, proxy.country,
+                    proxy.anonymity, proxy.response_time, proxy.last_tested,
+                    proxy.success_rate, proxy.ssl_support
+                ])
+        
+        logger.info(f"📄 Exported {len(self.working_proxies)} proxies to CSV")
+    
+    async def _export_markdown(self, docs_dir: Path) -> None:
+        """Export comprehensive markdown report."""
+        # Use the properly scoped percentage variable
+        percentage = self.statistics.success_percentage
+        
+        report = f"""# Proxy Hunt Report
 
-async def export_hunt_results(db, output_dir="docs"):
-    """Export Proxy Hound hunting results"""
-    logger.info(f"📤 Exporting hunt results to {output_dir}")
-    
-    try:
-        os.makedirs(output_dir, exist_ok=True)
-        
-        working_proxies = db.get_working_proxies(limit=10000)
-        hunt_stats = db.get_hunt_stats()
-        
-        logger.info(f"📊 Exporting {len(working_proxies)} working proxies")
-        
-        # Export main hunting results
-        txt_path = Path(output_dir) / "proxy_hound_results.txt"
-        async with aiofiles.open(txt_path, 'w') as f:
-            await f.write(f"# Proxy Hound Hunt Results - {datetime.now(timezone.utc).isoformat()}\n")
-            await f.write(f"# Working proxies: {hunt_stats['working_proxies']}\n")
-            await f.write(f"# Hunt success rate: {hunt_stats['success_rate']}%\n")
-            await f.write("# Hunting method: Advanced repository analysis with pack behavior tracking\n")
-            await f.write("# Validation: High-performance parallel testing\n")
-            await f.write("# Format: IP:PORT (sorted by hunt score and response time)\n\n")
-            
-            for proxy in working_proxies:
-                await f.write(f"{proxy[0]}:{proxy[1]}\n")
-        
-        # Enhanced JSON export with hunt data
-        json_data = {
-            "metadata": {
-                "generated_at": datetime.now(timezone.utc).isoformat(),
-                "total_working": len(working_proxies),
-                "hunt_stats": hunt_stats,
-                "hunting_method": "proxy-hound-advanced-repository-analysis",
-                "validation_method": "high-performance-parallel-pack-testing",
-                "sorted_by": "hunt_score_and_response_time"
-            },
-            "proxies": []
-        }
-        
-        # Build enhanced JSON with hunt scores
-        for p in working_proxies:
-            proxy_data = {
-                "ip": p[0],
-                "port": p[1],
-                "type": p[2] if len(p) > 2 else "unknown",
-                "source": p[3] if len(p) > 3 else "unknown",
-                "repository": p[4] if len(p) > 4 else "unknown",
-                "response_time_ms": p[7] if len(p) > 7 else None,
-                "hunt_score": p[8] if len(p) > 8 else 0
-            }
-            json_data["proxies"].append(proxy_data)
-        
-        json_path = Path(output_dir) / "proxy_hound_results.json"
-        async with aiofiles.open(json_path, 'w') as f:
-            await f.write(json.dumps(json_data, indent=2))
-        
-        # Export by type with hunt scores
-        by_type_dir = Path(output_dir) / "by_type"
-        os.makedirs(by_type_dir, exist_ok=True)
-        
-        if hunt_stats.get('by_type'):
-            for proxy_type in hunt_stats['by_type'].keys():
-                type_proxies = [p for p in working_proxies if (len(p) > 2 and p[2] == proxy_type)]
-                if type_proxies:
-                    type_path = by_type_dir / f"{proxy_type}_hunted.txt"
-                    async with aiofiles.open(type_path, 'w') as f:
-                        await f.write(f"# {proxy_type.upper()} Proxies - Hunted by Proxy Hound\n")
-                        await f.write(f"# Count: {len(type_proxies)}\n")
-                        await f.write("# Sorted by hunt score\n\n")
-                        for p in type_proxies:
-                            await f.write(f"{p[0]}:{p[1]}\n")
-        
-        # Hunt statistics
-        stats_path = Path(output_dir) / "hunt_stats.json"
-        async with aiofiles.open(stats_path, 'w') as f:
-            await f.write(json.dumps(hunt_stats, indent=2))
-        
-        # Create Proxy Hound dashboard
-        await create_proxy_hound_dashboard(hunt_stats, output_dir)
-        
-        logger.info(f"✅ Hunt results exported: {len(working_proxies)} proxies")
-        return len(working_proxies)
-        
-    except Exception as e:
-        logger.error(f"❌ Export failed: {e}")
-        raise
+Generated: {self.statistics.timestamp}
 
-async def create_proxy_hound_dashboard(hunt_stats, output_dir):
-    """Create Proxy Hound hunting dashboard"""
+## 📊 Hunt Statistics
+
+| Metric | Value |
+|--------|-------|
+| **Total Sources** | {self.statistics.total_sources:,} |
+| **Total Discovered** | {self.statistics.total_discovered:,} |
+| **Total Tested** | {self.statistics.total_tested:,} |
+| **Working Proxies** | {self.statistics.working_proxies:,} |
+| **Failed Proxies** | {self.statistics.failed_proxies:,} |
+| **Success Rate** | {percentage:.2f}% |
+| **Average Response Time** | {self.statistics.average_response_time:.2f}s |
+| **Hunt Duration** | {self.statistics.hunt_duration:.2f}s |
+
+## 🌍 Geographic Distribution
+
+"""
+        
+        # Add geographic analysis
+        countries = {}
+        for proxy in self.working_proxies:
+            country = proxy.country or "Unknown"
+            countries[country] = countries.get(country, 0) + 1
+        
+        for country, count in sorted(countries.items(), key=lambda x: x[1], reverse=True):
+            report += f"- **{country}**: {count} proxies\n"
+        
+        report += f"""
+
+## 🔒 Security Analysis
+
+- **SSL Support**: {sum(1 for p in self.working_proxies if p.ssl_support)} proxies
+- **Authentication Required**: {sum(1 for p in self.working_proxies if p.auth_required)} proxies
+- **Average Response Time**: {self.statistics.average_response_time:.2f}s
+
+## 📈 Performance Metrics
+
+### Response Time Distribution
+"""
+        
+        # Add response time analysis
+        if self.working_proxies:
+            times = [p.response_time for p in self.working_proxies if p.response_time]
+            if times:
+                times.sort()
+                report += f"- **Fastest**: {min(times):.2f}s\n"
+                report += f"- **Slowest**: {max(times):.2f}s\n"
+                report += f"- **Median**: {times[len(times)//2]:.2f}s\n"
+        
+        report += """
+
+## 🚀 Usage
+
+### Download Formats
+- [JSON Statistics](proxy_statistics.json)
+- [Working Proxies JSON](working_proxies.json)
+- [Working Proxies CSV](working_proxies.csv)
+
+### Integration
+```python
+import requests
+
+# Example proxy usage
+proxy = {
+    'http': 'http://proxy_host:proxy_port',
+    'https': 'http://proxy_host:proxy_port'
+}
+
+response = requests.get('https://httpbin.org/ip', proxies=proxy)
+print(response.json())
+```
+
+---
+*Report generated by Enterprise Proxy Hunter v2.0*
+"""
+        
+        with open(docs_dir / "README.md", "w") as f:
+            f.write(report)
+        
+        logger.info("📋 Exported comprehensive markdown report")
     
-    # Repository section with hunt scores
-    repo_section = ""
-    if hunt_stats.get('by_repository'):
-        repo_section = """
-    <div class="hunting-grounds">
-        <h2>🏆 Best Hunting Grounds</h2>
-        <div class="repo-grid">"""
+    async def _export_github_pages(self, docs_dir: Path) -> None:
+        """Export GitHub Pages compatible index.html."""
+        # Use the properly scoped percentage variable
+        percentage = self.statistics.success_percentage
         
-        for repo, data in list(hunt_stats['by_repository'].items())[:10]:
-            count = data.get('count', 0)
-            hunt_score = data.get('avg_hunt_score', 0)
-            response_time = data.get('avg_response_time', 0)
-            
-            repo_section += f"""
-            <div class="repo-card">
-                <div class="repo-name">🎯 {repo}</div>
-                <div class="repo-stats">
-                    <span class="count">{count:,} proxies</span>
-                    <span class="hunt-score">Hunt Score: {hunt_score}/100</span>
-                    <span class="response-time">{response_time}ms avg</span>
-                </div>
-            </div>"""
-        
-        repo_section += """
-        </div>
-    </div>"""
-    
-    # Hunt success section
-    hunt_success_section = ""
-    if hunt_stats.get('hunt_success'):
-        hunt_success_section = """
-        <div class="hunt-success">
-            <h2>🎯 Hunt Success Rates</h2>
-            <div class="success-grid">"""
-        
-        for repo, data in list(hunt_stats['hunt_success'].items())[:8]:
-            success_rate = data.get('avg_success_rate', 0)
-            hunts = data.get('hunts', 0)
-            
-            hunt_success_section += f"""
-            <div class="success-card">
-                <div class="repo-name">{repo}</div>
-                <div class="success-rate">{success_rate}% success</div>
-                <div class="hunt-count">{hunts} hunts</div>
-            </div>"""
-        
-        hunt_success_section += """
-            </div>
-        </div>"""
-    
-    # Type section
-    type_section = ""
-    if hunt_stats.get('by_type'):
-        type_section = """
-        <div class="prey-types">
-            <h2>🎪 Prey Types Captured</h2>
-            <div class="type-grid">"""
-        
-        for proxy_type, count in hunt_stats['by_type'].items():
-            type_section += f"""
-            <div class="type-card">
-                <div class="stat-number">{count:,}</div>
-                <div>{proxy_type.upper()}</div>
-            </div>"""
-        
-        type_section += """
-            </div>
-        </div>"""
-    
-    html = f"""<!DOCTYPE html>
+        html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐕 Proxy Hound Dashboard</title>
+    <title>Proxy Hunter Results</title>
     <style>
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }}
-        .header {{
-            background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-        }}
-        .header::before {{
-            content: '🐕';
-            position: absolute;
-            font-size: 8rem;
-            opacity: 0.1;
-            right: 2rem;
-            top: 1rem;
-        }}
-        .hunting-badge {{
-            background: rgba(255,255,255,0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-        }}
-        .stats {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }}
-        .stat {{
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #8B4513;
-        }}
-        .stat-number {{
-            font-size: 2rem;
-            font-weight: bold;
-            color: #8B4513;
-        }}
-        .hunting-info {{
-            background: linear-gradient(135deg, #fff8dc 0%, #f5f5dc 100%);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            border-left: 4px solid #daa520;
-        }}
-        .hunting-methods {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }}
-        .method {{
-            background: white;
-            padding: 1rem;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }}
-        .downloads {{
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }}
-        .btn {{
-            display: inline-block;
-            background: #8B4513;
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 6px;
-            margin: 5px;
-            font-weight: 500;
-        }}
-        .btn:hover {{
-            background: #A0522D;
-        }}
-        .hunting-grounds, .prey-types, .hunt-success {{
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }}
-        .repo-grid, .type-grid, .success-grid {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-        }}
-        .repo-card {{
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 6px;
-            border-left: 4px solid #8B4513;
-        }}
-        .repo-name {{
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }}
-        .repo-stats {{
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-        }}
-        .count {{
-            color: #666;
-            font-size: 0.8rem;
-        }}
-        .hunt-score {{
-            background: #e7f3ff;
-            color: #0066cc;
-            padding: 0.2rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            display: inline-block;
-            width: fit-content;
-        }}
-        .response-time {{
-            color: #28a745;
-            font-size: 0.7rem;
-            font-weight: 500;
-        }}
-        .success-card {{
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 6px;
-            border-left: 4px solid #28a745;
-            text-align: center;
-        }}
-        .success-rate {{
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #28a745;
-            margin: 0.5rem 0;
-        }}
-        .hunt-count {{
-            color: #666;
-            font-size: 0.8rem;
-        }}
-        .type-card {{
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 6px;
-            text-align: center;
-            border-left: 4px solid #dc3545;
-        }}
-        .footer {{
-            text-align: center;
-            margin-top: 2rem;
-            color: #666;
-            font-size: 0.9rem;
-        }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; }}
+        .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }}
+        .stat-card {{ background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }}
+        .stat-number {{ font-size: 2em; font-weight: bold; color: #28a745; }}
+        .stat-label {{ color: #6c757d; font-size: 0.9em; }}
+        table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+        th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }}
+        th {{ background-color: #f8f9fa; }}
+        .success {{ color: #28a745; }}
+        .timestamp {{ color: #6c757d; font-size: 0.9em; }}
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🐕 Proxy Hound Dashboard</h1>
-        <p>Advanced Repository Hunter - Tracking Quality Proxy Sources</p>
-        <div class="hunting-badge">
-            🎯 Scent Tracking • 🏹 Pack Validation • 🏆 Learning Algorithm
-        </div>
-    </div>
-    
-    <div class="hunting-info">
-        <h3>🐕 Hunting Strategy</h3>
-        <p>Proxy Hound uses advanced repository analysis to hunt down the highest quality proxy sources:</p>
-        <div class="hunting-methods">
-            <div class="method">
-                <h4>🔍 Scent Tracking</h4>
-                <p>Analyzes repository freshness, activity patterns, and quality indicators</p>
-            </div>
-            <div class="method">
-                <h4>📁 Content Hunting</h4>
-                <p>Deep file analysis for proxy treasure detection and territory mapping</p>
-            </div>
-            <div class="method">
-                <h4>🎪 Pack Behavior</h4>
-                <p>Community engagement analysis and pack leader reputation tracking</p>
-            </div>
-            <div class="method">
-                <h4>📈 Learning System</h4>
-                <p>Adapts hunting strategy based on success rates and performance feedback</p>
-            </div>
-        </div>
-    </div>
+    <h1>🐕 Proxy Hunter Results</h1>
+    <p class="timestamp">Last Updated: {self.statistics.timestamp}</p>
     
     <div class="stats">
-        <div class="stat">
-            <div class="stat-number">{hunt_stats['working_proxies']:,}</div>
-            <div>Working Proxies</div>
+        <div class="stat-card">
+            <div class="stat-number">{self.statistics.working_proxies:,}</div>
+            <div class="stat-label">Working Proxies</div>
         </div>
-        <div class="stat">
-            <div class="stat-number">{hunt_stats['total_proxies']:,}</div>
-            <div>Total Hunted</div>
+        <div class="stat-card">
+            <div class="stat-number">{self.statistics.total_tested:,}</div>
+            <div class="stat-label">Total Tested</div>
         </div>
-        <div class="stat">
-            <div class="stat-number">{hunt_stats['success_rate']}%</div>
-            <div>Hunt Success Rate</div>
+        <div class="stat-card">
+            <div class="stat-number">{percentage:.1f}%</div>
+            <div class="stat-label">Success Rate</div>
         </div>
-        <div class="stat">
-            <div class="stat-number">{len(hunt_stats.get('by_repository', {}))}</div>
-            <div>Territories Hunted</div>
+        <div class="stat-card">
+            <div class="stat-number">{self.statistics.average_response_time:.2f}s</div>
+            <div class="stat-label">Avg Response Time</div>
         </div>
     </div>
     
-    {type_section}
+    <h2>📥 Download Results</h2>
+    <ul>
+        <li><a href="proxy_statistics.json">📊 Statistics (JSON)</a></li>
+        <li><a href="working_proxies.json">🌐 Working Proxies (JSON)</a></li>
+        <li><a href="working_proxies.csv">📄 Working Proxies (CSV)</a></li>
+        <li><a href="README.md">📋 Full Report (Markdown)</a></li>
+    </ul>
     
-    {repo_section}
+    <h2>🔥 Top Performing Proxies</h2>
+    <table>
+        <thead>
+            <tr><th>Host</th><th>Port</th><th>Protocol</th><th>Response Time</th><th>SSL</th></tr>
+        </thead>
+        <tbody>
+"""
+        
+        # Add top 10 fastest proxies
+        fastest_proxies = sorted(
+            [p for p in self.working_proxies if p.response_time],
+            key=lambda x: x.response_time
+        )[:10]
+        
+        for proxy in fastest_proxies:
+            ssl_icon = "✅" if proxy.ssl_support else "❌"
+            html_content += f"""
+            <tr>
+                <td>{proxy.host}</td>
+                <td>{proxy.port}</td>
+                <td>{proxy.protocol.upper()}</td>
+                <td class="success">{proxy.response_time:.2f}s</td>
+                <td>{ssl_icon}</td>
+            </tr>"""
+        
+        html_content += """
+        </tbody>
+    </table>
     
-    {hunt_success_section}
-    
-    <div class="downloads">
-        <h2>📥 Download Hunt Results</h2>
-        <p>High-quality proxies hunted using advanced repository analysis and pack behavior tracking:</p>
-        <a href="proxy_hound_results.txt" class="btn">📄 Main Results</a>
-        <a href="proxy_hound_results.json" class="btn">📊 Enhanced JSON</a>
-        <a href="by_type/" class="btn">🗂️ By Type</a>
-        <a href="hunt_stats.json" class="btn">📈 Hunt Statistics</a>
-        <p><em>Updated every 8 hours using Proxy Hound's advanced hunting algorithms.</em></p>
-    </div>
-    
-    <div class="footer">
-        <p>Last hunt: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")}</p>
-        <p>🐕 Proxy Hound - Advanced repository analysis with pack behavior tracking</p>
-        <p>🎯 Hunt success improves over time through learning algorithms</p>
-    </div>
+    <footer style="margin-top: 40px; text-align: center; color: #6c757d;">
+        <p>Generated by Enterprise Proxy Hunter v2.0</p>
+    </footer>
 </body>
 </html>"""
-    
-    html_path = Path(output_dir) / "index.html"
-    async with aiofiles.open(html_path, 'w') as f:
-        await f.write(html)
+        
+        with open(docs_dir / "index.html", "w") as f:
+            f.write(html_content)
+        
+        logger.info("🌐 Exported GitHub Pages index.html")
 
 async def main():
-    """Proxy Hound main hunting expedition"""
-    start_time = time.time()
-    logger.info("🐕 Proxy Hound - Starting hunting expedition")
-    
-    # Hunting configuration
-    github_token = os.getenv("GITHUB_TOKEN")
-    max_pages = int(os.getenv("MAX_PAGES", "3"))
-    max_concurrent = int(os.getenv("MAX_CONCURRENT", "100"))
-    max_memory_mb = int(os.getenv("MAX_MEMORY_MB", "512"))
-    
-    logger.info(f"🎯 Hunt Configuration:")
-    logger.info(f"  - GitHub Token: {'✅ Set' if github_token else '❌ Missing'}")
-    logger.info(f"  - Max Pages per territory: {max_pages}")
-    logger.info(f"  - Pack Size (concurrent): {max_concurrent}")
-    logger.info(f"  - Memory Limit: {max_memory_mb}MB")
-    logger.info(f"  - Strategy: Advanced repository hunting with pack behavior analysis")
-    
+    """Main execution function with comprehensive error handling."""
     try:
-        # Initialize hunting database
-        logger.info("🗄️ Initializing hunt tracking database...")
-        db = ProxyHoundDatabase()
+        logger.info("🚀 Starting Enterprise Proxy Hunter v2.0")
         
-        # Start the hunt
-        logger.info("🐕 Starting hunting expedition...")
-        async with ProxyHound(github_token) as hound:
-            caught_proxies = await hound.start_hunt(max_pages, max_memory_mb)
+        # Initialize hunter with configuration
+        hunter = ProxyHunter(
+            max_concurrent=100,  # Adjust based on system capabilities
+            timeout=10
+        )
         
-        if not caught_proxies:
-            logger.error("❌ No proxies caught during hunt!")
-            await export_hunt_results(db)
-            return
+        # Execute hunt
+        stats = await hunter.hunt_proxies()
         
-        logger.info(f"✅ Hunt phase complete: {len(caught_proxies)} proxies caught")
+        # Export results
+        export_success = await hunter.export_results()
         
-        # Validate the pack
-        logger.info("🎯 Starting pack validation...")
-        validator = ProxyPackValidator(max_concurrent=max_concurrent)
-        
-        # Process in hunting packs
-        pack_size = min(10000, len(caught_proxies))
-        all_validated = []
-        
-        for i in range(0, len(caught_proxies), pack_size):
-            pack = caught_proxies[i:i + pack_size]
-            pack_num = i//pack_size + 1
-            total_packs = (len(caught_proxies)-1)//pack_size + 1
+        if export_success:
+            logger.info("🎯 Proxy hunt completed successfully!")
+            logger.info(f"📈 Final Results: {stats.working_proxies}/{stats.total_tested} proxies ({stats.success_percentage:.2f}% success)")
+        else:
+            logger.error("❌ Export failed, but hunt data is available")
+            exit(1)
             
-            logger.info(f"🏹 Validating pack {pack_num}/{total_packs}: {len(pack)} proxies")
-            
-            validated = await validator.validate_pack(pack)
-            all_validated.extend(validated)
-            
-            # Record hunt results immediately
-            db.add_hunt_results(validated)
-            
-            # Memory monitoring
-            process = psutil.Process()
-            memory_mb = process.memory_info().rss / 1024 / 1024
-            logger.info(f"💾 Memory usage: {memory_mb:.1f} MB")
-            
-            # Rest between large pack validations
-            if len(pack) >= 5000:
-                await asyncio.sleep(1)
-        
-        # Export hunt results
-        logger.info("📤 Exporting hunt results...")
-        exported_count = await export_hunt_results(db)
-        
-        # Final hunt statistics
-        hunt_stats = db.get_hunt_stats()
-        expedition_time = time.time() - start_time
-        
-        logger.info("=" * 80)
-        logger.info("🏆 PROXY HOUND HUNTING EXPEDITION COMPLETE")
-        logger.info("=" * 80)
-        logger.info(f"⏱️  Expedition time: {expedition_time:.1f} seconds")
-        logger.info(f"🎯 Total hunted: {hunt_stats['total_proxies']:,}")
-        logger.info(f"✅ Working proxies: {hunt_stats['working_proxies']:,}")
-        logger.info(f"🏹 Hunt success rate: {hunt_stats['success_rate']}%")
-        logger.info(f"📤 Exported: {exported_count:,}")
-        logger.info(f"🏞️ Territories hunted: {len(hunt_stats.get('by_repository', {}))}")
-        
-        # Performance metrics
-        if expedition_time > 0:
-            territories_per_minute = len(hunt_stats.get('by_repository', {})) * 60 / expedition_time
-            proxies_per_second = len(caught_proxies) / expedition_time
-            validation_rate = hunt_stats['total_proxies'] / expedition_time
-            
-            logger.info("⚡ Hunt Performance:")
-            logger.info(f"  - Territory hunting: {territories_per_minute:.1f} repos/min")
-            logger.info(f"  - Proxy capture: {proxies_per_second:.1f} proxies/sec")
-            logger.info(f"  - Pack validation: {validation_rate:.1f} validations/sec")
-        
-        # Best hunting grounds
-        if hunt_stats.get('by_repository'):
-            logger.info("🏆 Best hunting grounds:")
-            for repo, data in list(hunt_stats['by_repository'].items())[:5]:
-                if isinstance(data, dict):
-                    count = data.get('count', 0)
-                    hunt_score = data.get('avg_hunt_score', 0)
-                    logger.info(f"  - {repo}: {count:,} proxies (hunt score: {hunt_score:.1f})")
-                else:
-                    logger.info(f"  - {repo}: {data:,} proxies")
-        
-        # Prey type breakdown
-        if hunt_stats.get('by_type'):
-            logger.info("🎪 Prey types captured:")
-            for proxy_type, count in hunt_stats['by_type'].items():
-                logger.info(f"  - {proxy_type.upper()}: {count:,} ({percentage:.1f}%)")
-        
-        # Hunt success rates
-        if hunt_stats.get('hunt_success'):
-            logger.info("🎯 Top hunting success rates:")
-            for repo, data in list(hunt_stats['hunt_success'].items())[:3]:
-                success_rate = data.get('avg_success_rate', 0)
-                hunts = data.get('hunts', 0)
-                logger.info(f"  - {repo}: {success_rate:.1f}% success ({hunts} hunts)")
-        
-        # GitHub Actions output
-        if os.getenv("GITHUB_ACTIONS"):
-            try:
-                with open(os.getenv("GITHUB_OUTPUT", "/dev/stdout"), "a") as f:
-                    f.write(f"working_proxies={hunt_stats['working_proxies']}\n")
-                    f.write(f"total_proxies={hunt_stats['total_proxies']}\n")
-                    f.write(f"success_rate={hunt_stats['success_rate']}\n")
-                    f.write(f"territories_hunted={len(hunt_stats.get('by_repository', {}))}\n")
-                    f.write(f"expedition_time={expedition_time:.1f}\n")
-                    f.write(f"hunting_method=proxy_hound\n")
-            except Exception as e:
-                logger.warning(f"⚠️ GitHub Actions output failed: {e}")
-        
-        logger.info("🐕 Proxy Hound hunting expedition completed successfully!")
-        logger.info("🏆 Advanced repository analysis and pack behavior tracking delivered premium results")
-        
+    except KeyboardInterrupt:
+        logger.info("🛑 Hunt interrupted by user")
+        exit(0)
     except Exception as e:
-        logger.error(f"❌ Hunting expedition failed: {e}")
-        logger.error("Full traceback:", exc_info=True)
-        
-        # Emergency export
-        try:
-            logger.info("🔄 Creating emergency hunt report...")
-            db = ProxyHoundDatabase()
-            await export_hunt_results(db)
-        except:
-            pass
-        
-        raise
+        logger.error(f"💥 Fatal error in main: {e}")
+        exit(1)
 
 if __name__ == "__main__":
-    if sys.platform == "win32":
-        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+    # Configure asyncio for better performance
+    if hasattr(asyncio, 'set_event_loop_policy'):
+        # Use uvloop on Unix systems for better performance
+        try:
+            import uvloop
+            asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+            logger.info("🚀 Using uvloop for enhanced performance")
+        except ImportError:
+            logger.info("📡 Using default asyncio event loop")
     
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        logger.info("⏹️  Hunt interrupted by user")
-    except Exception as e:
-        logger.error(f"💥 Critical hunting error: {e}")
-        sys.exit(1)
+    # Run the main coroutine
+    asyncio.run(main())

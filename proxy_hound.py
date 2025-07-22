@@ -1268,6 +1268,9 @@ async def export_hunt_results(db, output_dir="docs"):
         # Create Proxy Hound dashboard
         await create_proxy_hound_dashboard(hunt_stats, output_dir)
         
+        # Create README.md hunt report
+        await create_readme_report(hunt_stats, output_dir, len(working_proxies))
+        
         logger.info(f"✅ Hunt results exported: {len(working_proxies)} proxies")
         return len(working_proxies)
         
@@ -1587,6 +1590,243 @@ async def create_proxy_hound_dashboard(hunt_stats, output_dir):
     html_path = Path(output_dir) / "index.html"
     async with aiofiles.open(html_path, 'w') as f:
         await f.write(html)
+
+async def create_readme_report(hunt_stats, output_dir, working_count):
+    """Create comprehensive README.md hunt report"""
+    
+    # Calculate additional metrics
+    total_proxies = hunt_stats['total_proxies']
+    success_rate = hunt_stats['success_rate']
+    territories_hunted = len(hunt_stats.get('by_repository', {}))
+    geolocated_count = hunt_stats['geolocated_proxies']
+    countries_found = hunt_stats['countries_found']
+    cities_found = hunt_stats['cities_found']
+    
+    # Build geographic section
+    geo_section = "## 🌍 Geographic Distribution\n\n"
+    if hunt_stats.get('by_country'):
+        for country, count in list(hunt_stats['by_country'].items())[:10]:
+            percentage = (count / working_count * 100) if working_count > 0 else 0
+            geo_section += f"- **{country}**: {count:,} proxies ({percentage:.1f}%)\n"
+    else:
+        geo_section += "- **Unknown**: Geographic data being processed...\n"
+    
+    # Build hunting grounds section
+    hunting_section = "## 🏹 Best Hunting Grounds\n\n"
+    if hunt_stats.get('by_repository'):
+        hunting_section += "| Repository | Proxies | Hunt Score | Avg Response |\n"
+        hunting_section += "|------------|---------|------------|---------------|\n"
+        for repo, data in list(hunt_stats['by_repository'].items())[:10]:
+            if isinstance(data, dict):
+                count = data.get('count', 0)
+                hunt_score = data.get('avg_hunt_score', 0)
+                response_time = data.get('avg_response_time', 0)
+                hunting_section += f"| `{repo}` | {count:,} | {hunt_score:.1f}/100 | {response_time:.0f}ms |\n"
+            else:
+                hunting_section += f"| `{repo}` | {data:,} | - | - |\n"
+    else:
+        hunting_section += "_Repository analysis in progress..._\n"
+    
+    # Build proxy types section
+    types_section = "## 🎪 Proxy Types Captured\n\n"
+    if hunt_stats.get('by_type'):
+        total_working = sum(hunt_stats['by_type'].values())
+        for proxy_type, count in hunt_stats['by_type'].items():
+            percentage = (count / total_working * 100) if total_working > 0 else 0
+            types_section += f"- **{proxy_type.upper()}**: {count:,} proxies ({percentage:.1f}%)\n"
+    else:
+        types_section += "_Proxy type analysis in progress..._\n"
+    
+    # Build performance section
+    if hunt_stats.get('by_repository'):
+        avg_scores = []
+        avg_responses = []
+        for repo, data in hunt_stats['by_repository'].items():
+            if isinstance(data, dict):
+                if data.get('avg_hunt_score'):
+                    avg_scores.append(data['avg_hunt_score'])
+                if data.get('avg_response_time'):
+                    avg_responses.append(data['avg_response_time'])
+        
+        avg_hunt_score = sum(avg_scores) / len(avg_scores) if avg_scores else 0
+        avg_response_time = sum(avg_responses) / len(avg_responses) if avg_responses else 0
+        fastest_response = min(avg_responses) if avg_responses else 0
+        slowest_response = max(avg_responses) if avg_responses else 0
+    else:
+        avg_hunt_score = 0
+        avg_response_time = 0
+        fastest_response = 0
+        slowest_response = 0
+    
+    readme_content = f"""# 🐕 Proxy Hound Hunt Report
+
+**Generated:** {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")}
+
+## 📊 Hunt Statistics
+
+| Metric | Value |
+|--------|-------|
+| **Territories Hunted** | {territories_hunted:,} repositories |
+| **Total Discovered** | {total_proxies:,} proxies |
+| **Working Proxies** | {working_count:,} proxies |
+| **Hunt Success Rate** | {success_rate:.2f}% |
+| **Geographic Coverage** | {countries_found} countries, {cities_found} cities |
+| **Geolocated Proxies** | {geolocated_count:,} ({(geolocated_count/working_count*100):.1f}% coverage) |
+| **Average Hunt Score** | {avg_hunt_score:.1f}/100 |
+| **Average Response Time** | {avg_response_time:.0f}ms |
+
+{geo_section}
+
+{hunting_section}
+
+{types_section}
+
+## 📈 Performance Metrics
+
+### Hunt Quality Analysis
+- **Fastest Repository Response**: {fastest_response:.0f}ms
+- **Slowest Repository Response**: {slowest_response:.0f}ms
+- **Average Hunt Score**: {avg_hunt_score:.1f}/100
+- **Pack Success Rate**: {success_rate:.2f}%
+
+### Hunting Method
+- **🎯 Scent Tracking**: Analyzes repository freshness and activity patterns
+- **🏹 Pack Behavior**: Community engagement and owner reputation analysis  
+- **🗺️ Territory Mapping**: Content analysis and file pattern detection
+- **🧠 Learning System**: Improves success rates through hunt result feedback
+- **🌍 Geolocation**: Multi-provider IP location with intelligent caching
+
+## 🚀 Usage
+
+### Download Formats
+- **[📄 Main Results](proxy_hound_results.txt)** - Clean IP:PORT list
+- **[📊 Enhanced JSON](proxy_hound_results.json)** - Full data with geolocation
+- **[📈 Hunt Statistics](hunt_stats.json)** - Detailed analytics  
+- **[🗂️ By Type](by_type/)** - Organized by protocol
+- **[🌐 Live Dashboard](index.html)** - Interactive web interface
+
+### Integration Examples
+
+#### Python Usage
+```python
+import json
+import requests
+
+# Load hunt results
+with open('proxy_hound_results.json', 'r') as f:
+    hunt_data = json.load(f)
+
+# Use highest scoring proxies first
+best_proxies = sorted(hunt_data['proxies'], 
+                     key=lambda x: x['hunt_score'], 
+                     reverse=True)
+
+# Test a proxy
+proxy = best_proxies[0]
+proxy_url = f"http://{{proxy['ip']}}:{{proxy['port']}}"
+
+proxies = {{
+    'http': proxy_url,
+    'https': proxy_url
+}}
+
+try:
+    response = requests.get('https://httpbin.org/ip', 
+                          proxies=proxies, 
+                          timeout=5)
+    print(f"✅ Proxy works! Your IP: {{response.json()['origin']}}")
+    print(f"📍 Location: {{proxy.get('city', 'Unknown')}}, {{proxy.get('country', 'Unknown')}}")
+except:
+    print("❌ Proxy failed")
+```
+
+#### cURL Usage  
+```bash
+# Use a high-scoring proxy
+curl -x proxy_ip:proxy_port https://httpbin.org/ip
+
+# Test with timeout
+curl --connect-timeout 3 -x proxy_ip:proxy_port https://httpbin.org/ip
+```
+
+#### JavaScript Usage
+```javascript
+// Load hunt results (in Node.js)
+const huntData = require('./proxy_hound_results.json');
+
+// Get best proxies by hunt score
+const bestProxies = huntData.proxies
+  .sort((a, b) => b.hunt_score - a.hunt_score)
+  .slice(0, 10);
+
+console.log('🎯 Top 10 Hunt Results:');
+bestProxies.forEach((proxy, i) => {{
+  console.log(`${{i+1}}. ${{proxy.ip}}:${{proxy.port}} (Score: ${{proxy.hunt_score}}/100, ${{proxy.country}})`);
+}});
+```
+
+## 🛡️ Security & Privacy
+
+### Proxy Security Levels
+- **🔒 Geographic Diversity**: {countries_found} countries for enhanced anonymity
+- **⚡ Performance Tested**: All proxies validated for functionality  
+- **🎯 Quality Scored**: Advanced algorithm ranks proxy reliability
+- **🌍 Geolocated**: Location data for strategic selection
+
+### Best Practices
+1. **Rotate Proxies**: Use different proxies for different requests
+2. **Test First**: Always verify proxy functionality before production use
+3. **Monitor Performance**: Track response times and success rates
+4. **Geographic Selection**: Choose proxies based on your target region
+5. **Respect Rate Limits**: Don't overload proxy providers
+
+## 🔄 Automated Updates
+
+This hunt report is automatically generated every 8 hours using:
+- **Advanced Repository Analysis** with pack behavior tracking
+- **Multi-Provider Geolocation** with intelligent fallback
+- **High-Performance Validation** (100 concurrent tests)
+- **Machine Learning** hunt success optimization
+
+## 📞 Support & Integration
+
+### API Integration
+The JSON exports can be directly integrated into:
+- Load balancers and proxy rotators
+- Web scraping frameworks  
+- API testing tools
+- Geographic proxy selection systems
+
+### Enterprise Features
+- **Hunt Score Algorithm**: Predictive proxy quality scoring
+- **Geographic Intelligence**: Strategic proxy location selection
+- **Performance Analytics**: Response time and success rate tracking
+- **Learning Optimization**: Continuous improvement through feedback
+
+---
+
+## 🏆 Hunt Summary
+
+**Proxy Hound v2.1** successfully analyzed **{territories_hunted:,} repository territories** and discovered **{total_proxies:,} potential proxies**. Through advanced pack validation and geolocation analysis, **{working_count:,} high-quality proxies** were confirmed working across **{countries_found} countries**.
+
+### Hunt Success Factors
+- **🎯 Scent Analysis**: {avg_hunt_score:.1f}/100 average territory quality
+- **🌍 Global Coverage**: {countries_found} countries, {cities_found} cities mapped
+- **⚡ Performance**: {avg_response_time:.0f}ms average response time
+- **🔬 Validation Rate**: {success_rate:.2f}% proxies passed strict testing
+
+*Report generated by **Proxy Hound v2.1** - Advanced Repository Hunter with Geolocation Intelligence*
+
+---
+
+**🌟 Star this repository if Proxy Hound helped you find quality proxies!**
+"""
+    
+    readme_path = Path(output_dir) / "README.md"
+    async with aiofiles.open(readme_path, 'w') as f:
+        await f.write(readme_content)
+    
+    logger.info("📄 README.md hunt report created")
 
 async def main():
     """Proxy Hound main hunting expedition"""

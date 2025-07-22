@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Enterprise Proxy Hunter System v2.0
+Enterprise Proxy Hunter System v2.1
 Security-focused, scalable proxy discovery and management system
-Designed for GitHub Actions deployment with comprehensive monitoring
+Now with comprehensive geolocation support
 """
 
 import asyncio
@@ -36,12 +36,28 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 @dataclass
+class GeolocationInfo:
+    """Comprehensive geolocation information."""
+    country: Optional[str] = None
+    country_code: Optional[str] = None
+    region: Optional[str] = None
+    city: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    timezone: Optional[str] = None
+    isp: Optional[str] = None
+    organization: Optional[str] = None
+    as_number: Optional[str] = None
+    threat_level: Optional[str] = None  # For security assessment
+
+@dataclass
 class ProxyInfo:
     """Enhanced proxy information with security metadata."""
     host: str
     port: int
     protocol: str
     country: Optional[str] = None
+    city: Optional[str] = None
     anonymity: Optional[str] = None
     response_time: Optional[float] = None
     last_tested: Optional[datetime] = None
@@ -49,7 +65,7 @@ class ProxyInfo:
     is_working: bool = False
     ssl_support: bool = False
     auth_required: bool = False
-    geolocation: Optional[Dict[str, str]] = None
+    geolocation: Optional[GeolocationInfo] = None
     
     @property
     def url(self) -> str:
@@ -61,10 +77,162 @@ class ProxyInfo:
         """Generate unique proxy fingerprint."""
         data = f"{self.host}:{self.port}:{self.protocol}"
         return hashlib.sha256(data.encode()).hexdigest()[:16]
+    
+    @property
+    def location_string(self) -> str:
+        """Get human-readable location string."""
+        if self.geolocation:
+            parts = []
+            if self.geolocation.city:
+                parts.append(self.geolocation.city)
+            if self.geolocation.region:
+                parts.append(self.geolocation.region)
+            if self.geolocation.country:
+                parts.append(self.geolocation.country)
+            return ", ".join(parts) if parts else "Unknown"
+        return "Unknown"
+
+class GeolocationService:
+    """Geolocation service with multiple providers and caching."""
+    
+    def __init__(self, cache_size: int = 10000):
+        self.cache: Dict[str, GeolocationInfo] = {}
+        self.cache_size = cache_size
+        self.session_timeout = aiohttp.ClientTimeout(total=10)
+        
+        # Multiple geolocation providers (free tier)
+        self.providers = [
+            {
+                'name': 'ip-api',
+                'url': 'http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,region,regionName,city,lat,lon,timezone,isp,org,as,mobile,proxy,hosting',
+                'rate_limit': 45,  # requests per minute
+                'last_request': 0
+            },
+            {
+                'name': 'ipapi.co',
+                'url': 'https://ipapi.co/{ip}/json/',
+                'rate_limit': 30,  # requests per minute for free tier
+                'last_request': 0
+            },
+            {
+                'name': 'ipwhois.app',
+                'url': 'http://ipwho.is/{ip}',
+                'rate_limit': 10000,  # requests per month
+                'last_request': 0
+            }
+        ]
+    
+    async def get_geolocation(self, ip: str) -> Optional[GeolocationInfo]:
+        """Get geolocation for IP with caching and fallback providers."""
+        
+        # Check cache first
+        if ip in self.cache:
+            logger.debug(f"🗺️ Cache hit for {ip}")
+            return self.cache[ip]
+        
+        # Try each provider until we get a result
+        for provider in self.providers:
+            try:
+                result = await self._query_provider(provider, ip)
+                if result:
+                    # Cache the result
+                    if len(self.cache) >= self.cache_size:
+                        # Simple cache eviction - remove oldest entry
+                        self.cache.pop(next(iter(self.cache)))
+                    
+                    self.cache[ip] = result
+                    logger.debug(f"🌍 Geolocation found for {ip}: {result.city}, {result.country}")
+                    return result
+                    
+            except Exception as e:
+                logger.debug(f"❌ Provider {provider['name']} failed for {ip}: {e}")
+                continue
+        
+        logger.debug(f"⚠️ No geolocation found for {ip}")
+        return None
+    
+    async def _query_provider(self, provider: Dict, ip: str) -> Optional[GeolocationInfo]:
+        """Query a specific geolocation provider."""
+        
+        # Rate limiting
+        current_time = time.time()
+        time_since_last = current_time - provider['last_request']
+        min_interval = 60.0 / provider['rate_limit']  # Convert to seconds between requests
+        
+        if time_since_last < min_interval:
+            sleep_time = min_interval - time_since_last
+            await asyncio.sleep(sleep_time)
+        
+        provider['last_request'] = time.time()
+        
+        url = provider['url'].format(ip=ip)
+        
+        async with aiohttp.ClientSession(timeout=self.session_timeout) as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return self._parse_response(provider['name'], data)
+                else:
+                    logger.debug(f"❌ {provider['name']} returned status {response.status} for {ip}")
+                    return None
+    
+    def _parse_response(self, provider_name: str, data: Dict) -> Optional[GeolocationInfo]:
+        """Parse geolocation response based on provider format."""
+        
+        try:
+            if provider_name == 'ip-api':
+                if data.get('status') == 'success':
+                    return GeolocationInfo(
+                        country=data.get('country'),
+                        country_code=data.get('countryCode'),
+                        region=data.get('regionName'),
+                        city=data.get('city'),
+                        latitude=data.get('lat'),
+                        longitude=data.get('lon'),
+                        timezone=data.get('timezone'),
+                        isp=data.get('isp'),
+                        organization=data.get('org'),
+                        as_number=data.get('as'),
+                        threat_level='proxy' if data.get('proxy') else 'clean'
+                    )
+            
+            elif provider_name == 'ipapi.co':
+                if 'error' not in data:
+                    return GeolocationInfo(
+                        country=data.get('country_name'),
+                        country_code=data.get('country_code'),
+                        region=data.get('region'),
+                        city=data.get('city'),
+                        latitude=data.get('latitude'),
+                        longitude=data.get('longitude'),
+                        timezone=data.get('timezone'),
+                        isp=data.get('org'),
+                        organization=data.get('org')
+                    )
+            
+            elif provider_name == 'ipwhois.app':
+                if data.get('success'):
+                    return GeolocationInfo(
+                        country=data.get('country'),
+                        country_code=data.get('country_code'),
+                        region=data.get('region'),
+                        city=data.get('city'),
+                        latitude=data.get('latitude'),
+                        longitude=data.get('longitude'),
+                        timezone=data.get('timezone', {}).get('id'),
+                        isp=data.get('connection', {}).get('isp'),
+                        organization=data.get('connection', {}).get('org'),
+                        as_number=data.get('connection', {}).get('asn')
+                    )
+            
+        except Exception as e:
+            logger.debug(f"❌ Error parsing {provider_name} response: {e}")
+        
+        return None
 
 @dataclass
 class HuntStatistics:
-    """Comprehensive hunting statistics with proper scope management."""
+    """Comprehensive hunting statistics with geolocation metrics."""
     total_sources: int = 0
     total_discovered: int = 0
     total_tested: int = 0
@@ -75,6 +243,9 @@ class HuntStatistics:
     average_response_time: float = 0.0
     hunt_duration: float = 0.0
     timestamp: str = ""
+    geolocated_proxies: int = 0
+    countries_found: int = 0
+    cities_found: int = 0
     
     def calculate_metrics(self) -> None:
         """Calculate derived metrics with proper error handling."""
@@ -269,12 +440,13 @@ class ProxyHunter:
         self.max_concurrent = max_concurrent
         self.timeout = timeout
         self.validator = ProxyValidator(timeout=timeout, max_concurrent=max_concurrent)
+        self.geolocation_service = GeolocationService()
         self.sources: List[ProxySource] = [FreeProxySource()]
         self.statistics = HuntStatistics()
         self.working_proxies: List[ProxyInfo] = []
         self.all_proxies: List[ProxyInfo] = []
         
-        logger.info("🐕 Proxy Hound database initialized")
+        logger.info("🐕 Proxy Hunter with Geolocation initialized")
     
     async def hunt_proxies(self) -> HuntStatistics:
         """Main hunting orchestration with comprehensive error handling."""
@@ -289,10 +461,14 @@ class ProxyHunter:
             # Phase 2: Validate discovered proxies
             await self._validate_proxies()
             
-            # Phase 3: Calculate final statistics
+            # Phase 3: Geolocate working proxies
+            await self._geolocate_proxies()
+            
+            # Phase 4: Calculate final statistics
             self._finalize_statistics(hunt_start_time)
             
             logger.info(f"🏁 Hunt completed: {self.statistics.working_proxies}/{self.statistics.total_tested} proxies working")
+            logger.info(f"🌍 Geolocation: {self.statistics.geolocated_proxies} proxies, {self.statistics.countries_found} countries, {self.statistics.cities_found} cities")
             
         except Exception as e:
             logger.error(f"💥 Critical hunting error: {e}")
@@ -372,6 +548,59 @@ class ProxyHunter:
             progress = min(i + batch_size, len(validation_tasks))
             logger.info(f"📈 Progress: {progress}/{self.statistics.total_tested} tested")
     
+    async def _geolocate_proxies(self) -> None:
+        """Add geolocation information to working proxies."""
+        logger.info("🌍 Phase 3: Geolocating working proxies...")
+        
+        if not self.working_proxies:
+            logger.warning("⚠️ No working proxies to geolocate")
+            return
+        
+        # Create semaphore for rate limiting geolocation requests
+        geo_semaphore = asyncio.Semaphore(10)  # Conservative rate limiting
+        
+        async def geolocate_proxy(proxy: ProxyInfo) -> ProxyInfo:
+            async with geo_semaphore:
+                geolocation = await self.geolocation_service.get_geolocation(proxy.host)
+                if geolocation:
+                    proxy.geolocation = geolocation
+                    proxy.country = geolocation.country
+                    proxy.city = geolocation.city
+                return proxy
+        
+        # Create geolocation tasks
+        geo_tasks = [
+            asyncio.create_task(geolocate_proxy(proxy))
+            for proxy in self.working_proxies
+        ]
+        
+        logger.info(f"🗺️ Geolocating {len(geo_tasks)} working proxies...")
+        
+        # Process geolocation results
+        results = await asyncio.gather(*geo_tasks, return_exceptions=True)
+        
+        # Update working proxies with geolocation data
+        geolocated_count = 0
+        countries = set()
+        cities = set()
+        
+        for result in results:
+            if isinstance(result, Exception):
+                logger.error(f"💥 Geolocation error: {result}")
+            elif result.geolocation:
+                geolocated_count += 1
+                if result.geolocation.country:
+                    countries.add(result.geolocation.country)
+                if result.geolocation.city:
+                    cities.add(result.geolocation.city)
+        
+        self.statistics.geolocated_proxies = geolocated_count
+        self.statistics.countries_found = len(countries)
+        self.statistics.cities_found = len(cities)
+        
+        logger.info(f"🌍 Geolocation complete: {geolocated_count}/{len(self.working_proxies)} proxies geolocated")
+        logger.info(f"📍 Found proxies in {len(countries)} countries and {len(cities)} cities")
+    
     def _finalize_statistics(self, hunt_start_time: float) -> None:
         """Calculate final hunting statistics."""
         self.statistics.hunt_duration = time.time() - hunt_start_time
@@ -389,8 +618,7 @@ class ProxyHunter:
     async def export_results(self) -> bool:
         """Export hunt results to multiple formats."""
         try:
-            logger.info("🔄 Creating emergency hunt report...")
-            logger.info("📤 Exporting hunt results to docs")
+            logger.info("📤 Exporting hunt results with geolocation data...")
             
             # Ensure docs directory exists
             docs_dir = Path("docs")
@@ -408,7 +636,7 @@ class ProxyHunter:
             # Export GitHub Pages index
             await self._export_github_pages(docs_dir)
             
-            logger.info(f"✅ Hunt results exported: {self.statistics.working_proxies} proxies")
+            logger.info(f"✅ Hunt results exported: {self.statistics.working_proxies} proxies with geolocation")
             return True
             
         except Exception as e:
@@ -417,48 +645,70 @@ class ProxyHunter:
     
     async def _export_json(self, docs_dir: Path) -> None:
         """Export results to JSON format."""
+        # Custom serializer for datetime and dataclass objects
+        def json_serializer(obj):
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            elif hasattr(obj, '__dict__'):
+                return obj.__dict__
+            return str(obj)
+        
         # Export statistics
         stats_data = asdict(self.statistics)
         with open(docs_dir / "proxy_statistics.json", "w") as f:
-            json.dump(stats_data, f, indent=2, default=str)
+            json.dump(stats_data, f, indent=2, default=json_serializer)
         
-        # Export working proxies
-        proxies_data = [asdict(proxy) for proxy in self.working_proxies]
+        # Export working proxies with geolocation
+        proxies_data = []
+        for proxy in self.working_proxies:
+            proxy_dict = asdict(proxy)
+            if proxy.geolocation:
+                proxy_dict['geolocation'] = asdict(proxy.geolocation)
+            proxies_data.append(proxy_dict)
+        
         with open(docs_dir / "working_proxies.json", "w") as f:
-            json.dump(proxies_data, f, indent=2, default=str)
+            json.dump(proxies_data, f, indent=2, default=json_serializer)
         
-        logger.info(f"📊 Exported {len(self.working_proxies)} proxies to JSON")
+        logger.info(f"📊 Exported {len(self.working_proxies)} proxies to JSON with geolocation")
     
     async def _export_csv(self, docs_dir: Path) -> None:
-        """Export working proxies to CSV format."""
+        """Export working proxies to CSV format with geolocation."""
         if not self.working_proxies:
             return
             
         with open(docs_dir / "working_proxies.csv", "w", newline="") as f:
             writer = csv.writer(f)
             
-            # Write header
+            # Write header with geolocation fields
             writer.writerow([
-                "host", "port", "protocol", "country", "anonymity",
-                "response_time", "last_tested", "success_rate", "ssl_support"
+                "host", "port", "protocol", "country", "city", "region",
+                "anonymity", "response_time", "last_tested", "success_rate", 
+                "ssl_support", "isp", "organization", "latitude", "longitude"
             ])
             
             # Write proxy data
             for proxy in self.working_proxies:
+                geo = proxy.geolocation
                 writer.writerow([
-                    proxy.host, proxy.port, proxy.protocol, proxy.country,
+                    proxy.host, proxy.port, proxy.protocol, 
+                    proxy.country or (geo.country if geo else ""),
+                    proxy.city or (geo.city if geo else ""),
+                    geo.region if geo else "",
                     proxy.anonymity, proxy.response_time, proxy.last_tested,
-                    proxy.success_rate, proxy.ssl_support
+                    proxy.success_rate, proxy.ssl_support,
+                    geo.isp if geo else "",
+                    geo.organization if geo else "",
+                    geo.latitude if geo else "",
+                    geo.longitude if geo else ""
                 ])
         
-        logger.info(f"📄 Exported {len(self.working_proxies)} proxies to CSV")
+        logger.info(f"📄 Exported {len(self.working_proxies)} proxies to CSV with geolocation")
     
     async def _export_markdown(self, docs_dir: Path) -> None:
-        """Export comprehensive markdown report."""
-        # Use the properly scoped percentage variable
+        """Export comprehensive markdown report with geolocation analysis."""
         percentage = self.statistics.success_percentage
         
-        report = f"""# Proxy Hunt Report
+        report = f"""# Proxy Hunt Report with Geolocation
 
 Generated: {self.statistics.timestamp}
 
@@ -474,210 +724,16 @@ Generated: {self.statistics.timestamp}
 | **Success Rate** | {percentage:.2f}% |
 | **Average Response Time** | {self.statistics.average_response_time:.2f}s |
 | **Hunt Duration** | {self.statistics.hunt_duration:.2f}s |
+| **Geolocated Proxies** | {self.statistics.geolocated_proxies:,} |
+| **Countries Found** | {self.statistics.countries_found:,} |
+| **Cities Found** | {self.statistics.cities_found:,} |
 
 ## 🌍 Geographic Distribution
 
+### By Country
 """
         
-        # Add geographic analysis
+        # Add country analysis
         countries = {}
         for proxy in self.working_proxies:
             country = proxy.country or "Unknown"
-            countries[country] = countries.get(country, 0) + 1
-        
-        for country, count in sorted(countries.items(), key=lambda x: x[1], reverse=True):
-            report += f"- **{country}**: {count} proxies\n"
-        
-        report += f"""
-
-## 🔒 Security Analysis
-
-- **SSL Support**: {sum(1 for p in self.working_proxies if p.ssl_support)} proxies
-- **Authentication Required**: {sum(1 for p in self.working_proxies if p.auth_required)} proxies
-- **Average Response Time**: {self.statistics.average_response_time:.2f}s
-
-## 📈 Performance Metrics
-
-### Response Time Distribution
-"""
-        
-        # Add response time analysis
-        if self.working_proxies:
-            times = [p.response_time for p in self.working_proxies if p.response_time]
-            if times:
-                times.sort()
-                report += f"- **Fastest**: {min(times):.2f}s\n"
-                report += f"- **Slowest**: {max(times):.2f}s\n"
-                report += f"- **Median**: {times[len(times)//2]:.2f}s\n"
-        
-        report += """
-
-## 🚀 Usage
-
-### Download Formats
-- [JSON Statistics](proxy_statistics.json)
-- [Working Proxies JSON](working_proxies.json)
-- [Working Proxies CSV](working_proxies.csv)
-
-### Integration
-```python
-import requests
-
-# Example proxy usage
-proxy = {
-    'http': 'http://proxy_host:proxy_port',
-    'https': 'http://proxy_host:proxy_port'
-}
-
-response = requests.get('https://httpbin.org/ip', proxies=proxy)
-print(response.json())
-```
-
----
-*Report generated by Enterprise Proxy Hunter v2.0*
-"""
-        
-        with open(docs_dir / "README.md", "w") as f:
-            f.write(report)
-        
-        logger.info("📋 Exported comprehensive markdown report")
-    
-    async def _export_github_pages(self, docs_dir: Path) -> None:
-        """Export GitHub Pages compatible index.html."""
-        # Use the properly scoped percentage variable
-        percentage = self.statistics.success_percentage
-        
-        html_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proxy Hunter Results</title>
-    <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; }}
-        .stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }}
-        .stat-card {{ background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }}
-        .stat-number {{ font-size: 2em; font-weight: bold; color: #28a745; }}
-        .stat-label {{ color: #6c757d; font-size: 0.9em; }}
-        table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
-        th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }}
-        th {{ background-color: #f8f9fa; }}
-        .success {{ color: #28a745; }}
-        .timestamp {{ color: #6c757d; font-size: 0.9em; }}
-    </style>
-</head>
-<body>
-    <h1>🐕 Proxy Hunter Results</h1>
-    <p class="timestamp">Last Updated: {self.statistics.timestamp}</p>
-    
-    <div class="stats">
-        <div class="stat-card">
-            <div class="stat-number">{self.statistics.working_proxies:,}</div>
-            <div class="stat-label">Working Proxies</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{self.statistics.total_tested:,}</div>
-            <div class="stat-label">Total Tested</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{percentage:.1f}%</div>
-            <div class="stat-label">Success Rate</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{self.statistics.average_response_time:.2f}s</div>
-            <div class="stat-label">Avg Response Time</div>
-        </div>
-    </div>
-    
-    <h2>📥 Download Results</h2>
-    <ul>
-        <li><a href="proxy_statistics.json">📊 Statistics (JSON)</a></li>
-        <li><a href="working_proxies.json">🌐 Working Proxies (JSON)</a></li>
-        <li><a href="working_proxies.csv">📄 Working Proxies (CSV)</a></li>
-        <li><a href="README.md">📋 Full Report (Markdown)</a></li>
-    </ul>
-    
-    <h2>🔥 Top Performing Proxies</h2>
-    <table>
-        <thead>
-            <tr><th>Host</th><th>Port</th><th>Protocol</th><th>Response Time</th><th>SSL</th></tr>
-        </thead>
-        <tbody>
-"""
-        
-        # Add top 10 fastest proxies
-        fastest_proxies = sorted(
-            [p for p in self.working_proxies if p.response_time],
-            key=lambda x: x.response_time
-        )[:10]
-        
-        for proxy in fastest_proxies:
-            ssl_icon = "✅" if proxy.ssl_support else "❌"
-            html_content += f"""
-            <tr>
-                <td>{proxy.host}</td>
-                <td>{proxy.port}</td>
-                <td>{proxy.protocol.upper()}</td>
-                <td class="success">{proxy.response_time:.2f}s</td>
-                <td>{ssl_icon}</td>
-            </tr>"""
-        
-        html_content += """
-        </tbody>
-    </table>
-    
-    <footer style="margin-top: 40px; text-align: center; color: #6c757d;">
-        <p>Generated by Enterprise Proxy Hunter v2.0</p>
-    </footer>
-</body>
-</html>"""
-        
-        with open(docs_dir / "index.html", "w") as f:
-            f.write(html_content)
-        
-        logger.info("🌐 Exported GitHub Pages index.html")
-
-async def main():
-    """Main execution function with comprehensive error handling."""
-    try:
-        logger.info("🚀 Starting Enterprise Proxy Hunter v2.0")
-        
-        # Initialize hunter with configuration
-        hunter = ProxyHunter(
-            max_concurrent=100,  # Adjust based on system capabilities
-            timeout=10
-        )
-        
-        # Execute hunt
-        stats = await hunter.hunt_proxies()
-        
-        # Export results
-        export_success = await hunter.export_results()
-        
-        if export_success:
-            logger.info("🎯 Proxy hunt completed successfully!")
-            logger.info(f"📈 Final Results: {stats.working_proxies}/{stats.total_tested} proxies ({stats.success_percentage:.2f}% success)")
-        else:
-            logger.error("❌ Export failed, but hunt data is available")
-            exit(1)
-            
-    except KeyboardInterrupt:
-        logger.info("🛑 Hunt interrupted by user")
-        exit(0)
-    except Exception as e:
-        logger.error(f"💥 Fatal error in main: {e}")
-        exit(1)
-
-if __name__ == "__main__":
-    # Configure asyncio for better performance
-    if hasattr(asyncio, 'set_event_loop_policy'):
-        # Use uvloop on Unix systems for better performance
-        try:
-            import uvloop
-            asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-            logger.info("🚀 Using uvloop for enhanced performance")
-        except ImportError:
-            logger.info("📡 Using default asyncio event loop")
-    
-    # Run the main coroutine
-    asyncio.run(main())

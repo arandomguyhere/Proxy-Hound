@@ -1,18 +1,22 @@
-name: Proxy Intelligence System
+name: Proxy Hound Intelligence System
 
 on:
   schedule:
-    - cron: '0 */8 * * *'
+    - cron: '0 */8 * * *'  # Every 8 hours
   workflow_dispatch:
     inputs:
       max_pages:
-        description: 'GitHub pages to search'
+        description: 'GitHub pages to search per hunting ground'
         required: false
         default: '3'
       max_concurrent:
-        description: 'Concurrent validations'
+        description: 'Concurrent proxy validations'
         required: false
-        default: '50'
+        default: '100'
+      max_memory_mb:
+        description: 'Memory limit in MB'
+        required: false
+        default: '512'
 
 permissions:
   contents: write
@@ -20,10 +24,10 @@ permissions:
   id-token: write
 
 jobs:
-  proxy-discovery:
-    name: Discover and Validate Proxies
+  proxy-hound-hunt:
+    name: Advanced Proxy Hunting Expedition
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     
     steps:
       - name: Checkout Repository
@@ -31,189 +35,261 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Setup Python
+      - name: Setup Python Environment
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
-          cache-dependency-path: 'requirements-minimal.txt'
       
-      - name: Install Dependencies
+      - name: Install Hunting Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-minimal.txt
+          pip install aiohttp aiofiles psutil
+          echo "🐕 Proxy Hound dependencies installed"
       
-      - name: Configure Git
+      - name: Configure Git for Hunt Results
         run: |
-          git config --global user.name "ProxyBot"
-          git config --global user.email "proxy-bot@users.noreply.github.com"
+          git config --global user.name "ProxyHound"
+          git config --global user.email "proxy-hound@users.noreply.github.com"
           git config --global pull.rebase false
       
-      - name: System Info
+      - name: System Resources Check
         run: |
-          echo "System Resources:"
-          df -h
-          free -h
-          echo "Python Environment:"
-          python --version
-          pip list
+          echo "🖥️ System Resources:"
+          echo "CPU: $(nproc) cores"
+          echo "Memory: $(free -h | grep '^Mem:' | awk '{print $2}')"
+          echo "Disk: $(df -h / | tail -1 | awk '{print $4}') available"
+          echo "Python: $(python --version)"
+          echo "🐕 Ready for hunting expedition"
       
-      - name: Restore Database
+      - name: Restore Hunt Database
         run: |
-          if [ -f "proxies.db" ]; then
-            if file proxies.db | grep -q "gzip"; then
-              echo "Decompressing database"
-              mv proxies.db proxies.db.gz
-              gunzip proxies.db.gz
+          if [ -f "proxy_hound.db" ]; then
+            if file proxy_hound.db | grep -q "gzip"; then
+              echo "🗄️ Decompressing hunt database..."
+              mv proxy_hound.db proxy_hound.db.gz
+              gunzip proxy_hound.db.gz
             fi
-            echo "Database size: $(du -h proxies.db | cut -f1)"
-            sqlite3 proxies.db "SELECT COUNT(*) FROM proxies;" 2>/dev/null || echo "Database needs initialization"
+            echo "📊 Database size: $(du -h proxy_hound.db | cut -f1)"
+            sqlite3 proxy_hound.db "SELECT COUNT(*) FROM proxies;" 2>/dev/null || echo "Database needs initialization"
+            WORKING_COUNT=$(sqlite3 proxy_hound.db "SELECT COUNT(*) FROM proxies WHERE is_working = 1;" 2>/dev/null || echo "0")
+            echo "✅ Working proxies in database: $WORKING_COUNT"
           else
-            echo "No existing database found"
+            echo "🆕 No existing hunt database found - starting fresh hunt"
           fi
       
-      - name: Run Proxy Discovery
+      - name: Execute Proxy Hound Hunt
         env:
-          GITHUB_TOKEN: ${{ secrets.PROXY_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MAX_PAGES: ${{ github.event.inputs.max_pages || '3' }}
-          MAX_CONCURRENT: ${{ github.event.inputs.max_concurrent || '50' }}
+          MAX_CONCURRENT: ${{ github.event.inputs.max_concurrent || '100' }}
+          MAX_MEMORY_MB: ${{ github.event.inputs.max_memory_mb || '512' }}
           GITHUB_ACTIONS: 'true'
         run: |
-          echo "Starting discovery"
-          echo "MAX_PAGES: $MAX_PAGES"
-          echo "MAX_CONCURRENT: $MAX_CONCURRENT"
-          echo "GitHub Token configured: $(echo $GITHUB_TOKEN | head -c 10)"
-          python proxy_discovery_optimized.py
-          echo "Script execution completed with exit code: $?"
-      
-      - name: Check Script Results
-        run: |
-          echo "Checking script results:"
-          echo "Files in repository:"
-          ls -la
+          echo "🐕 Starting Proxy Hound hunting expedition..."
+          echo "Configuration:"
+          echo "  - Max Pages: $MAX_PAGES"
+          echo "  - Max Concurrent: $MAX_CONCURRENT"
+          echo "  - Memory Limit: ${MAX_MEMORY_MB}MB"
+          echo "  - GitHub Token: $(echo $GITHUB_TOKEN | head -c 10)..."
           
-          if [ -f "proxies.db" ]; then
-            echo "Database exists: $(du -h proxies.db | cut -f1)"
+          python proxy_hound.py
+          
+          HUNT_EXIT_CODE=$?
+          echo "🏁 Hunt completed with exit code: $HUNT_EXIT_CODE"
+          
+          if [ $HUNT_EXIT_CODE -eq 0 ]; then
+            echo "✅ Hunting expedition successful!"
           else
-            echo "No database file found"
+            echo "⚠️ Hunt completed with warnings (exit code: $HUNT_EXIT_CODE)"
+          fi
+      
+      - name: Analyze Hunt Results
+        run: |
+          echo "🔍 Analyzing hunt results..."
+          
+          if [ -f "proxy_hound.db" ]; then
+            echo "📊 Database analysis:"
+            TOTAL_PROXIES=$(sqlite3 proxy_hound.db "SELECT COUNT(*) FROM proxies;" 2>/dev/null || echo "0")
+            WORKING_PROXIES=$(sqlite3 proxy_hound.db "SELECT COUNT(*) FROM proxies WHERE is_working = 1;" 2>/dev/null || echo "0")
+            REPOSITORIES=$(sqlite3 proxy_hound.db "SELECT COUNT(DISTINCT repository) FROM proxies WHERE repository IS NOT NULL;" 2>/dev/null || echo "0")
+            COUNTRIES=$(sqlite3 proxy_hound.db "SELECT COUNT(DISTINCT country) FROM proxies WHERE country IS NOT NULL AND is_working = 1;" 2>/dev/null || echo "0")
+            
+            echo "  - Total proxies hunted: $TOTAL_PROXIES"
+            echo "  - Working proxies: $WORKING_PROXIES"
+            echo "  - Repositories hunted: $REPOSITORIES"
+            echo "  - Countries found: $COUNTRIES"
+            
+            if [ "$TOTAL_PROXIES" -gt 0 ]; then
+              SUCCESS_RATE=$(echo "scale=2; $WORKING_PROXIES * 100 / $TOTAL_PROXIES" | bc -l 2>/dev/null || echo "0")
+              echo "  - Success rate: ${SUCCESS_RATE}%"
+            fi
+          else
+            echo "❌ No database found"
           fi
           
           if [ -d "docs" ]; then
-            echo "Docs directory exists"
+            echo "📁 Documentation generated:"
             ls -la docs/
+            
+            if [ -f "docs/hunt_stats.json" ]; then
+              echo "📈 Hunt statistics available"
+            fi
           else
-            echo "Docs directory missing"
+            echo "⚠️ No docs directory found"
             mkdir -p docs
           fi
       
-      - name: Create Fallback Pages
+      - name: Create Fallback Content
         run: |
           mkdir -p docs
           
+          # Create fallback index if needed
           if [ ! -f "docs/index.html" ]; then
-            echo "Creating fallback dashboard"
-            echo '<!DOCTYPE html>' > docs/index.html
-            echo '<html><head><title>Proxy Intelligence Dashboard</title>' >> docs/index.html
-            echo '<style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:20px}' >> docs/index.html
-            echo '.header{background:#f0f0f0;padding:20px;border-radius:8px;text-align:center}' >> docs/index.html
-            echo '.status{background:#fff3cd;padding:15px;border-radius:5px;margin:20px 0}</style>' >> docs/index.html
-            echo '</head><body><div class="header"><h1>Proxy Intelligence System</h1>' >> docs/index.html
-            echo '<p>Automated proxy discovery and validation</p></div>' >> docs/index.html
-            echo '<div class="status"><h2>System Status</h2>' >> docs/index.html
-            echo '<p>The proxy discovery system is initializing. Results will appear after the first successful run.</p>' >> docs/index.html
-            echo '<p>Check back in a few minutes for updated proxy lists.</p></div></body></html>' >> docs/index.html
+            echo "🔄 Creating fallback dashboard..."
+            cat > docs/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy Hound Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+        .status { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐕 Proxy Hound Dashboard</h1>
+        <p>Advanced Repository Hunter - Initializing...</p>
+    </div>
+    <div class="status">
+        <h2>System Status</h2>
+        <p>The Proxy Hound is preparing for its first hunting expedition. Results will appear after the initial hunt completes.</p>
+        <p>Check back in a few minutes for comprehensive proxy intelligence.</p>
+    </div>
+</body>
+</html>
+EOF
           fi
           
-          if [ ! -f "docs/proxies.txt" ]; then
-            echo "# Proxy List - System Initializing" > docs/proxies.txt
-            echo "# No proxies discovered yet" >> docs/proxies.txt
-            echo "# Check back after the first run completes" >> docs/proxies.txt
-          fi
-          
-          if [ ! -f "docs/stats.json" ]; then
-            echo '{' > docs/stats.json
-            echo '  "total_proxies": 0,' >> docs/stats.json
-            echo '  "working_proxies": 0,' >> docs/stats.json
-            echo '  "success_rate": 0,' >> docs/stats.json
-            echo '  "countries": 0,' >> docs/stats.json
-            echo '  "last_updated": "System initializing",' >> docs/stats.json
-            echo '  "status": "first_run"' >> docs/stats.json
-            echo '}' >> docs/stats.json
+          # Create fallback stats
+          if [ ! -f "docs/hunt_stats.json" ]; then
+            cat > docs/hunt_stats.json << 'EOF'
+{
+  "total_proxies": 0,
+  "working_proxies": 0,
+  "success_rate": 0,
+  "geolocated_proxies": 0,
+  "countries_found": 0,
+  "cities_found": 0,
+  "last_updated": "System initializing",
+  "status": "first_hunt"
+}
+EOF
           fi
       
-      - name: Verify Results
+      - name: Compress Hunt Database
         run: |
-          echo "Final verification:"
-          if [ -f "proxies.db" ]; then
-            if file proxies.db | grep -q "gzip"; then
-              cp proxies.db proxies.db.gz
-              gunzip proxies.db.gz
-            fi
-            echo "Database size: $(du -h proxies.db | cut -f1)"
-            sqlite3 proxies.db "SELECT COUNT(*) FROM proxies;" 2>/dev/null || echo "Query failed"
-            gzip -c proxies.db > proxies.db.gz
-            rm proxies.db
-            mv proxies.db.gz proxies.db
+          if [ -f "proxy_hound.db" ]; then
+            echo "🗜️ Compressing hunt database for storage..."
+            ORIGINAL_SIZE=$(du -h proxy_hound.db | cut -f1)
+            gzip -c proxy_hound.db > proxy_hound.db.gz
+            rm proxy_hound.db
+            mv proxy_hound.db.gz proxy_hound.db
+            COMPRESSED_SIZE=$(du -h proxy_hound.db | cut -f1)
+            echo "📦 Database compressed: $ORIGINAL_SIZE → $COMPRESSED_SIZE"
           fi
-          
-          echo "Docs directory contents:"
-          ls -la docs/
-          echo "Repository size: $(du -sh . | cut -f1)"
       
-      - name: Sync with Remote
+      - name: Sync with Remote Repository
         run: |
-          echo "Syncing with remote repository"
-          git fetch origin main
+          echo "🔄 Syncing with remote repository..."
+          git fetch origin main || echo "Fetch completed"
           git status
-          echo "Checking for conflicts"
       
-      - name: Commit and Push Results
+      - name: Commit Hunt Results
         run: |
-          git add docs/ proxies.db 2>/dev/null || true
+          # Add all hunt results
+          git add docs/ proxy_hound.db 2>/dev/null || true
           
+          # Check if there are changes to commit
           if git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "📭 No new hunt results to commit"
             exit 0
           fi
           
-          echo "Pulling latest changes before commit"
+          echo "📤 Committing hunt results..."
+          
+          # Pull latest changes
           git pull origin main --no-edit || echo "Pull completed with merge"
           
+          # Commit with timestamp
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          git commit -m "Proxy discovery update $TIMESTAMP" || echo "Commit completed"
+          git commit -m "🐕 Proxy Hound hunt results - $TIMESTAMP
+
+Hunt Summary:
+- Advanced repository hunting with geolocation
+- Pack behavior analysis and learning algorithms
+- High-performance parallel validation
+- Professional dashboard with hunt statistics" || echo "Commit completed"
           
-          echo "Pushing changes to remote"
+          # Push to remote
+          echo "🚀 Pushing hunt results to repository..."
           git push origin main
           
-          echo "Changes committed and pushed successfully"
+          echo "✅ Hunt results successfully committed and pushed"
       
       - name: Setup GitHub Pages
         if: github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v4
       
-      - name: Upload to Pages
+      - name: Upload Hunt Results to Pages
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/
       
-      - name: Deploy to Pages
+      - name: Deploy Hunt Dashboard
         if: github.ref == 'refs/heads/main'
         uses: actions/deploy-pages@v4
       
-      - name: Create Summary
+      - name: Generate Hunt Summary
         run: |
-          echo "## Proxy Intelligence Results" >> $GITHUB_STEP_SUMMARY
+          echo "## 🐕 Proxy Hound Hunt Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -f docs/stats.json ]; then
-            WORKING=$(grep -o '"working_proxies":[^,]*' docs/stats.json | cut -d':' -f2 | tr -d ' ')
-            TOTAL=$(grep -o '"total_proxies":[^,]*' docs/stats.json | cut -d':' -f2 | tr -d ' ')
-            echo "- Working Proxies: $WORKING" >> $GITHUB_STEP_SUMMARY
-            echo "- Total Discovered: $TOTAL" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f docs/hunt_stats.json ]; then
+            WORKING=$(grep -o '"working_proxies":[^,]*' docs/hunt_stats.json | cut -d':' -f2 | tr -d ' ' || echo "0")
+            TOTAL=$(grep -o '"total_proxies":[^,]*' docs/hunt_stats.json | cut -d':' -f2 | tr -d ' ' || echo "0")
+            COUNTRIES=$(grep -o '"countries_found":[^,]*' docs/hunt_stats.json | cut -d':' -f2 | tr -d ' ' || echo "0")
+            GEOLOCATED=$(grep -o '"geolocated_proxies":[^,]*' docs/hunt_stats.json | cut -d':' -f2 | tr -d ' ' || echo "0")
+            
+            echo "### Hunt Statistics" >> $GITHUB_STEP_SUMMARY
+            echo "- 🎯 **Working Proxies**: $WORKING" >> $GITHUB_STEP_SUMMARY
+            echo "- 📊 **Total Hunted**: $TOTAL" >> $GITHUB_STEP_SUMMARY
+            echo "- 🌍 **Geolocated**: $GEOLOCATED" >> $GITHUB_STEP_SUMMARY
+            echo "- 🗺️ **Countries Found**: $COUNTRIES" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "$TOTAL" -gt 0 ] && [ "$WORKING" -gt 0 ]; then
+              SUCCESS_RATE=$(echo "scale=1; $WORKING * 100 / $TOTAL" | bc -l 2>/dev/null || echo "0")
+              echo "- 🏹 **Success Rate**: ${SUCCESS_RATE}%" >> $GITHUB_STEP_SUMMARY
+            fi
           else
-            echo "- Status: No stats file found" >> $GITHUB_STEP_SUMMARY
+            echo "- ⚠️ Hunt statistics not available" >> $GITHUB_STEP_SUMMARY
           fi
-          echo "- Dashboard: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/" >> $GITHUB_STEP_SUMMARY
-          if [ -f "docs/proxies.txt" ]; then
-            echo "- Proxy List: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/proxies.txt" >> $GITHUB_STEP_SUMMARY
-          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🌐 Access Hunt Results" >> $GITHUB_STEP_SUMMARY
+          echo "- [🐕 Hunt Dashboard](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [📊 Hunt Statistics](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/hunt_stats.json)" >> $GITHUB_STEP_SUMMARY
+          echo "- [📄 Proxy List](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/proxy_hound_results.txt)" >> $GITHUB_STEP_SUMMARY
+          echo "- [📥 JSON Export](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/proxy_hound_results.json)" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🐕 Hunting Features" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Advanced GitHub repository hunting" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Scent tracking and pack behavior analysis" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Learning algorithms for improved success" >> $GITHUB_STEP_SUMMARY
+          echo "

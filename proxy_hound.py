@@ -52,7 +52,7 @@ BACKUP_HUNTING_GROUNDS = [
 
 @dataclass
 class GeolocationInfo:
-    """Comprehensive geolocation information with consensus scoring."""
+    """Comprehensive geolocation information."""
     country: Optional[str] = None
     country_code: Optional[str] = None
     region: Optional[str] = None
@@ -64,11 +64,6 @@ class GeolocationInfo:
     organization: Optional[str] = None
     as_number: Optional[str] = None
     threat_level: Optional[str] = None
-    # Accuracy and consensus fields
-    provider: Optional[str] = None
-    accuracy_score: float = 0.0
-    confidence_score: float = 0.0
-    provider_count: int = 0
 
 @dataclass
 class ProxyInfo:
@@ -106,240 +101,71 @@ class ProxyInfo:
         return "Unknown"
 
 class GeolocationService:
-    """High-accuracy geolocation service with multiple premium providers and consensus system."""
+    """Geolocation service with multiple providers and caching."""
     
     def __init__(self, cache_size: int = 10000):
         self.cache: Dict[str, GeolocationInfo] = {}
         self.cache_size = cache_size
-        self.session_timeout = aiohttp.ClientTimeout(total=15)
+        self.session_timeout = aiohttp.ClientTimeout(total=10)
         
-        # Multiple geolocation providers (free + premium tiers)
+        # Multiple geolocation providers (free tier)
         self.providers = [
-            # High accuracy paid/premium services
-            {
-                'name': 'ipgeolocation',
-                'url': 'https://api.ipgeolocation.io/ipgeo?apiKey={api_key}&ip={ip}&fields=geo',
-                'rate_limit': 1000,  # requests per day (free tier)
-                'accuracy': 95,
-                'last_request': 0,
-                'api_key_env': 'IPGEOLOCATION_API_KEY'
-            },
-            {
-                'name': 'ipstack',
-                'url': 'http://api.ipstack.com/{ip}?access_key={api_key}&fields=main',
-                'rate_limit': 1000,  # requests per month (free tier)  
-                'accuracy': 90,
-                'last_request': 0,
-                'api_key_env': 'IPSTACK_API_KEY'
-            },
-            {
-                'name': 'abstractapi',
-                'url': 'https://ipgeolocation.abstractapi.com/v1/?api_key={api_key}&ip_address={ip}',
-                'rate_limit': 1000,  # requests per month (free tier)
-                'accuracy': 93,
-                'last_request': 0,
-                'api_key_env': 'ABSTRACTAPI_KEY'
-            },
-            {
-                'name': 'ipdata',
-                'url': 'https://api.ipdata.co/{ip}?api-key={api_key}&fields=ip,city,region,country_name,country_code,latitude,longitude,timezone,asn,threat',
-                'rate_limit': 1500,  # requests per day (free tier)
-                'accuracy': 92,
-                'last_request': 0,
-                'api_key_env': 'IPDATA_API_KEY'
-            },
-            # Free tier services (backup)
             {
                 'name': 'ip-api',
                 'url': 'http://ip-api.com/json/{ip}?fields=status,message,country,countryCode,region,regionName,city,lat,lon,timezone,isp,org,as,mobile,proxy,hosting',
                 'rate_limit': 45,  # requests per minute
-                'accuracy': 85,
                 'last_request': 0
             },
             {
                 'name': 'ipapi.co',
                 'url': 'https://ipapi.co/{ip}/json/',
                 'rate_limit': 30,  # requests per minute for free tier
-                'accuracy': 80,
                 'last_request': 0
             },
             {
                 'name': 'ipwhois.app',
                 'url': 'http://ipwho.is/{ip}',
                 'rate_limit': 1000,  # requests per hour
-                'accuracy': 75,
                 'last_request': 0
             }
         ]
-        
-        # Load API keys from environment
-        for provider in self.providers:
-            if 'api_key_env' in provider:
-                api_key = os.getenv(provider['api_key_env'])
-                provider['api_key'] = api_key
-                if api_key:
-                    logger.info(f"🔑 {provider['name']} API key loaded")
-                else:
-                    logger.warning(f"⚠️ {provider['name']} API key missing - using free tier only")
     
     async def get_geolocation(self, ip: str) -> Optional[GeolocationInfo]:
-        """Get high-accuracy geolocation using consensus from multiple providers."""
+        """Get geolocation for IP with caching and fallback providers."""
         
         # Check cache first
-        cache_key = f"{ip}_consensus"
-        if cache_key in self.cache:
-            logger.debug(f"🗺️ Consensus cache hit for {ip}")
-            return self.cache[cache_key]
+        if ip in self.cache:
+            logger.debug(f"🗺️ Cache hit for {ip}")
+            return self.cache[ip]
         
-        # Query multiple providers for consensus
-        results = []
-        available_providers = [p for p in self.providers if self._provider_available(p)]
-        
-        # Sort by accuracy rating (highest first)
-        available_providers.sort(key=lambda x: x['accuracy'], reverse=True)
-        
-        # Query top 3-5 providers for consensus
-        consensus_providers = available_providers[:min(5, len(available_providers))]
-        
-        logger.debug(f"🌍 Querying {len(consensus_providers)} providers for {ip}")
-        
-        for provider in consensus_providers:
+        # Try each provider until we get a result
+        for provider in self.providers:
             try:
                 result = await self._query_provider(provider, ip)
                 if result:
-                    result.provider = provider['name']
-                    result.accuracy_score = provider['accuracy']
-                    results.append(result)
-                    logger.debug(f"✅ {provider['name']}: {result.city}, {result.country}")
-                else:
-                    logger.debug(f"❌ {provider['name']}: No data")
+                    # Cache the result
+                    if len(self.cache) >= self.cache_size:
+                        # Simple cache eviction - remove oldest entry
+                        self.cache.pop(next(iter(self.cache)))
+                    
+                    self.cache[ip] = result
+                    logger.debug(f"🌍 Geolocation found for {ip}: {result.city}, {result.country}")
+                    return result
                     
             except Exception as e:
-                logger.debug(f"❌ {provider['name']} failed for {ip}: {e}")
+                logger.debug(f"❌ Provider {provider['name']} failed for {ip}: {e}")
                 continue
-                
-            # Small delay between providers to respect rate limits
-            await asyncio.sleep(0.1)
         
-        if not results:
-            logger.debug(f"⚠️ No geolocation results for {ip}")
-            return None
-        
-        # Create consensus result from multiple providers
-        consensus_result = self._create_consensus(results, ip)
-        
-        # Cache the consensus result
-        if len(self.cache) >= self.cache_size:
-            # Simple cache eviction - remove oldest entry
-            self.cache.pop(next(iter(self.cache)))
-        
-        self.cache[cache_key] = consensus_result
-        
-        logger.debug(f"🎯 Consensus result for {ip}: {consensus_result.city}, {consensus_result.country} (confidence: {consensus_result.confidence_score:.1f}%)")
-        return consensus_result
-    
-    def _provider_available(self, provider: Dict) -> bool:
-        """Check if provider is available (has API key if required)."""
-        if 'api_key_env' in provider:
-            return provider.get('api_key') is not None
-        return True
-    
-    def _create_consensus(self, results: List[GeolocationInfo], ip: str) -> GeolocationInfo:
-        """Create consensus result from multiple provider results."""
-        if len(results) == 1:
-            results[0].confidence_score = results[0].accuracy_score
-            return results[0]
-        
-        # Weighted voting system based on provider accuracy
-        country_votes = {}
-        city_votes = {}
-        coords_sum = {'lat': 0, 'lon': 0, 'weight': 0}
-        
-        # Collect data with accuracy weights
-        timezone_votes = {}
-        isp_votes = {}
-        asn_votes = {}
-        
-        for result in results:
-            weight = result.accuracy_score / 100.0
-            
-            # Country voting
-            if result.country:
-                if result.country not in country_votes:
-                    country_votes[result.country] = {'weight': 0, 'code': result.country_code}
-                country_votes[result.country]['weight'] += weight
-            
-            # City voting  
-            if result.city:
-                city_key = f"{result.city}, {result.country}"
-                if city_key not in city_votes:
-                    city_votes[city_key] = {'weight': 0, 'city': result.city, 'region': result.region}
-                city_votes[city_key]['weight'] += weight
-                
-            # Coordinate averaging (weighted)
-            if result.latitude and result.longitude:
-                coords_sum['lat'] += result.latitude * weight
-                coords_sum['lon'] += result.longitude * weight  
-                coords_sum['weight'] += weight
-            
-            # Other field voting
-            if result.timezone:
-                timezone_votes[result.timezone] = timezone_votes.get(result.timezone, 0) + weight
-            if result.isp:
-                isp_votes[result.isp] = isp_votes.get(result.isp, 0) + weight
-            if result.as_number:
-                asn_votes[result.as_number] = asn_votes.get(result.as_number, 0) + weight
-        
-        # Determine consensus values
-        consensus = GeolocationInfo()
-        
-        # Best country by weighted vote
-        if country_votes:
-            best_country = max(country_votes.items(), key=lambda x: x[1]['weight'])
-            consensus.country = best_country[0]
-            consensus.country_code = best_country[1]['code']
-        
-        # Best city by weighted vote
-        if city_votes:
-            best_city = max(city_votes.items(), key=lambda x: x[1]['weight'])
-            consensus.city = best_city[1]['city']
-            consensus.region = best_city[1]['region']
-        
-        # Average coordinates (weighted)
-        if coords_sum['weight'] > 0:
-            consensus.latitude = coords_sum['lat'] / coords_sum['weight']
-            consensus.longitude = coords_sum['lon'] / coords_sum['weight']
-        
-        # Best other fields by vote
-        if timezone_votes:
-            consensus.timezone = max(timezone_votes.items(), key=lambda x: x[1])[0]
-        if isp_votes:
-            consensus.isp = max(isp_votes.items(), key=lambda x: x[1])[0]
-        if asn_votes:
-            consensus.as_number = max(asn_votes.items(), key=lambda x: x[1])[0]
-            
-        # Calculate confidence score
-        total_weight = sum(r.accuracy_score for r in results)
-        agreement_weight = max(country_votes.values(), key=lambda x: x['weight'])['weight'] if country_votes else 0
-        consensus.confidence_score = (agreement_weight * 100 / (total_weight / 100)) if total_weight > 0 else 0
-        consensus.provider_count = len(results)
-        
-        return consensus
+        logger.debug(f"⚠️ No geolocation found for {ip}")
+        return None
     
     async def _query_provider(self, provider: Dict, ip: str) -> Optional[GeolocationInfo]:
-        """Query a specific geolocation provider with API key support."""
+        """Query a specific geolocation provider."""
         
         # Rate limiting
         current_time = time.time()
         time_since_last = current_time - provider['last_request']
-        
-        # Convert rate limit to seconds between requests
-        if provider['name'] in ['ipgeolocation', 'ipstack', 'abstractapi', 'ipdata']:
-            # Daily/monthly limits - more conservative spacing
-            min_interval = 2.0  # 2 seconds between requests
-        else:
-            # Hourly/minute limits
-            min_interval = 60.0 / provider['rate_limit']
+        min_interval = 60.0 / provider['rate_limit']  # Convert to seconds between requests
         
         if time_since_last < min_interval:
             sleep_time = min_interval - time_since_last
@@ -347,92 +173,22 @@ class GeolocationService:
         
         provider['last_request'] = time.time()
         
-        # Build URL with API key if needed
-        url = provider['url']
-        if 'api_key' in provider and provider.get('api_key'):
-            url = url.format(ip=ip, api_key=provider['api_key'])
-        else:
-            url = url.format(ip=ip)
+        url = provider['url'].format(ip=ip)
         
-        # Skip if API key required but not available
-        if '{api_key}' in url:
-            logger.debug(f"⚠️ Skipping {provider['name']} - API key required")
-            return None
-        
-        try:
-            async with aiohttp.ClientSession(timeout=self.session_timeout) as session:
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        return self._parse_response(provider['name'], data)
-                    else:
-                        logger.debug(f"❌ {provider['name']} returned status {response.status} for {ip}")
-                        return None
-        except Exception as e:
-            logger.debug(f"❌ {provider['name']} query failed: {e}")
-            return None
+        async with aiohttp.ClientSession(timeout=self.session_timeout) as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return self._parse_response(provider['name'], data)
+                else:
+                    logger.debug(f"❌ {provider['name']} returned status {response.status} for {ip}")
+                    return None
     
     def _parse_response(self, provider_name: str, data: Dict) -> Optional[GeolocationInfo]:
         """Parse geolocation response based on provider format."""
         
         try:
-            if provider_name == 'ipgeolocation':
-                return GeolocationInfo(
-                    country=data.get('country_name'),
-                    country_code=data.get('country_code2'),
-                    region=data.get('state_prov'),
-                    city=data.get('city'),
-                    latitude=float(data.get('latitude')) if data.get('latitude') else None,
-                    longitude=float(data.get('longitude')) if data.get('longitude') else None,
-                    timezone=data.get('time_zone', {}).get('name') if isinstance(data.get('time_zone'), dict) else data.get('time_zone'),
-                    isp=data.get('isp'),
-                    organization=data.get('organization'),
-                    as_number=f"AS{data.get('asn')}" if data.get('asn') else None
-                )
-            
-            elif provider_name == 'ipstack':
-                return GeolocationInfo(
-                    country=data.get('country_name'),
-                    country_code=data.get('country_code'),
-                    region=data.get('region_name'),
-                    city=data.get('city'),
-                    latitude=data.get('latitude'),
-                    longitude=data.get('longitude'),
-                    timezone=data.get('time_zone', {}).get('id') if isinstance(data.get('time_zone'), dict) else None,
-                    isp=data.get('connection', {}).get('isp') if isinstance(data.get('connection'), dict) else None,
-                    as_number=f"AS{data.get('connection', {}).get('asn')}" if isinstance(data.get('connection'), dict) and data.get('connection', {}).get('asn') else None
-                )
-            
-            elif provider_name == 'abstractapi':
-                return GeolocationInfo(
-                    country=data.get('country'),
-                    country_code=data.get('country_code'),
-                    region=data.get('region'),
-                    city=data.get('city'),
-                    latitude=data.get('latitude'),
-                    longitude=data.get('longitude'),
-                    timezone=data.get('timezone', {}).get('name') if isinstance(data.get('timezone'), dict) else data.get('timezone'),
-                    isp=data.get('connection', {}).get('isp_name') if isinstance(data.get('connection'), dict) else None,
-                    organization=data.get('connection', {}).get('organization_name') if isinstance(data.get('connection'), dict) else None,
-                    as_number=data.get('connection', {}).get('autonomous_system_number') if isinstance(data.get('connection'), dict) else None
-                )
-            
-            elif provider_name == 'ipdata':
-                return GeolocationInfo(
-                    country=data.get('country_name'),
-                    country_code=data.get('country_code'),
-                    region=data.get('region'),
-                    city=data.get('city'),
-                    latitude=data.get('latitude'),
-                    longitude=data.get('longitude'),
-                    timezone=data.get('time_zone', {}).get('name') if isinstance(data.get('time_zone'), dict) else data.get('time_zone'),
-                    isp=data.get('asn', {}).get('name') if isinstance(data.get('asn'), dict) else None,
-                    organization=data.get('asn', {}).get('domain') if isinstance(data.get('asn'), dict) else None,
-                    as_number=f"AS{data.get('asn', {}).get('asn')}" if isinstance(data.get('asn'), dict) and data.get('asn', {}).get('asn') else None,
-                    threat_level='proxy' if data.get('threat', {}).get('is_proxy') else 'clean'
-                )
-            
-            elif provider_name == 'ip-api':
+            if provider_name == 'ip-api':
                 if data.get('status') == 'success':
                     return GeolocationInfo(
                         country=data.get('country'),
@@ -615,18 +371,7 @@ class ProxyHoundDatabase:
                         repository TEXT,
                         hunt_score REAL DEFAULT 0,
                         country TEXT,
-                        country_code TEXT,
-                        region TEXT,
                         city TEXT,
-                        latitude REAL,
-                        longitude REAL,
-                        timezone TEXT,
-                        isp TEXT,
-                        organization TEXT,
-                        as_number TEXT,
-                        threat_level TEXT,
-                        geo_confidence REAL DEFAULT 0,
-                        geo_provider_count INTEGER DEFAULT 0,
                         last_checked TEXT,
                         is_working BOOLEAN DEFAULT 0,
                         response_time REAL,
@@ -681,30 +426,15 @@ class ProxyHoundDatabase:
                     
                     data = [
                         (p.ip, p.port, p.proxy_type, p.source, 
-                         p.repository, p.hunt_score, 
-                         p.country, p.geolocation.country_code if p.geolocation else None,
-                         p.geolocation.region if p.geolocation else None, p.city,
-                         p.geolocation.latitude if p.geolocation else None,
-                         p.geolocation.longitude if p.geolocation else None,
-                         p.geolocation.timezone if p.geolocation else None,
-                         p.geolocation.isp if p.geolocation else None,
-                         p.geolocation.organization if p.geolocation else None,
-                         p.geolocation.as_number if p.geolocation else None,
-                         p.geolocation.threat_level if p.geolocation else None,
-                         p.geolocation.confidence_score if p.geolocation else 0,
-                         p.geolocation.provider_count if p.geolocation else 0,
+                         p.repository, p.hunt_score, p.country, p.city,
                          p.last_checked, p.is_working, p.response_time)
                         for p in batch
                     ]
                     
                     conn.executemany("""
                         INSERT OR REPLACE INTO proxies 
-                        (ip, port, proxy_type, source, repository, hunt_score, 
-                         country, country_code, region, city, latitude, longitude, 
-                         timezone, isp, organization, as_number, threat_level,
-                         geo_confidence, geo_provider_count,
-                         last_checked, is_working, response_time)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        (ip, port, proxy_type, source, repository, hunt_score, country, city, last_checked, is_working, response_time)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """, data)
                 
                 conn.execute("COMMIT")
@@ -718,13 +448,9 @@ class ProxyHoundDatabase:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 query = """
-                    SELECT ip, port, proxy_type, source, repository, 
-                           country, country_code, region, city, 
-                           latitude, longitude, timezone, isp, organization, 
-                           as_number, threat_level, geo_confidence, geo_provider_count,
-                           last_checked, response_time, hunt_score
+                    SELECT ip, port, proxy_type, source, repository, country, city, last_checked, response_time, hunt_score
                     FROM proxies WHERE is_working = 1 
-                    ORDER BY geo_confidence DESC, hunt_score DESC, response_time ASC
+                    ORDER BY hunt_score DESC, response_time ASC
                 """
                 
                 if limit:
@@ -1507,89 +1233,16 @@ async def export_hunt_results(db, output_dir="docs"):
                 "type": p[2] if len(p) > 2 else "unknown",
                 "source": p[3] if len(p) > 3 else "unknown",
                 "repository": p[4] if len(p) > 4 else "unknown",
-                "geolocation": {
-                    "country": p[5] if len(p) > 5 and p[5] else "Unknown",
-                    "country_code": p[6] if len(p) > 6 and p[6] else "Unknown", 
-                    "region": p[7] if len(p) > 7 and p[7] else "Unknown",
-                    "city": p[8] if len(p) > 8 and p[8] else "Unknown",
-                    "latitude": p[9] if len(p) > 9 and p[9] else None,
-                    "longitude": p[10] if len(p) > 10 and p[10] else None,
-                    "timezone": p[11] if len(p) > 11 and p[11] else "Unknown",
-                    "isp": p[12] if len(p) > 12 and p[12] else "Unknown",
-                    "organization": p[13] if len(p) > 13 and p[13] else "Unknown", 
-                    "asn": p[14] if len(p) > 14 and p[14] else "Unknown",
-                    "threat_level": p[15] if len(p) > 15 and p[15] else "clean",
-                    "confidence_score": p[16] if len(p) > 16 and p[16] else 0,
-                    "provider_count": p[17] if len(p) > 17 and p[17] else 0,
-                    "accuracy_rating": "High" if (p[16] if len(p) > 16 and p[16] else 0) > 90 else 
-                                     "Medium" if (p[16] if len(p) > 16 and p[16] else 0) > 75 else "Low"
-                },
-                "last_checked": p[18] if len(p) > 18 else None,
-                "response_time_ms": p[19] if len(p) > 19 else None,
-                "hunt_score": p[20] if len(p) > 20 else 0
+                "country": p[5] if len(p) > 5 else "unknown",
+                "city": p[6] if len(p) > 6 else "unknown",
+                "response_time_ms": p[8] if len(p) > 8 else None,
+                "hunt_score": p[9] if len(p) > 9 else 0
             }
             json_data["proxies"].append(proxy_data)
         
         json_path = Path(output_dir) / "proxy_hound_results.json"
         async with aiofiles.open(json_path, 'w') as f:
             await f.write(json.dumps(json_data, indent=2))
-        
-        # Create detailed geolocation CSV
-        csv_path = Path(output_dir) / "proxy_hound_detailed.csv"
-        async with aiofiles.open(csv_path, 'w') as f:
-            # CSV Header
-            await f.write("IP,Port,Type,Country,Country_Code,Region,City,Latitude,Longitude,Timezone,ISP,Organization,ASN,Threat_Level,Geo_Confidence,Provider_Count,Accuracy_Rating,Response_Time_ms,Hunt_Score,Last_Checked,Repository\n")
-            
-            # CSV Data
-            for p in working_proxies:
-                confidence = p[16] if len(p) > 16 and p[16] else 0
-                accuracy_rating = "High" if confidence > 90 else "Medium" if confidence > 75 else "Low"
-                
-                csv_line = f"{p[0]},{p[1]}"  # IP, Port
-                csv_line += f",{p[2] if len(p) > 2 and p[2] else 'unknown'}"  # Type
-                csv_line += f",{p[5] if len(p) > 5 and p[5] else 'Unknown'}"  # Country
-                csv_line += f",{p[6] if len(p) > 6 and p[6] else 'Unknown'}"  # Country Code
-                csv_line += f",{p[7] if len(p) > 7 and p[7] else 'Unknown'}"  # Region
-                csv_line += f",{p[8] if len(p) > 8 and p[8] else 'Unknown'}"  # City
-                csv_line += f",{p[9] if len(p) > 9 and p[9] else ''}"  # Latitude
-                csv_line += f",{p[10] if len(p) > 10 and p[10] else ''}"  # Longitude
-                csv_line += f",{p[11] if len(p) > 11 and p[11] else 'Unknown'}"  # Timezone
-                csv_line += f",{p[12] if len(p) > 12 and p[12] else 'Unknown'}"  # ISP
-                csv_line += f",{p[13] if len(p) > 13 and p[13] else 'Unknown'}"  # Organization
-                csv_line += f",{p[14] if len(p) > 14 and p[14] else 'Unknown'}"  # ASN
-                csv_line += f",{p[15] if len(p) > 15 and p[15] else 'clean'}"  # Threat Level
-                csv_line += f",{confidence:.1f}"  # Geo Confidence
-                csv_line += f",{p[17] if len(p) > 17 and p[17] else 0}"  # Provider Count
-                csv_line += f",{accuracy_rating}"  # Accuracy Rating
-                csv_line += f",{p[19] if len(p) > 19 and p[19] else ''}"  # Response Time
-                csv_line += f",{p[20] if len(p) > 20 and p[20] else 0}"  # Hunt Score
-                csv_line += f",{p[18] if len(p) > 18 and p[18] else ''}"  # Last Checked
-                csv_line += f",{p[4] if len(p) > 4 and p[4] else 'unknown'}\n"  # Repository
-                await f.write(csv_line)
-        
-        # Create geolocation summary
-        geo_summary_path = Path(output_dir) / "geolocation_summary.txt"
-        async with aiofiles.open(geo_summary_path, 'w') as f:
-            await f.write(f"# Proxy Hound Geolocation Summary\n")
-            await f.write(f"# Generated: {datetime.now(timezone.utc).isoformat()}\n\n")
-            
-            await f.write("🌍 GEOGRAPHIC DISTRIBUTION:\n")
-            if hunt_stats.get('by_country'):
-                for country, count in hunt_stats['by_country'].items():
-                    await f.write(f"  {country}: {count:,} proxies\n")
-            
-            await f.write(f"\n🏙️ CITIES FOUND: {hunt_stats['cities_found']}\n")
-            if hunt_stats.get('by_city'):
-                for city, count in list(hunt_stats['by_city'].items())[:20]:
-                    await f.write(f"  {city}: {count:,} proxies\n")
-            
-            await f.write(f"\n📊 GEOLOCATION COVERAGE:\n")
-            await f.write(f"  Total Working: {hunt_stats['working_proxies']:,}\n")
-            await f.write(f"  Geolocated: {hunt_stats['geolocated_proxies']:,}\n")
-            coverage_pct = (hunt_stats['geolocated_proxies'] / hunt_stats['working_proxies'] * 100) if hunt_stats['working_proxies'] > 0 else 0
-            await f.write(f"  Coverage: {coverage_pct:.1f}%\n")
-        
-        logger.info(f"📍 Detailed geolocation exports created")
         
         # Export by type with hunt scores
         by_type_dir = Path(output_dir) / "by_type"
@@ -1918,15 +1571,12 @@ async def create_proxy_hound_dashboard(hunt_stats, output_dir):
     
     <div class="downloads">
         <h2>📥 Download Hunt Results</h2>
-        <p>High-quality proxies hunted using advanced repository analysis with comprehensive geolocation:</p>
+        <p>High-quality proxies hunted using advanced repository analysis with geolocation:</p>
         <a href="proxy_hound_results.txt" class="btn">📄 Main Results</a>
         <a href="proxy_hound_results.json" class="btn">📊 Enhanced JSON</a>
-        <a href="proxy_hound_detailed.csv" class="btn">🌍 Detailed CSV</a>
-        <a href="geolocation_summary.txt" class="btn">📍 Geolocation Summary</a>
         <a href="by_type/" class="btn">🗂️ By Type</a>
         <a href="hunt_stats.json" class="btn">📈 Hunt Statistics</a>
-        <p><em>📍 <strong>New!</strong> Detailed CSV includes latitude, longitude, ASN, ISP, timezone, and threat analysis.</em></p>
-        <p><em>Updated every 8 hours using Proxy Hound's advanced hunting algorithms with multi-provider geolocation.</em></p>
+        <p><em>Updated every 8 hours using Proxy Hound's advanced hunting algorithms with geolocation.</em></p>
     </div>
     
     <div class="footer">
@@ -2050,9 +1700,7 @@ async def create_readme_report(hunt_stats, output_dir, working_count):
 
 ### Download Formats
 - **[📄 Main Results](proxy_hound_results.txt)** - Clean IP:PORT list
-- **[📊 Enhanced JSON](proxy_hound_results.json)** - Full data with detailed geolocation
-- **[🌍 Detailed CSV](proxy_hound_detailed.csv)** - Comprehensive geolocation data with lat/long, ASN, ISP
-- **[📍 Geolocation Summary](geolocation_summary.txt)** - Geographic distribution overview
+- **[📊 Enhanced JSON](proxy_hound_results.json)** - Full data with geolocation
 - **[📈 Hunt Statistics](hunt_stats.json)** - Detailed analytics  
 - **[🗂️ By Type](by_type/)** - Organized by protocol
 - **[🌐 Live Dashboard](index.html)** - Interactive web interface
@@ -2064,7 +1712,7 @@ async def create_readme_report(hunt_stats, output_dir, working_count):
 import json
 import requests
 
-# Load hunt results with detailed geolocation
+# Load hunt results
 with open('proxy_hound_results.json', 'r') as f:
     hunt_data = json.load(f)
 
@@ -2073,42 +1721,23 @@ best_proxies = sorted(hunt_data['proxies'],
                      key=lambda x: x['hunt_score'], 
                      reverse=True)
 
-# Display detailed geolocation info
-for i, proxy in enumerate(best_proxies[:5]):
-    print(f"\n🎯 Proxy #{i+1} (Score: {proxy['hunt_score']}/100)")
-    print(f"📍 Address: {proxy['ip']}:{proxy['port']} ({proxy['type']})")
-    
-    geo = proxy.get('geolocation', {})
-    print(f"🌍 Location: {geo.get('city', 'Unknown')}, {geo.get('region', 'Unknown')}, {geo.get('country', 'Unknown')}")
-    print(f"📌 Coordinates: {geo.get('latitude', 'N/A')}, {geo.get('longitude', 'N/A')}")
-    print(f"🏢 ISP: {geo.get('isp', 'Unknown')}")
-    print(f"🏛️ Organization: {geo.get('organization', 'Unknown')}")
-    print(f"📶 ASN: {geo.get('asn', 'Unknown')}")
-    print(f"⏰ Timezone: {geo.get('timezone', 'Unknown')}")
-    print(f"🛡️ Threat Level: {geo.get('threat_level', 'unknown')}")
-    print(f"⚡ Response Time: {proxy.get('response_time_ms', 'N/A')}ms")
+# Test a proxy
+proxy = best_proxies[0]
+proxy_url = f"http://{{proxy['ip']}}:{{proxy['port']}}"
 
-# Test best proxy with full geolocation info
-best_proxy = best_proxies[0]
-proxy_url = f"http://{best_proxy['ip']}:{best_proxy['port']}"
-
-proxies = {
+proxies = {{
     'http': proxy_url,
     'https': proxy_url
-}
+}}
 
 try:
     response = requests.get('https://httpbin.org/ip', 
                           proxies=proxies, 
                           timeout=5)
-    print(f"\n✅ Proxy works! Your IP: {response.json()['origin']}")
-    
-    geo = best_proxy.get('geolocation', {})
-    print(f"📍 Your apparent location: {geo.get('city', 'Unknown')}, {geo.get('country', 'Unknown')}")
-    print(f"📶 Through ASN: {geo.get('asn', 'Unknown')} ({geo.get('isp', 'Unknown')})")
-    print(f"📌 Coordinates: {geo.get('latitude', 'N/A')}, {geo.get('longitude', 'N/A')}")
-except Exception as e:
-    print(f"❌ Proxy failed: {e}")
+    print(f"✅ Proxy works! Your IP: {{response.json()['origin']}}")
+    print(f"📍 Location: {{proxy.get('city', 'Unknown')}}, {{proxy.get('country', 'Unknown')}}")
+except:
+    print("❌ Proxy failed")
 ```
 
 #### cURL Usage  
@@ -2120,53 +1749,7 @@ curl -x proxy_ip:proxy_port https://httpbin.org/ip
 curl --connect-timeout 3 -x proxy_ip:proxy_port https://httpbin.org/ip
 ```
 
-#### CSV Analysis (Pandas)
-```python
-import pandas as pd
-
-# Load detailed geolocation data
-df = pd.read_csv('proxy_hound_detailed.csv')
-
-# Display geolocation overview  
-print("🌍 GEOLOCATION OVERVIEW:")
-print(f"Total proxies: {len(df):,}")
-print(f"Unique countries: {df['Country'].nunique()}")
-print(f"Unique cities: {df['City'].nunique()}")
-print(f"Average response time: {df['Response_Time_ms'].mean():.1f}ms")
-
-# Top countries by proxy count
-print("\n🏆 TOP 10 COUNTRIES:")
-country_counts = df['Country'].value_counts().head(10)
-for country, count in country_counts.items():
-    print(f"  {country}: {count:,} proxies")
-
-# Best performing proxies by hunt score
-print("\n🎯 TOP 10 HIGHEST SCORING PROXIES:")
-top_proxies = df.nlargest(10, 'Hunt_Score')
-for _, proxy in top_proxies.iterrows():
-    print(f"  {proxy['IP']}:{proxy['Port']} - Score: {proxy['Hunt_Score']}/100")
-    print(f"    📍 {proxy['City']}, {proxy['Country']} ({proxy['ASN']})")
-    print(f"    🏢 {proxy['ISP']} | ⚡ {proxy['Response_Time_ms']}ms")
-
-# Filter by specific criteria
-us_proxies = df[df['Country'] == 'United States']
-fast_proxies = df[df['Response_Time_ms'] < 1000]  # Under 1 second
-high_score_proxies = df[df['Hunt_Score'] > 80]    # Score > 80
-
-print(f"\n📊 FILTERED RESULTS:")
-print(f"US proxies: {len(us_proxies):,}")
-print(f"Fast proxies (<1s): {len(fast_proxies):,}")
-print(f"High-score proxies (>80): {len(high_score_proxies):,}")
-
-# Geographic analysis
-print(f"\n📌 GEOGRAPHIC COORDINATES:")
-coords_available = df.dropna(subset=['Latitude', 'Longitude'])
-print(f"Proxies with coordinates: {len(coords_available):,} ({len(coords_available)/len(df)*100:.1f}%)")
-
-if len(coords_available) > 0:
-    print(f"Latitude range: {coords_available['Latitude'].min():.2f} to {coords_available['Latitude'].max():.2f}")
-    print(f"Longitude range: {coords_available['Longitude'].min():.2f} to {coords_available['Longitude'].max():.2f}")
-```
+#### JavaScript Usage
 ```javascript
 // Load hunt results (in Node.js)
 const huntData = require('./proxy_hound_results.json');

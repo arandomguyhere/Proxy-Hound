@@ -148,47 +148,47 @@ jobs:
           if [ ! -f "docs/index.html" ]; then
             echo "🔄 Creating fallback dashboard..."
             cat > docs/index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proxy Hound Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
-        .status { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>🐕 Proxy Hound Dashboard</h1>
-        <p>Advanced Repository Hunter - Initializing...</p>
-    </div>
-    <div class="status">
-        <h2>System Status</h2>
-        <p>The Proxy Hound is preparing for its first hunting expedition. Results will appear after the initial hunt completes.</p>
-        <p>Check back in a few minutes for comprehensive proxy intelligence.</p>
-    </div>
-</body>
-</html>
-EOF
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Proxy Hound Dashboard</title>
+              <style>
+                  body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+                  .header { background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+                  .status { background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; }
+              </style>
+          </head>
+          <body>
+              <div class="header">
+                  <h1>🐕 Proxy Hound Dashboard</h1>
+                  <p>Advanced Repository Hunter - Initializing...</p>
+              </div>
+              <div class="status">
+                  <h2>System Status</h2>
+                  <p>The Proxy Hound is preparing for its first hunting expedition. Results will appear after the initial hunt completes.</p>
+                  <p>Check back in a few minutes for comprehensive proxy intelligence.</p>
+              </div>
+          </body>
+          </html>
+          EOF
           fi
           
           # Create fallback stats
           if [ ! -f "docs/hunt_stats.json" ]; then
             cat > docs/hunt_stats.json << 'EOF'
-{
-  "total_proxies": 0,
-  "working_proxies": 0,
-  "success_rate": 0,
-  "geolocated_proxies": 0,
-  "countries_found": 0,
-  "cities_found": 0,
-  "last_updated": "System initializing",
-  "status": "first_hunt"
-}
-EOF
+          {
+            "total_proxies": 0,
+            "working_proxies": 0,
+            "success_rate": 0,
+            "geolocated_proxies": 0,
+            "countries_found": 0,
+            "cities_found": 0,
+            "last_updated": "System initializing",
+            "status": "first_hunt"
+          }
+          EOF
           fi
       
       - name: Compress Hunt Database
@@ -229,11 +229,11 @@ EOF
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
           git commit -m "🐕 Proxy Hound hunt results - $TIMESTAMP
 
-Hunt Summary:
-- Advanced repository hunting with geolocation
-- Pack behavior analysis and learning algorithms
-- High-performance parallel validation
-- Professional dashboard with hunt statistics" || echo "Commit completed"
+          Hunt Summary:
+          - Advanced repository hunting with geolocation
+          - Pack behavior analysis and learning algorithms
+          - High-performance parallel validation
+          - Professional dashboard with hunt statistics" || echo "Commit completed"
           
           # Push to remote
           echo "🚀 Pushing hunt results to repository..."
@@ -291,6 +291,7 @@ Hunt Summary:
           echo "### 🐕 Hunting Features" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Advanced GitHub repository hunting" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Scent tracking and pack behavior analysis" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Learning algorithms for improved success" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ High-performance parallel validation" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Comprehensive geolocation support" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Professional dashboard with hunt statistics" >> $GITHUB_STEP_SUMMARY

@@ -1,55 +1,60 @@
 {
-  "total_proxies": 76422,
-  "working_proxies": 1831,
-  "success_rate": 2.4,
+  "total_proxies": 77155,
+  "working_proxies": 2013,
+  "success_rate": 2.61,
   "by_type": {
-    "https": 925,
-    "socks4": 879,
+    "https": 1000,
+    "socks4": 986,
     "socks5": 27
   },
   "by_repository": {
     "heads/main": {
-      "count": 1131,
+      "count": 1223,
       "avg_hunt_score": 50.0,
-      "avg_response_time": 1573.5
+      "avg_response_time": 1555.7
     },
     "Proxy-List/main": {
-      "count": 691,
+      "count": 777,
       "avg_hunt_score": 50.0,
-      "avg_response_time": 1954.8
+      "avg_response_time": 1906.5
     },
     "PROXY-List/master": {
-      "count": 9,
+      "count": 12,
       "avg_hunt_score": 50.0,
-      "avg_response_time": 1041.1
+      "avg_response_time": 1112.8
+    },
+    "main/proxies": {
+      "count": 1,
+      "avg_hunt_score": 50.0,
+      "avg_response_time": 1191.8
     }
   },
   "by_country": {
-    "Canada": 653,
-    "China": 472,
-    "United States": 119,
-    "South Korea": 71,
-    "Germany": 70,
-    "Indonesia": 46,
-    "Malaysia": 35,
-    "United Arab Emirates": 26,
-    "Vietnam": 24,
-    "Philippines": 24
+    "Canada": 670,
+    "China": 481,
+    "United States": 120,
+    "Germany": 84,
+    "South Korea": 57,
+    "Indonesia": 48,
+    "Malaysia": 40,
+    "Vietnam": 34,
+    "Hong Kong": 34,
+    "Philippines": 28
   },
   "by_city": {
-    "Montreal, Canada": 650,
-    "Beijing, China": 156,
-    "Hangzhou, China": 68,
-    "Shenzhen, China": 54,
-    "Seoul, South Korea": 44,
-    "Shanghai, China": 40,
-    "Kuala Lumpur, Malaysia": 35,
-    "Frankfurt am Main, Germany": 29,
-    "Fuzhou, China": 29,
-    "Qingdao, China": 29
+    "Montreal, Canada": 668,
+    "Beijing, China": 139,
+    "Hangzhou, China": 88,
+    "Shenzhen, China": 62,
+    "Shanghai, China": 45,
+    "Kuala Lumpur, Malaysia": 39,
+    "Seoul, South Korea": 34,
+    "Nanjing, China": 33,
+    "Frankfurt am Main, Germany": 31,
+    "Hong Kong, Hong Kong": 31
   },
   "hunt_success": {},
-  "geolocated_proxies": 1795,
+  "geolocated_proxies": 1911,
   "countries_found": 10,
   "cities_found": 10
 }

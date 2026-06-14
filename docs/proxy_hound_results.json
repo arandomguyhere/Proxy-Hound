@@ -1,31 +1,31 @@
 {
   "metadata": {
-    "generated_at": "2026-06-14T11:01:40.347821+00:00",
+    "generated_at": "2026-06-14T17:36:03.474541+00:00",
     "total_working": 10000,
     "hunt_stats": {
-      "total_proxies": 709867,
-      "working_proxies": 13914,
-      "success_rate": 1.96,
+      "total_proxies": 710069,
+      "working_proxies": 14011,
+      "success_rate": 1.97,
       "by_type": {
-        "https": 11498,
-        "socks4": 1500,
-        "socks5": 916
+        "https": 11503,
+        "socks4": 1462,
+        "socks5": 1046
       },
       "by_repository": {
         "heads/main": {
-          "count": 11586,
+          "count": 11577,
           "avg_hunt_score": 50.0,
-          "avg_response_time": 1402.6
+          "avg_response_time": 1390.8
         },
         "Proxy-List/main": {
-          "count": 1783,
+          "count": 1897,
           "avg_hunt_score": 50.0,
-          "avg_response_time": 1328.7
+          "avg_response_time": 1318.1
         },
         "PROXY-List/master": {
-          "count": 463,
+          "count": 455,
           "avg_hunt_score": 50.0,
-          "avg_response_time": 1108.2
+          "avg_response_time": 1087.6
         },
         "main/proxies": {
           "count": 82,
@@ -35,30 +35,30 @@
       },
       "by_country": {
         "Canada": 2379,
-        "United States": 2125,
-        "China": 1596,
-        "Singapore": 1103,
-        "Netherlands": 960,
-        "Vietnam": 478,
-        "The Netherlands": 391,
-        "Japan": 385,
-        "Finland": 277,
-        "Cambodia": 266
+        "United States": 2148,
+        "China": 1653,
+        "Singapore": 1095,
+        "Netherlands": 962,
+        "Vietnam": 480,
+        "The Netherlands": 397,
+        "Japan": 390,
+        "Finland": 279,
+        "Cambodia": 273
       },
       "by_city": {
         "Montreal, Canada": 2356,
-        "Singapore, Singapore": 1103,
-        "Phoenix, United States": 668,
-        "Beijing, China": 487,
+        "Singapore, Singapore": 1095,
+        "Phoenix, United States": 670,
+        "Beijing, China": 490,
         "Naaldwijk, Netherlands": 457,
-        "Amsterdam, Netherlands": 387,
-        "Ashburn, United States": 358,
-        "Tokyo, Japan": 318,
+        "Amsterdam, Netherlands": 388,
+        "Ashburn, United States": 363,
+        "Tokyo, Japan": 319,
         "Naaldwijk, The Netherlands": 307,
-        "Los Angeles, United States": 293
+        "Los Angeles, United States": 295
       },
       "hunt_success": {},
-      "geolocated_proxies": 12311,
+      "geolocated_proxies": 12500,
       "countries_found": 10,
       "cities_found": 10
     },
@@ -76,17 +76,6 @@
       "country": "United States",
       "city": "Ashburn",
       "response_time_ms": 6.6,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "152.53.210.85",
-      "port": 8081,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": "United States",
-      "city": "Manassas",
-      "response_time_ms": 6.84,
       "hunt_score": 50.0
     },
     {
@@ -343,6 +332,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "152.53.210.85",
+      "port": 8081,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Manassas",
+      "response_time_ms": 14.08,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "139.177.229.197",
       "port": 8080,
       "type": "socks4",
@@ -351,6 +351,17 @@
       "country": "United States",
       "city": "Ashburn",
       "response_time_ms": 15.0,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "52.188.28.218",
+      "port": 3128,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Arlington",
+      "response_time_ms": 15.24,
       "hunt_score": 50.0
     },
     {
@@ -406,6 +417,28 @@
       "country": "United States",
       "city": "Palo Alto",
       "response_time_ms": 16.88,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "5.161.103.41",
+      "port": 88,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Ashburn",
+      "response_time_ms": 18.51,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "52.226.76.91",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Boydton",
+      "response_time_ms": 18.84,
       "hunt_score": 50.0
     },
     {
@@ -607,6 +640,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "138.197.112.162",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Clifton",
+      "response_time_ms": 29.81,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "13.218.86.1",
       "port": 23806,
       "type": "socks5",
@@ -805,6 +849,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "174.138.119.88",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Clifton",
+      "response_time_ms": 44.4,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "34.120.166.23",
       "port": 8080,
       "type": "socks5",
@@ -857,6 +912,28 @@
       "country": "Canada",
       "city": "Toronto",
       "response_time_ms": 48.61,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "50.173.118.209",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "York",
+      "response_time_ms": 49.12,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "34.102.241.71",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Kansas City",
+      "response_time_ms": 49.19,
       "hunt_score": 50.0
     },
     {
@@ -1124,17 +1201,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "34.102.241.71",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 53.32,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "104.129.194.43",
       "port": 10774,
       "type": "https",
@@ -1154,17 +1220,6 @@
       "country": "United States",
       "city": "Dublin",
       "response_time_ms": 53.6,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "35.224.100.167",
-      "port": 80,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "United States",
-      "city": "Council Bluffs",
-      "response_time_ms": 53.88,
       "hunt_score": 50.0
     },
     {
@@ -1242,6 +1297,17 @@
       "country": "United States",
       "city": "North Bergen",
       "response_time_ms": 56.22,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "172.200.72.48",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Boydton",
+      "response_time_ms": 57.11,
       "hunt_score": 50.0
     },
     {
@@ -1740,6 +1806,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "34.136.200.110",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Council Bluffs",
+      "response_time_ms": 67.94,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "104.129.194.38",
       "port": 11821,
       "type": "https",
@@ -1828,17 +1905,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "34.136.200.110",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 70.3,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "104.129.194.43",
       "port": 11646,
       "type": "https",
@@ -1905,6 +1971,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "3.137.86.220",
+      "port": 443,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Dublin",
+      "response_time_ms": 74.5,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "104.129.202.125",
       "port": 10111,
       "type": "https",
@@ -1913,17 +1990,6 @@
       "country": "United States",
       "city": "San Jose",
       "response_time_ms": 74.75,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "52.34.243.150",
-      "port": 8080,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "United States",
-      "city": "Portland",
-      "response_time_ms": 76.42,
       "hunt_score": 50.0
     },
     {
@@ -1971,6 +2037,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "3.137.86.220",
+      "port": 1080,
+      "type": "https",
+      "source": "repository:PROXY-List/master",
+      "repository": "PROXY-List/master",
+      "country": "United States",
+      "city": "Dublin",
+      "response_time_ms": 78.92,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "148.113.172.51",
       "port": 8080,
       "type": "https",
@@ -1979,17 +2056,6 @@
       "country": null,
       "city": null,
       "response_time_ms": 79.73,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "34.127.40.229",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 79.85,
       "hunt_score": 50.0
     },
     {
@@ -2158,17 +2224,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "52.188.28.218",
-      "port": 3128,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "United States",
-      "city": "Boydton",
-      "response_time_ms": 91.47,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "139.177.229.200",
       "port": 8080,
       "type": "https",
@@ -2323,6 +2378,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "34.43.46.91",
+      "port": 443,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Mountain View",
+      "response_time_ms": 100.13,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.90",
       "port": 21311,
       "type": "https",
@@ -2419,17 +2485,6 @@
       "country": "United States",
       "city": "Reston",
       "response_time_ms": 106.32,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "50.173.118.209",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "York",
-      "response_time_ms": 106.46,
       "hunt_score": 50.0
     },
     {
@@ -3038,17 +3093,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "138.197.112.162",
-      "port": 80,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "United States",
-      "city": "Clifton",
-      "response_time_ms": 115.92,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "67.43.236.20",
       "port": 15935,
       "type": "https",
@@ -3214,6 +3258,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "34.43.46.91",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Mountain View",
+      "response_time_ms": 120.3,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "190.9.109.196",
       "port": 999,
       "type": "https",
@@ -3346,6 +3401,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "34.44.49.215",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Council Bluffs",
+      "response_time_ms": 122.83,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "35.243.0.213",
       "port": 10101,
       "type": "https",
@@ -3464,6 +3530,17 @@
       "country": "United States",
       "city": "San Jose",
       "response_time_ms": 125.22,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "35.224.100.167",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Council Bluffs",
+      "response_time_ms": 125.53,
       "hunt_score": 50.0
     },
     {
@@ -4094,6 +4171,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "34.83.88.197",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "The Dalles",
+      "response_time_ms": 140.96,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 12645,
       "type": "https",
@@ -4113,6 +4201,17 @@
       "country": "United States",
       "city": "San Jose",
       "response_time_ms": 141.4,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "34.127.40.229",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "The Dalles",
+      "response_time_ms": 141.64,
       "hunt_score": 50.0
     },
     {
@@ -4457,6 +4556,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "52.34.243.150",
+      "port": 8080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Portland",
+      "response_time_ms": 153.6,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 7097,
       "type": "https",
@@ -4553,17 +4663,6 @@
       "country": "United States",
       "city": "North Bergen",
       "response_time_ms": 157.22,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "34.83.88.197",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 158.16,
       "hunt_score": 50.0
     },
     {
@@ -6250,6 +6349,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "12.50.107.217",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Jacksonville",
+      "response_time_ms": 204.95,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.236.20",
       "port": 19463,
       "type": "https",
@@ -6921,6 +7031,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "132.226.157.212",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Phoenix",
+      "response_time_ms": 223.4,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.236.18",
       "port": 2561,
       "type": "https",
@@ -7108,6 +7229,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "37.9.13.23",
+      "port": 8081,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Russia",
+      "city": "St Petersburg",
+      "response_time_ms": 228.84,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "89.167.16.53",
       "port": 3128,
       "type": "https",
@@ -7160,6 +7292,17 @@
       "country": "Japan",
       "city": "Osaka",
       "response_time_ms": 230.34,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "178.212.144.7",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Poland",
+      "city": "Sok\u00f3\u0142ka",
+      "response_time_ms": 230.36,
       "hunt_score": 50.0
     },
     {
@@ -8934,6 +9077,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "51.141.175.118",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Quincy",
+      "response_time_ms": 266.74,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 4325,
       "type": "https",
@@ -9077,17 +9231,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "34.44.49.215",
-      "port": 80,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "United States",
-      "city": "Council Bluffs",
-      "response_time_ms": 270.53,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "35.243.1.4",
       "port": 10052,
       "type": "https",
@@ -9151,6 +9294,17 @@
       "country": null,
       "city": null,
       "response_time_ms": 271.57,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "52.229.30.3",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Quincy",
+      "response_time_ms": 271.71,
       "hunt_score": 50.0
     },
     {
@@ -10452,17 +10606,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "37.9.13.23",
-      "port": 8081,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 299.79,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "62.84.83.218",
       "port": 80,
       "type": "https",
@@ -10735,17 +10878,6 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 307.44,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "178.212.144.7",
-      "port": 80,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Poland",
-      "city": "Sok\u00f3\u0142ka",
-      "response_time_ms": 307.55,
       "hunt_score": 50.0
     },
     {
@@ -11134,6 +11266,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "78.188.2.119",
+      "port": 3310,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "T\u00fcrkiye",
+      "city": "Istanbul",
+      "response_time_ms": 316.34,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.165.210",
       "port": 8698,
       "type": "https",
@@ -11497,6 +11640,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "85.98.92.248",
+      "port": 3310,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Turkey",
+      "city": "Izmir",
+      "response_time_ms": 321.23,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 20059,
       "type": "https",
@@ -11640,6 +11794,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "78.186.40.188",
+      "port": 3310,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Turkey",
+      "city": "Trabzon",
+      "response_time_ms": 323.35,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.165.78",
       "port": 8983,
       "type": "https",
@@ -11714,6 +11879,17 @@
       "country": "Australia",
       "city": "Melbourne",
       "response_time_ms": 324.17,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "94.158.49.82",
+      "port": 3128,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Uzbekistan",
+      "city": "Guliston",
+      "response_time_ms": 324.6,
       "hunt_score": 50.0
     },
     {
@@ -12036,17 +12212,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "16.163.88.228",
-      "port": 80,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": null,
-      "city": null,
-      "response_time_ms": 332.96,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "72.10.160.174",
       "port": 14019,
       "type": "https",
@@ -12113,6 +12278,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "45.172.218.67",
+      "port": 3028,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Colombia",
+      "city": "Chiriguan\u00e1",
+      "response_time_ms": 334.37,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 18423,
       "type": "https",
@@ -12165,6 +12341,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 334.99,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "160.238.65.8",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "The Netherlands",
+      "city": "Amsterdam",
+      "response_time_ms": 335.02,
       "hunt_score": 50.0
     },
     {
@@ -12267,6 +12454,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "64.188.125.187",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Finland",
+      "city": "Helsinki",
+      "response_time_ms": 336.4,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.165.84",
       "port": 31280,
       "type": "https",
@@ -12322,17 +12520,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "45.172.218.67",
-      "port": 3028,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Colombia",
-      "city": "Chiriguan\u00e1",
-      "response_time_ms": 337.74,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "67.43.228.250",
       "port": 15645,
       "type": "https",
@@ -12352,6 +12539,17 @@
       "country": "Mexico",
       "city": "Quer\u00e9taro City",
       "response_time_ms": 338.23,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "40.89.145.14",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "France",
+      "city": "Paris",
+      "response_time_ms": 338.26,
       "hunt_score": 50.0
     },
     {
@@ -13015,6 +13213,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "35.233.82.227",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Belgium",
+      "city": "Brussels",
+      "response_time_ms": 350.93,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.228.253",
       "port": 32627,
       "type": "https",
@@ -13133,6 +13342,17 @@
       "country": "United States",
       "city": "Phoenix",
       "response_time_ms": 353.42,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "65.108.203.37",
+      "port": 18080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Finland",
+      "city": "Helsinki",
+      "response_time_ms": 353.72,
       "hunt_score": 50.0
     },
     {
@@ -13895,6 +14115,28 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "194.102.38.65",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United Kingdom",
+      "city": "Manchester",
+      "response_time_ms": 366.26,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "62.84.245.79",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Netherlands",
+      "city": "Eindhoven",
+      "response_time_ms": 366.62,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.162.237",
       "port": 57369,
       "type": "https",
@@ -14159,6 +14401,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "81.181.104.227",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Poland",
+      "city": "Warsaw",
+      "response_time_ms": 371.52,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 32941,
       "type": "https",
@@ -14178,6 +14431,17 @@
       "country": "United States",
       "city": "Ashburn",
       "response_time_ms": 372.1,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "46.249.100.124",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Frankfurt am Main",
+      "response_time_ms": 372.53,
       "hunt_score": 50.0
     },
     {
@@ -14346,6 +14610,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "185.141.26.131",
+      "port": 3128,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Netherlands",
+      "city": "Amsterdam",
+      "response_time_ms": 375.09,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "35.243.0.211",
       "port": 10032,
       "type": "https",
@@ -14365,17 +14640,6 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 375.55,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "85.98.92.248",
-      "port": 3310,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 375.68,
       "hunt_score": 50.0
     },
     {
@@ -15281,6 +15545,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "82.102.11.164",
+      "port": 3460,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United Kingdom",
+      "city": "Gosport",
+      "response_time_ms": 388.3,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 33087,
       "type": "https",
@@ -15512,6 +15787,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "191.40.5.0",
+      "port": 8888,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Frankfurt am Main",
+      "response_time_ms": 392.69,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.91",
       "port": 17089,
       "type": "https",
@@ -15663,6 +15949,17 @@
       "country": "Australia",
       "city": "Melbourne",
       "response_time_ms": 395.32,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "178.170.43.121",
+      "port": 8081,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "France",
+      "city": "Boulogne-Billancourt",
+      "response_time_ms": 395.39,
       "hunt_score": 50.0
     },
     {
@@ -15938,6 +16235,17 @@
       "country": null,
       "city": null,
       "response_time_ms": 400.37,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "138.124.61.202",
+      "port": 444,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Frankfurt am Main",
+      "response_time_ms": 400.4,
       "hunt_score": 50.0
     },
     {
@@ -16290,6 +16598,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 405.79,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "194.150.110.134",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Denmark",
+      "city": "Taastrup",
+      "response_time_ms": 406.33,
       "hunt_score": 50.0
     },
     {
@@ -16700,6 +17019,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "79.110.202.131",
+      "port": 8081,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Poland",
+      "city": "Wroclaw",
+      "response_time_ms": 414.01,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "35.243.0.212",
       "port": 10091,
       "type": "https",
@@ -16752,6 +17082,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 414.65,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "79.110.192.44",
+      "port": 8081,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Poland",
+      "city": "Wroclaw",
+      "response_time_ms": 414.7,
       "hunt_score": 50.0
     },
     {
@@ -16818,17 +17159,6 @@
       "country": "United States",
       "city": "Ashburn",
       "response_time_ms": 415.39,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "64.188.125.187",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Finland",
-      "city": "Helsinki",
-      "response_time_ms": 415.46,
       "hunt_score": 50.0
     },
     {
@@ -16975,6 +17305,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "79.110.200.148",
+      "port": 8081,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Poland",
+      "city": "Wroc\u0142aw",
+      "response_time_ms": 417.92,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.165.74",
       "port": 33831,
       "type": "https",
@@ -16983,6 +17324,17 @@
       "country": "United States",
       "city": "Phoenix",
       "response_time_ms": 417.98,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "185.135.69.34",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Iraq",
+      "city": "Al Mansour",
+      "response_time_ms": 418.12,
       "hunt_score": 50.0
     },
     {
@@ -17261,6 +17613,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "212.127.95.235",
+      "port": 8081,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Poland",
+      "city": "Wroc\u0142aw",
+      "response_time_ms": 420.98,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.228.252",
       "port": 7657,
       "type": "https",
@@ -17324,6 +17687,17 @@
       "country": "Switzerland",
       "city": "Zurich",
       "response_time_ms": 422.34,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "16.163.88.228",
+      "port": 80,
+      "type": "https",
+      "source": "repository:PROXY-List/master",
+      "repository": "PROXY-List/master",
+      "country": "Hong Kong",
+      "city": "Hong Kong",
+      "response_time_ms": 422.41,
       "hunt_score": 50.0
     },
     {
@@ -17423,6 +17797,17 @@
       "country": "United States",
       "city": "Phoenix",
       "response_time_ms": 423.39,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "79.110.200.27",
+      "port": 8000,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Poland",
+      "city": "Wroc\u0142aw",
+      "response_time_ms": 423.49,
       "hunt_score": 50.0
     },
     {
@@ -17602,17 +17987,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "78.188.2.119",
-      "port": 3310,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "T\u00fcrkiye",
-      "city": "Istanbul",
-      "response_time_ms": 426.6,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "91.108.243.203",
       "port": 3128,
       "type": "https",
@@ -17654,17 +18028,6 @@
       "country": "The Netherlands",
       "city": "Utrecht",
       "response_time_ms": 427.68,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "213.135.6.13",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Germany",
-      "city": "Saarbr\u00fccken",
-      "response_time_ms": 427.69,
       "hunt_score": 50.0
     },
     {
@@ -17778,6 +18141,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "154.211.2.68",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Netherlands",
+      "city": "Amsterdam",
+      "response_time_ms": 429.84,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "147.161.246.246",
       "port": 11692,
       "type": "https",
@@ -17819,6 +18193,28 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 430.05,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "185.228.137.178",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Germany",
+      "city": "Nuremberg",
+      "response_time_ms": 430.18,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "176.111.37.216",
+      "port": 39811,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Ukraine",
+      "city": "Dobropol'ye",
+      "response_time_ms": 430.22,
       "hunt_score": 50.0
     },
     {
@@ -17965,6 +18361,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "144.31.156.154",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Finland",
+      "city": "Helsinki",
+      "response_time_ms": 432.73,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "104.129.194.46",
       "port": 11141,
       "type": "https",
@@ -18017,6 +18424,17 @@
       "country": "United States",
       "city": "Phoenix",
       "response_time_ms": 433.16,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "167.71.232.168",
+      "port": 3000,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "India",
+      "city": "Bengaluru",
+      "response_time_ms": 433.33,
       "hunt_score": 50.0
     },
     {
@@ -18193,17 +18611,6 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 435.05,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "115.239.234.43",
-      "port": 7302,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": null,
-      "city": null,
-      "response_time_ms": 435.21,
       "hunt_score": 50.0
     },
     {
@@ -18567,6 +18974,17 @@
       "country": "United States",
       "city": "Phoenix",
       "response_time_ms": 439.93,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "130.61.179.77",
+      "port": 1234,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Frankfurt am Main",
+      "response_time_ms": 440.24,
       "hunt_score": 50.0
     },
     {
@@ -19461,17 +19879,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "185.135.69.34",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Iraq",
-      "city": "Musayib",
-      "response_time_ms": 454.85,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "221.164.160.105",
       "port": 443,
       "type": "https",
@@ -19491,6 +19898,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 455.1,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "77.38.244.214",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Latvia",
+      "city": "Riga",
+      "response_time_ms": 455.34,
       "hunt_score": 50.0
     },
     {
@@ -19766,17 +20184,6 @@
       "country": null,
       "city": null,
       "response_time_ms": 459.52,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "167.71.232.168",
-      "port": 3000,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": null,
-      "city": null,
-      "response_time_ms": 459.69,
       "hunt_score": 50.0
     },
     {
@@ -20462,6 +20869,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "202.133.88.173",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "France",
+      "city": "Paris",
+      "response_time_ms": 470.88,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.90",
       "port": 4391,
       "type": "https",
@@ -20536,6 +20954,17 @@
       "country": "Russia",
       "city": "Nizhny Tagil",
       "response_time_ms": 472.02,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "31.131.248.48",
+      "port": 3129,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Russia",
+      "city": "St Petersburg",
+      "response_time_ms": 472.5,
       "hunt_score": 50.0
     },
     {
@@ -20814,6 +21243,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "213.165.42.185",
+      "port": 7443,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Frankfurt am Main",
+      "response_time_ms": 476.57,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.90",
       "port": 10753,
       "type": "https",
@@ -20899,6 +21339,17 @@
       "country": null,
       "city": null,
       "response_time_ms": 478.3,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "45.239.175.60",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Brazil",
+      "city": "Lagarto",
+      "response_time_ms": 478.47,
       "hunt_score": 50.0
     },
     {
@@ -21375,6 +21826,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "143.198.239.98",
+      "port": 1047,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Santa Clara",
+      "response_time_ms": 486.06,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.165.108",
       "port": 9195,
       "type": "https",
@@ -21408,14 +21870,14 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "154.27.196.60",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Mexico",
-      "city": "Ciudad de Villa de \u00c1lvarez",
-      "response_time_ms": 488.49,
+      "ip": "212.47.232.28",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "France",
+      "city": "Paris",
+      "response_time_ms": 487.09,
       "hunt_score": 50.0
     },
     {
@@ -22079,6 +22541,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "37.110.147.13",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Moscow",
+      "response_time_ms": 501.15,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.165.149",
       "port": 8689,
       "type": "https",
@@ -22618,6 +23091,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "167.86.95.198",
+      "port": 3128,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Nuremberg",
+      "response_time_ms": 508.15,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "110.77.162.90",
       "port": 80,
       "type": "socks5",
@@ -23066,6 +23550,17 @@
       "country": "United States",
       "city": "Phoenix",
       "response_time_ms": 513.52,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "138.124.113.102",
+      "port": 7443,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "The Netherlands",
+      "city": "Amsterdam",
+      "response_time_ms": 513.61,
       "hunt_score": 50.0
     },
     {
@@ -23586,6 +24081,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "5.11.93.98",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United Kingdom",
+      "city": "Farnborough",
+      "response_time_ms": 520.78,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 9619,
       "type": "https",
@@ -23737,6 +24243,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 523.08,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "115.239.234.43",
+      "port": 7302,
+      "type": "https",
+      "source": "repository:PROXY-List/master",
+      "repository": "PROXY-List/master",
+      "country": "China",
+      "city": "Shaoxing",
+      "response_time_ms": 523.31,
       "hunt_score": 50.0
     },
     {
@@ -24191,6 +24708,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "84.47.150.125",
+      "port": 1080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Moscow",
+      "response_time_ms": 529.44,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "104.129.202.127",
       "port": 10819,
       "type": "https",
@@ -24287,6 +24815,17 @@
       "country": "Vietnam",
       "city": "Ho Chi Minh City",
       "response_time_ms": 530.84,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "82.97.247.37",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "St Petersburg",
+      "response_time_ms": 531.11,
       "hunt_score": 50.0
     },
     {
@@ -24452,6 +24991,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 534.45,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "159.224.232.194",
+      "port": 8888,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Ukraine",
+      "city": "Kyiv",
+      "response_time_ms": 534.51,
       "hunt_score": 50.0
     },
     {
@@ -24826,6 +25376,17 @@
       "country": "Japan",
       "city": "Tokyo",
       "response_time_ms": 540.98,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "79.174.12.190",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Moscow",
+      "response_time_ms": 541.04,
       "hunt_score": 50.0
     },
     {
@@ -25258,6 +25819,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "46.150.9.111",
+      "port": 8123,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Ukraine",
+      "city": "Kharkiv",
+      "response_time_ms": 550.38,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.228.253",
       "port": 12823,
       "type": "https",
@@ -25343,6 +25915,17 @@
       "country": "United States",
       "city": "Phoenix",
       "response_time_ms": 551.33,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "188.191.165.159",
+      "port": 8080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Noginsk",
+      "response_time_ms": 551.49,
       "hunt_score": 50.0
     },
     {
@@ -25742,6 +26325,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "213.131.85.27",
+      "port": 1981,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Egypt",
+      "city": "Al Y\u0101s\u012bn\u012byah",
+      "response_time_ms": 557.97,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.94",
       "port": 10239,
       "type": "https",
@@ -25885,6 +26479,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "189.36.129.185",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Brazil",
+      "city": "Belo Horizonte",
+      "response_time_ms": 560.13,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 3141,
       "type": "https",
@@ -25915,6 +26520,17 @@
       "country": "United States",
       "city": "Phoenix",
       "response_time_ms": 561.99,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "1.231.81.166",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Korea",
+      "city": "Jongno-gu",
+      "response_time_ms": 562.36,
       "hunt_score": 50.0
     },
     {
@@ -26171,6 +26787,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "144.31.73.173",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Germany",
+      "city": "Frankfurt am Main",
+      "response_time_ms": 565.94,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "131.153.163.178",
       "port": 22311,
       "type": "https",
@@ -26179,6 +26806,17 @@
       "country": "United States",
       "city": "Ashburn",
       "response_time_ms": 566.28,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "185.200.188.234",
+      "port": 10001,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Moscow",
+      "response_time_ms": 566.79,
       "hunt_score": 50.0
     },
     {
@@ -26545,6 +27183,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "62.133.62.207",
+      "port": 1082,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "France",
+      "city": "Paris",
+      "response_time_ms": 574.0,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.90",
       "port": 25685,
       "type": "https",
@@ -26743,6 +27392,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "170.244.25.52",
+      "port": 8888,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Brazil",
+      "city": "Tapejara",
+      "response_time_ms": 579.44,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "193.227.129.196",
       "port": 50732,
       "type": "https",
@@ -26820,6 +27480,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "31.10.83.158",
+      "port": 8080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Ramenskoye",
+      "response_time_ms": 582.19,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "116.203.112.97",
       "port": 3128,
       "type": "https",
@@ -26828,6 +27499,17 @@
       "country": "Germany",
       "city": "Nuremberg",
       "response_time_ms": 582.72,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "62.133.62.207",
+      "port": 1081,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "France",
+      "city": "Paris",
+      "response_time_ms": 582.87,
       "hunt_score": 50.0
     },
     {
@@ -27689,6 +28371,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "170.64.170.204",
+      "port": 8080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Australia",
+      "city": "Sydney",
+      "response_time_ms": 595.96,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "62.109.0.55",
       "port": 18080,
       "type": "https",
@@ -28261,17 +28954,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "8.154.21.175",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 607.83,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "139.177.229.47",
       "port": 8080,
       "type": "socks4",
@@ -28302,17 +28984,6 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 608.72,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "170.244.27.58",
-      "port": 8888,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Brazil",
-      "city": "Tapejara",
-      "response_time_ms": 608.78,
       "hunt_score": 50.0
     },
     {
@@ -28492,17 +29163,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "170.244.26.206",
-      "port": 8888,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Brazil",
-      "city": "Tapejara",
-      "response_time_ms": 612.47,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "67.43.228.253",
       "port": 24437,
       "type": "https",
@@ -28511,6 +29171,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 612.68,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "62.133.62.184",
+      "port": 1082,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "France",
+      "city": "Paris",
+      "response_time_ms": 612.72,
       "hunt_score": 50.0
     },
     {
@@ -29009,6 +29680,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "103.157.200.126",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Pakistan",
+      "city": "Model Town",
+      "response_time_ms": 623.28,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.165.106",
       "port": 34895,
       "type": "https",
@@ -29482,17 +30164,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "170.244.27.142",
-      "port": 8888,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Brazil",
-      "city": "Tapejara",
-      "response_time_ms": 633.41,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "52.78.193.98",
       "port": 44918,
       "type": "socks4",
@@ -29614,6 +30285,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "48.210.225.96",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Japan",
+      "city": "Tokyo",
+      "response_time_ms": 635.21,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 17397,
       "type": "https",
@@ -29702,6 +30384,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "176.101.220.90",
+      "port": 8090,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Ukraine",
+      "city": "Dnipro",
+      "response_time_ms": 637.46,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.173",
       "port": 22249,
       "type": "https",
@@ -29754,6 +30447,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 638.26,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "34.71.229.255",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Council Bluffs",
+      "response_time_ms": 639.08,
       "hunt_score": 50.0
     },
     {
@@ -30219,6 +30923,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "62.182.204.81",
+      "port": 88,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Makhachkala",
+      "response_time_ms": 645.09,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 20465,
       "type": "https",
@@ -30271,6 +30986,17 @@
       "country": "Finland",
       "city": "Helsinki",
       "response_time_ms": 646.02,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "91.186.213.124",
+      "port": 1081,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Sweden",
+      "city": "Stockholm",
+      "response_time_ms": 647.16,
       "hunt_score": 50.0
     },
     {
@@ -30450,6 +31176,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "51.250.86.201",
+      "port": 2080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Moscow",
+      "response_time_ms": 650.95,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "40.192.120.87",
       "port": 3128,
       "type": "socks4",
@@ -30502,6 +31239,17 @@
       "country": "Japan",
       "city": "Tokyo",
       "response_time_ms": 651.51,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "14.143.222.113",
+      "port": 57788,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "India",
+      "city": "Chennai",
+      "response_time_ms": 651.53,
       "hunt_score": 50.0
     },
     {
@@ -30645,6 +31393,17 @@
       "country": "Russia",
       "city": "Ryazan",
       "response_time_ms": 654.42,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "74.176.195.135",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Japan",
+      "city": "Tokyo",
+      "response_time_ms": 654.66,
       "hunt_score": 50.0
     },
     {
@@ -31649,6 +32408,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "95.66.138.21",
+      "port": 8880,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Vladimir",
+      "response_time_ms": 669.88,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "27.71.228.32",
       "port": 3128,
       "type": "https",
@@ -31825,6 +32595,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "194.186.33.7",
+      "port": 8080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Russia",
+      "city": "Moscow",
+      "response_time_ms": 671.18,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.170.70",
       "port": 29909,
       "type": "https",
@@ -31924,6 +32705,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "210.148.90.0",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Japan",
+      "city": "Chiyoda City",
+      "response_time_ms": 672.34,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "43.167.213.189",
       "port": 6006,
       "type": "https",
@@ -32012,6 +32804,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "154.201.77.250",
+      "port": 11021,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Los Angeles",
+      "response_time_ms": 674.12,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.90",
       "port": 11677,
       "type": "https",
@@ -32020,6 +32823,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 674.24,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "94.182.177.92",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Iran",
+      "city": "Tehran",
+      "response_time_ms": 674.28,
       "hunt_score": 50.0
     },
     {
@@ -32210,6 +33024,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "79.137.205.130",
+      "port": 7443,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "The Netherlands",
+      "city": "Amsterdam",
+      "response_time_ms": 675.87,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "43.167.244.75",
       "port": 6006,
       "type": "https",
@@ -32361,6 +33186,17 @@
       "country": null,
       "city": null,
       "response_time_ms": 677.63,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "87.226.22.225",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Latvia",
+      "city": "Riga",
+      "response_time_ms": 677.86,
       "hunt_score": 50.0
     },
     {
@@ -32592,6 +33428,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 680.45,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "159.65.166.126",
+      "port": 8118,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Clifton",
+      "response_time_ms": 680.49,
       "hunt_score": 50.0
     },
     {
@@ -34080,6 +34927,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "8.154.21.175",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Hangzhou",
+      "response_time_ms": 702.77,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "185.132.133.56",
       "port": 12923,
       "type": "https",
@@ -34517,6 +35375,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 712.02,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "58.214.243.92",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Wuxi",
+      "response_time_ms": 712.22,
       "hunt_score": 50.0
     },
     {
@@ -35488,17 +36357,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "37.187.92.9",
-      "port": 1029,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "France",
-      "city": "Roubaix",
-      "response_time_ms": 728.1,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "125.25.5.187",
       "port": 8080,
       "type": "https",
@@ -35969,6 +36827,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 736.52,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "58.214.243.91",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Wuxi",
+      "response_time_ms": 736.73,
       "hunt_score": 50.0
     },
     {
@@ -36841,6 +37710,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "45.84.222.25",
+      "port": 1080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "The Netherlands",
+      "city": "Amsterdam",
+      "response_time_ms": 754.32,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "35.243.0.214",
       "port": 10114,
       "type": "https",
@@ -36926,6 +37806,17 @@
       "country": "Finland",
       "city": "Helsinki",
       "response_time_ms": 756.06,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "220.116.142.217",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Korea",
+      "city": "Dobong-gu",
+      "response_time_ms": 756.34,
       "hunt_score": 50.0
     },
     {
@@ -37160,6 +38051,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "183.110.216.128",
+      "port": 8090,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "South Korea",
+      "city": "Seongnam-si",
+      "response_time_ms": 761.2,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "210.209.236.242",
       "port": 80,
       "type": "https",
@@ -37179,6 +38081,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 761.69,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "4.213.98.253",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "India",
+      "city": "Pune",
+      "response_time_ms": 761.77,
       "hunt_score": 50.0
     },
     {
@@ -37347,6 +38260,28 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "183.110.216.159",
+      "port": 8090,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "South Korea",
+      "city": "Seongnam-si",
+      "response_time_ms": 763.84,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "41.184.92.220",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Nigeria",
+      "city": "Abuja",
+      "response_time_ms": 764.06,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "8.138.86.55",
       "port": 3128,
       "type": "https",
@@ -37366,6 +38301,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 764.67,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "58.214.243.92",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Wuxi",
+      "response_time_ms": 764.8,
       "hunt_score": 50.0
     },
     {
@@ -37523,6 +38469,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "219.249.37.107",
+      "port": 8382,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "South Korea",
+      "city": "Buk-gu",
+      "response_time_ms": 767.56,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 29053,
       "type": "https",
@@ -37663,17 +38620,6 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 771.18,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "46.150.9.111",
-      "port": 8123,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Ukraine",
-      "city": "Kharkiv",
-      "response_time_ms": 772.07,
       "hunt_score": 50.0
     },
     {
@@ -37930,6 +38876,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "219.249.37.107",
+      "port": 8197,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Korea",
+      "city": "Buk-gu",
+      "response_time_ms": 776.23,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "166.88.61.54",
       "port": 8000,
       "type": "https",
@@ -37982,6 +38939,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 777.33,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "138.124.114.42",
+      "port": 7443,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Frankfurt am Main",
+      "response_time_ms": 777.42,
       "hunt_score": 50.0
     },
     {
@@ -38216,6 +39184,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "112.184.234.229",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Korea",
+      "city": "Samcheok",
+      "response_time_ms": 780.99,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.165.147",
       "port": 38033,
       "type": "https",
@@ -38348,6 +39327,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "219.249.37.107",
+      "port": 8380,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Korea",
+      "city": "Buk-gu",
+      "response_time_ms": 782.82,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.236.20",
       "port": 4937,
       "type": "https",
@@ -38477,6 +39467,28 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 784.64,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "4.213.167.178",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "India",
+      "city": "Pune",
+      "response_time_ms": 784.86,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "125.136.46.100",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Korea",
+      "city": "Jinju",
+      "response_time_ms": 785.0,
       "hunt_score": 50.0
     },
     {
@@ -38733,6 +39745,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "129.154.217.238",
+      "port": 8080,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "South Korea",
+      "city": "Seoul",
+      "response_time_ms": 788.33,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.174",
       "port": 12283,
       "type": "https",
@@ -38983,6 +40006,17 @@
       "country": null,
       "city": null,
       "response_time_ms": 793.66,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "183.110.216.128",
+      "port": 8091,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Korea",
+      "city": "Seongnam-si",
+      "response_time_ms": 793.93,
       "hunt_score": 50.0
     },
     {
@@ -39382,17 +40416,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "139.28.49.43",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Syria",
-      "city": "Aleppo",
-      "response_time_ms": 802.48,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "89.39.104.152",
       "port": 14266,
       "type": "https",
@@ -39679,6 +40702,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "220.128.223.136",
+      "port": 8082,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Taiwan",
+      "city": "Taipei",
+      "response_time_ms": 805.68,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "8.243.68.11",
       "port": 8080,
       "type": "https",
@@ -39698,6 +40732,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 805.8,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "208.102.24.225",
+      "port": 8888,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Harrison",
+      "response_time_ms": 805.85,
       "hunt_score": 50.0
     },
     {
@@ -39819,6 +40864,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 807.84,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "131.153.163.180",
+      "port": 8251,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Ashburn",
+      "response_time_ms": 808.21,
       "hunt_score": 50.0
     },
     {
@@ -40042,6 +41098,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "12.50.107.220",
+      "port": 80,
+      "type": "https",
+      "source": "repository:PROXY-List/master",
+      "repository": "PROXY-List/master",
+      "country": "United States",
+      "city": "Tequesta",
+      "response_time_ms": 813.31,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 14839,
       "type": "https",
@@ -40218,6 +41285,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "168.222.254.26",
+      "port": 8888,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Germany",
+      "city": "Frankfurt am Main",
+      "response_time_ms": 817.52,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.228.250",
       "port": 2317,
       "type": "https",
@@ -40336,6 +41414,17 @@
       "country": "Japan",
       "city": "Tokyo",
       "response_time_ms": 818.95,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "152.67.191.232",
+      "port": 6800,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "India",
+      "city": "Hyderabad",
+      "response_time_ms": 819.05,
       "hunt_score": 50.0
     },
     {
@@ -40966,17 +42055,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "139.28.49.230",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Syria",
-      "city": "Aleppo",
-      "response_time_ms": 829.11,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "89.211.180.171",
       "port": 8080,
       "type": "https",
@@ -41029,6 +42107,17 @@
       "country": "Russia",
       "city": "Novoivanovskoye",
       "response_time_ms": 829.68,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "20.204.43.57",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "India",
+      "city": "Pune",
+      "response_time_ms": 829.69,
       "hunt_score": 50.0
     },
     {
@@ -41857,17 +42946,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "185.141.26.131",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Amsterdam",
-      "response_time_ms": 841.55,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "43.216.1.13",
       "port": 44777,
       "type": "https",
@@ -42000,6 +43078,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "183.110.216.159",
+      "port": 8091,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Korea",
+      "city": "Seongnam-si",
+      "response_time_ms": 844.0,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 2685,
       "type": "https",
@@ -42085,17 +43174,6 @@
       "country": "Philippines",
       "city": "Clark Freeport Zone",
       "response_time_ms": 845.32,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "193.123.227.123",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "South Korea",
-      "city": "Seoul",
-      "response_time_ms": 845.52,
       "hunt_score": 50.0
     },
     {
@@ -42572,6 +43650,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "218.252.100.222",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Hong Kong",
+      "city": "Fo Tan",
+      "response_time_ms": 851.66,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "43.133.27.207",
       "port": 6006,
       "type": "https",
@@ -42756,6 +43845,17 @@
       "country": "Vietnam",
       "city": "Hanoi",
       "response_time_ms": 856.09,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "193.239.86.180",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Hong Kong",
+      "city": "Hong Kong",
+      "response_time_ms": 856.11,
       "hunt_score": 50.0
     },
     {
@@ -42965,6 +44065,17 @@
       "country": "Japan",
       "city": "Tokyo",
       "response_time_ms": 858.55,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "154.65.39.8",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Senegal",
+      "city": "Dakar",
+      "response_time_ms": 859.31,
       "hunt_score": 50.0
     },
     {
@@ -43496,6 +44607,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "219.249.37.107",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Korea",
+      "city": "Buk-gu",
+      "response_time_ms": 866.9,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "193.227.129.195",
       "port": 33284,
       "type": "https",
@@ -43903,17 +45025,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "109.194.34.246",
-      "port": 8082,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Russia",
-      "city": "Tomsk",
-      "response_time_ms": 871.41,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "72.10.164.178",
       "port": 30217,
       "type": "https",
@@ -44252,6 +45363,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 875.59,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "47.128.73.163",
+      "port": 1080,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Singapore",
+      "city": "Singapore",
+      "response_time_ms": 875.61,
       "hunt_score": 50.0
     },
     {
@@ -45432,6 +46554,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "120.27.224.64",
+      "port": 3129,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Hangzhou",
+      "response_time_ms": 883.34,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "47.82.176.89",
       "port": 3128,
       "type": "https",
@@ -45905,6 +47038,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "217.154.155.115",
+      "port": 8080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Berlin",
+      "response_time_ms": 886.84,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "47.82.145.219",
       "port": 3128,
       "type": "socks4",
@@ -46045,6 +47189,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 887.81,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "101.132.222.120",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Shanghai",
+      "response_time_ms": 887.86,
       "hunt_score": 50.0
     },
     {
@@ -46837,6 +47992,17 @@
       "country": null,
       "city": null,
       "response_time_ms": 891.09,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "203.19.38.114",
+      "port": 1080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Hong Kong",
+      "city": "Hong Kong",
+      "response_time_ms": 891.11,
       "hunt_score": 50.0
     },
     {
@@ -47819,6 +48985,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "217.182.195.221",
+      "port": 30003,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "France",
+      "city": "Roubaix",
+      "response_time_ms": 896.07,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "47.82.161.209",
       "port": 3128,
       "type": "https",
@@ -48333,6 +49510,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 898.81,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "123.57.0.163",
+      "port": 8888,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Beijing",
+      "response_time_ms": 898.87,
       "hunt_score": 50.0
     },
     {
@@ -49708,6 +50896,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 904.35,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "47.245.117.43",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Singapore",
+      "city": "Singapore",
+      "response_time_ms": 904.37,
       "hunt_score": 50.0
     },
     {
@@ -51501,6 +52700,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 911.69,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.48.70.161",
+      "port": 83,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "India",
+      "city": "Hyderabad",
+      "response_time_ms": 911.7,
       "hunt_score": 50.0
     },
     {
@@ -53902,6 +55112,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "175.34.36.22",
+      "port": 8888,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Australia",
+      "city": "Brisbane",
+      "response_time_ms": 921.28,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "47.82.146.53",
       "port": 3128,
       "type": "https",
@@ -54188,6 +55409,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "27.34.242.98",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "India",
+      "city": "Bengaluru",
+      "response_time_ms": 922.42,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "203.95.196.196",
       "port": 8080,
       "type": "https",
@@ -54207,6 +55439,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 922.49,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "113.208.119.142",
+      "port": 9002,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Beijing",
+      "response_time_ms": 922.51,
       "hunt_score": 50.0
     },
     {
@@ -54716,6 +55959,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "41.59.90.168",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Tanzania",
+      "city": "Dar es Salaam",
+      "response_time_ms": 924.87,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "113.165.202.31",
       "port": 1003,
       "type": "https",
@@ -54823,6 +56077,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 925.42,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "120.55.240.71",
+      "port": 8647,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Hangzhou",
+      "response_time_ms": 925.47,
       "hunt_score": 50.0
     },
     {
@@ -55618,6 +56883,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "39.107.58.214",
+      "port": 7818,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Beijing",
+      "response_time_ms": 929.96,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "47.82.144.34",
       "port": 3128,
       "type": "https",
@@ -55648,6 +56924,28 @@
       "country": null,
       "city": null,
       "response_time_ms": 930.09,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "139.196.46.164",
+      "port": 8888,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Shanghai",
+      "response_time_ms": 930.22,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "41.59.90.175",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Tanzania",
+      "city": "Dar es Salaam",
+      "response_time_ms": 930.22,
       "hunt_score": 50.0
     },
     {
@@ -55747,6 +57045,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 930.55,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "47.79.119.13",
+      "port": 8080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Singapore",
+      "city": "Singapore",
+      "response_time_ms": 930.59,
       "hunt_score": 50.0
     },
     {
@@ -56058,6 +57367,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "47.115.187.208",
+      "port": 10086,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Shenzhen",
+      "response_time_ms": 932.42,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "47.100.254.82",
       "port": 80,
       "type": "https",
@@ -56187,6 +57507,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 933.26,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "97.74.87.226",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Singapore",
+      "city": "Singapore",
+      "response_time_ms": 933.27,
       "hunt_score": 50.0
     },
     {
@@ -57268,6 +58599,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "113.204.79.230",
+      "port": 9091,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Jinrongjie",
+      "response_time_ms": 938.43,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.171",
       "port": 19011,
       "type": "https",
@@ -58005,6 +59347,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "196.251.131.87",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Africa",
+      "city": "Johannesburg",
+      "response_time_ms": 942.31,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.228.250",
       "port": 7875,
       "type": "https",
@@ -58357,6 +59710,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "118.31.43.236",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Hangzhou",
+      "response_time_ms": 945.09,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "16.78.108.50",
       "port": 165,
       "type": "socks5",
@@ -58475,6 +59839,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 946.2,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "27.109.158.122",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Macao",
+      "city": "Zhuojiacun",
+      "response_time_ms": 946.29,
       "hunt_score": 50.0
     },
     {
@@ -59182,6 +60557,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "120.26.123.95",
+      "port": 8010,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Hangzhou",
+      "response_time_ms": 952.04,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 28947,
       "type": "https",
@@ -59421,6 +60807,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 954.76,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "197.221.240.247",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Zimbabwe",
+      "city": "Harare",
+      "response_time_ms": 954.79,
       "hunt_score": 50.0
     },
     {
@@ -60194,6 +61591,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "103.213.97.78",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Changzhou",
+      "response_time_ms": 961.66,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.91",
       "port": 17883,
       "type": "https",
@@ -60411,6 +61819,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 964.85,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "218.77.183.214",
+      "port": 5224,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Haikou",
+      "response_time_ms": 964.96,
       "hunt_score": 50.0
     },
     {
@@ -60920,6 +62339,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "120.26.0.11",
+      "port": 8880,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Hangzhou",
+      "response_time_ms": 971.18,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.228.253",
       "port": 3075,
       "type": "https",
@@ -61052,6 +62482,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "197.221.240.246",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Zimbabwe",
+      "city": "Harare",
+      "response_time_ms": 972.61,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "89.38.98.64",
       "port": 11347,
       "type": "https",
@@ -61137,6 +62578,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 973.17,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.51.223.133",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "India",
+      "city": "Jaigaon",
+      "response_time_ms": 973.19,
       "hunt_score": 50.0
     },
     {
@@ -61236,6 +62688,17 @@
       "country": "Indonesia",
       "city": "Serang",
       "response_time_ms": 974.95,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "89.169.53.40",
+      "port": 7443,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Frankfurt Am Main",
+      "response_time_ms": 974.96,
       "hunt_score": 50.0
     },
     {
@@ -61357,17 +62820,6 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 975.83,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "34.43.46.91",
-      "port": 443,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 975.84,
       "hunt_score": 50.0
     },
     {
@@ -61547,6 +62999,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "203.174.15.138",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Jakarta",
+      "response_time_ms": 978.16,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.172",
       "port": 20939,
       "type": "https",
@@ -61657,6 +63120,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "41.59.90.170",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Tanzania",
+      "city": "Dar es Salaam",
+      "response_time_ms": 980.51,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "34.237.145.144",
       "port": 80,
       "type": "https",
@@ -61712,6 +63186,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "203.95.198.125",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Cambodia",
+      "city": "Phnom Penh",
+      "response_time_ms": 981.3,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "171.241.224.165",
       "port": 1005,
       "type": "https",
@@ -61731,6 +63216,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 981.48,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.161.16.195",
+      "port": 50070,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Vietnam",
+      "city": "Ph\u00fac Lai",
+      "response_time_ms": 981.49,
       "hunt_score": 50.0
     },
     {
@@ -61896,6 +63392,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 983.2,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.67.80.154",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Utan",
+      "response_time_ms": 983.3,
       "hunt_score": 50.0
     },
     {
@@ -62284,17 +63791,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "46.101.251.110",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Germany",
-      "city": "Frankfurt am Main",
-      "response_time_ms": 988.17,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "121.230.9.146",
       "port": 1080,
       "type": "https",
@@ -62545,6 +64041,17 @@
       "country": "United States",
       "city": "Ashburn",
       "response_time_ms": 990.62,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "101.201.225.47",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Beijing",
+      "response_time_ms": 990.7,
       "hunt_score": 50.0
     },
     {
@@ -63901,6 +65408,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "103.118.44.201",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Cambodia",
+      "city": "Phnom Penh",
+      "response_time_ms": 1004.46,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "156.236.75.152",
       "port": 3128,
       "type": "https",
@@ -64165,6 +65683,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "221.231.13.198",
+      "port": 1080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Nanjing",
+      "response_time_ms": 1006.8,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.170",
       "port": 23501,
       "type": "https",
@@ -64363,6 +65892,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "203.95.199.159",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Cambodia",
+      "city": "Phnom Penh",
+      "response_time_ms": 1009.08,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "103.118.44.129",
       "port": 8080,
       "type": "https",
@@ -64371,6 +65911,17 @@
       "country": "Cambodia",
       "city": "Krong Siem Reap",
       "response_time_ms": 1009.31,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "38.183.144.134",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Bekasi",
+      "response_time_ms": 1009.43,
       "hunt_score": 50.0
     },
     {
@@ -64558,6 +66109,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 1011.78,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.216.50.11",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Cambodia",
+      "city": "Phnom Penh",
+      "response_time_ms": 1011.8,
       "hunt_score": 50.0
     },
     {
@@ -64800,6 +66362,17 @@
       "country": "United States",
       "city": "Reston",
       "response_time_ms": 1014.2,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "115.127.31.66",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Bangladesh",
+      "city": "Dhaka",
+      "response_time_ms": 1014.31,
       "hunt_score": 50.0
     },
     {
@@ -65408,6 +66981,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "47.115.221.69",
+      "port": 9090,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Shenzhen",
+      "response_time_ms": 1021.96,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.165.109",
       "port": 34889,
       "type": "https",
@@ -65815,6 +67399,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "45.88.174.195",
+      "port": 8080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "The Netherlands",
+      "city": "Amsterdam",
+      "response_time_ms": 1025.99,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 13961,
       "type": "https",
@@ -66200,6 +67795,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "103.118.47.205",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Cambodia",
+      "city": "Phnom Penh",
+      "response_time_ms": 1030.71,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "115.231.37.166",
       "port": 12196,
       "type": "https",
@@ -66398,17 +68004,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "221.153.92.39",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1033.26,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "5.180.172.130",
       "port": 80,
       "type": "https",
@@ -66472,6 +68067,17 @@
       "country": "China",
       "city": "Hangzhou",
       "response_time_ms": 1034.07,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "203.95.196.58",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Cambodia",
+      "city": "Phnom Penh",
+      "response_time_ms": 1034.27,
       "hunt_score": 50.0
     },
     {
@@ -67047,17 +68653,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "182.155.254.159",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Taiwan",
-      "city": "Taichung",
-      "response_time_ms": 1041.51,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "15.160.151.84",
       "port": 69,
       "type": "socks5",
@@ -67209,17 +68804,6 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1043.7,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "193.239.86.180",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1043.77,
       "hunt_score": 50.0
     },
     {
@@ -67509,17 +69093,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "190.181.26.194",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1048.4,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "171.237.110.244",
       "port": 1010,
       "type": "https",
@@ -67671,6 +69244,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1049.91,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "178.156.206.253",
+      "port": 8118,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Ashburn",
+      "response_time_ms": 1049.94,
       "hunt_score": 50.0
     },
     {
@@ -67836,6 +69420,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1052.37,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "183.215.23.242",
+      "port": 9091,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Qingyuan",
+      "response_time_ms": 1052.52,
       "hunt_score": 50.0
     },
     {
@@ -68081,6 +69676,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "39.109.113.97",
+      "port": 4090,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Hong Kong",
+      "city": "Kwai Chung",
+      "response_time_ms": 1055.19,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "203.95.198.177",
       "port": 8080,
       "type": "https",
@@ -68309,6 +69915,17 @@
       "country": "Switzerland",
       "city": "Zurich",
       "response_time_ms": 1057.44,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "219.65.73.81",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "India",
+      "city": "Kolkata",
+      "response_time_ms": 1057.5,
       "hunt_score": 50.0
     },
     {
@@ -69299,6 +70916,17 @@
       "country": "Netherlands",
       "city": "Amsterdam",
       "response_time_ms": 1072.63,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "41.59.90.171",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Tanzania",
+      "city": "Dar es Salaam",
+      "response_time_ms": 1072.64,
       "hunt_score": 50.0
     },
     {
@@ -70325,6 +71953,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "103.151.20.131",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Indonesia",
+      "city": "Makassar",
+      "response_time_ms": 1086.8,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "203.95.198.158",
       "port": 8080,
       "type": "https",
@@ -70498,6 +72137,17 @@
       "country": "China",
       "city": "Shanghai",
       "response_time_ms": 1089.35,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "192.9.182.6",
+      "port": 20172,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Australia",
+      "city": "Sydney",
+      "response_time_ms": 1089.39,
       "hunt_score": 50.0
     },
     {
@@ -70798,6 +72448,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "200.174.198.32",
+      "port": 8888,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Brazil",
+      "city": "S\u00e3o Paulo",
+      "response_time_ms": 1094.21,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "47.82.152.168",
       "port": 3128,
       "type": "https",
@@ -70839,6 +72500,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1094.67,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.153.149.138",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Weleri",
+      "response_time_ms": 1094.68,
       "hunt_score": 50.0
     },
     {
@@ -73020,6 +74692,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "50.114.33.162",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Cambodia",
+      "city": "Phnom Penh",
+      "response_time_ms": 1128.82,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "89.39.104.152",
       "port": 11197,
       "type": "https",
@@ -73284,17 +74967,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "219.249.37.107",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1133.56,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "18.143.173.102",
       "port": 8333,
       "type": "socks5",
@@ -73493,6 +75165,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "202.28.194.139",
+      "port": 31280,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Thailand",
+      "city": "Chiang Mai",
+      "response_time_ms": 1135.61,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.228.250",
       "port": 6551,
       "type": "https",
@@ -73567,17 +75250,6 @@
       "country": "United States",
       "city": "San Jose",
       "response_time_ms": 1136.38,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "35.233.82.227",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1136.42,
       "hunt_score": 50.0
     },
     {
@@ -74098,6 +75770,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "197.221.249.196",
+      "port": 80,
+      "type": "socks5",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Zimbabwe",
+      "city": "Harare",
+      "response_time_ms": 1144.19,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "193.233.210.158",
       "port": 8085,
       "type": "https",
@@ -74227,6 +75910,17 @@
       "country": "Netherlands",
       "city": "Amsterdam",
       "response_time_ms": 1146.97,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "176.61.151.123",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Portugal",
+      "city": "Faro Municipality",
+      "response_time_ms": 1147.19,
       "hunt_score": 50.0
     },
     {
@@ -75022,17 +76716,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "219.249.37.107",
-      "port": 8380,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1159.91,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "47.82.145.121",
       "port": 3128,
       "type": "https",
@@ -75052,17 +76735,6 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1160.17,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "176.106.241.50",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Russia",
-      "city": "Mytishchi",
-      "response_time_ms": 1160.26,
       "hunt_score": 50.0
     },
     {
@@ -75778,6 +77450,17 @@
       "country": "India",
       "city": "Hyderabad",
       "response_time_ms": 1174.21,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "157.245.100.190",
+      "port": 442,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "India",
+      "city": "Bengaluru",
+      "response_time_ms": 1174.46,
       "hunt_score": 50.0
     },
     {
@@ -76727,6 +78410,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "113.11.76.233",
+      "port": 30226,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Bangladesh",
+      "city": "Rajshahi",
+      "response_time_ms": 1190.12,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "185.165.241.5",
       "port": 15335,
       "type": "https",
@@ -77651,17 +79345,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "46.35.9.110",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "France",
-      "city": "Paris",
-      "response_time_ms": 1205.94,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "72.10.164.178",
       "port": 1303,
       "type": "https",
@@ -78110,6 +79793,17 @@
       "country": "China",
       "city": "Suzhou",
       "response_time_ms": 1214.09,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "153.0.171.163",
+      "port": 8085,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Haikou",
+      "response_time_ms": 1214.16,
       "hunt_score": 50.0
     },
     {
@@ -78605,6 +80299,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1220.85,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "143.42.66.91",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Singapore",
+      "city": "Singapore",
+      "response_time_ms": 1221.05,
       "hunt_score": 50.0
     },
     {
@@ -79994,6 +81699,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "182.155.254.159",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Taiwan",
+      "city": "Taichung",
+      "response_time_ms": 1246.13,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "14.143.222.113",
       "port": 57738,
       "type": "https",
@@ -80225,17 +81941,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "157.10.192.4",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Indonesia",
-      "city": "Giriroto",
-      "response_time_ms": 1248.93,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "47.82.154.29",
       "port": 3128,
       "type": "https",
@@ -80244,6 +81949,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 1249.07,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "116.171.106.26",
+      "port": 3443,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Jinrongjie",
+      "response_time_ms": 1249.14,
       "hunt_score": 50.0
     },
     {
@@ -80885,6 +82601,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "217.77.102.18",
+      "port": 3128,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Russia",
+      "city": "Samara",
+      "response_time_ms": 1260.45,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.93",
       "port": 17973,
       "type": "https",
@@ -81289,6 +83016,17 @@
       "country": "Finland",
       "city": "Helsinki",
       "response_time_ms": 1269.84,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "165.154.7.156",
+      "port": 8888,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Hong Kong",
+      "city": "Hong Kong",
+      "response_time_ms": 1269.94,
       "hunt_score": 50.0
     },
     {
@@ -82059,6 +83797,17 @@
       "country": "Vietnam",
       "city": "Ho Chi Minh City",
       "response_time_ms": 1284.65,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.48.71.6",
+      "port": 83,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "India",
+      "city": "Banjara Hills",
+      "response_time_ms": 1285.0,
       "hunt_score": 50.0
     },
     {
@@ -83118,17 +84867,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "123.56.232.96",
-      "port": 9998,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Beijing",
-      "response_time_ms": 1306.21,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "52.51.50.129",
       "port": 3128,
       "type": "https",
@@ -83489,6 +85227,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1312.23,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.68.215.75",
+      "port": 8181,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Pasarkemis",
+      "response_time_ms": 1312.24,
       "hunt_score": 50.0
     },
     {
@@ -84083,6 +85832,17 @@
       "country": "Netherlands",
       "city": "Naaldwijk",
       "response_time_ms": 1324.67,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "47.242.243.198",
+      "port": 2233,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Hong Kong",
+      "city": "Hong Kong",
+      "response_time_ms": 1325.23,
       "hunt_score": 50.0
     },
     {
@@ -84779,6 +86539,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "4.221.164.109",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "South Africa",
+      "city": "Johannesburg",
+      "response_time_ms": 1342.21,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "116.107.104.183",
       "port": 10001,
       "type": "https",
@@ -85142,6 +86913,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "178.208.169.149",
+      "port": 8118,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United Kingdom",
+      "city": "City of London",
+      "response_time_ms": 1350.82,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.164.178",
       "port": 16681,
       "type": "https",
@@ -85227,6 +87009,17 @@
       "country": "Netherlands",
       "city": "Naaldwijk",
       "response_time_ms": 1352.92,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.247.13.131",
+      "port": 8085,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Magelang",
+      "response_time_ms": 1353.18,
       "hunt_score": 50.0
     },
     {
@@ -85835,17 +87628,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "148.81.121.5",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Poland",
-      "city": "Warsaw",
-      "response_time_ms": 1367.07,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "78.12.249.123",
       "port": 8123,
       "type": "socks5",
@@ -86044,6 +87826,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "149.104.4.88",
+      "port": 10809,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Hong Kong",
+      "city": "Chai Wan",
+      "response_time_ms": 1370.34,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "67.43.228.253",
       "port": 15389,
       "type": "https",
@@ -86220,6 +88013,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "39.106.192.29",
+      "port": 8443,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Beijing",
+      "response_time_ms": 1374.38,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "43.133.29.31",
       "port": 6006,
       "type": "https",
@@ -86385,6 +88189,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "103.248.9.202",
+      "port": 8090,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Garut",
+      "response_time_ms": 1378.23,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "72.10.160.90",
       "port": 15527,
       "type": "https",
@@ -86462,28 +88277,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "122.3.87.41",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Philippines",
-      "city": "Angeles City",
-      "response_time_ms": 1379.05,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "38.210.179.204",
-      "port": 999,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Mexico",
-      "city": "Zimapan",
-      "response_time_ms": 1379.19,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "113.11.94.2",
       "port": 8443,
       "type": "https",
@@ -86558,6 +88351,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 1381.32,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.48.71.130",
+      "port": 84,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "India",
+      "city": "Banjara Hills",
+      "response_time_ms": 1381.47,
       "hunt_score": 50.0
     },
     {
@@ -86701,6 +88505,17 @@
       "country": "China",
       "city": "Wenzhou",
       "response_time_ms": 1383.34,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "118.31.43.236",
+      "port": 443,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Hangzhou",
+      "response_time_ms": 1383.37,
       "hunt_score": 50.0
     },
     {
@@ -86954,6 +88769,17 @@
       "country": null,
       "city": null,
       "response_time_ms": 1388.76,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "101.71.143.237",
+      "port": 8092,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Hangzhou",
+      "response_time_ms": 1389.13,
       "hunt_score": 50.0
     },
     {
@@ -87449,17 +89275,6 @@
       "country": null,
       "city": null,
       "response_time_ms": 1400.71,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "152.67.191.232",
-      "port": 6800,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "India",
-      "city": "Hyderabad",
-      "response_time_ms": 1401.23,
       "hunt_score": 50.0
     },
     {
@@ -88486,17 +90301,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "20.204.43.57",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1421.58,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "40.192.3.100",
       "port": 32255,
       "type": "socks5",
@@ -88772,17 +90576,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "102.68.128.212",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Libya",
-      "city": "Tripoli",
-      "response_time_ms": 1429.78,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "101.66.195.214",
       "port": 8085,
       "type": "https",
@@ -89022,6 +90815,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1432.85,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.251.8.255",
+      "port": 8282,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Ubud",
+      "response_time_ms": 1433.94,
       "hunt_score": 50.0
     },
     {
@@ -90411,17 +92215,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "212.231.191.23",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1465.88,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "67.43.236.20",
       "port": 5315,
       "type": "https",
@@ -90452,6 +92245,17 @@
       "country": "Bahrain",
       "city": "Manama",
       "response_time_ms": 1466.79,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "210.177.178.148",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Hong Kong",
+      "city": "Wan Chai",
+      "response_time_ms": 1467.0,
       "hunt_score": 50.0
     },
     {
@@ -90518,6 +92322,17 @@
       "country": "Morocco",
       "city": "Casablanca",
       "response_time_ms": 1468.25,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "123.56.232.96",
+      "port": 9998,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Beijing",
+      "response_time_ms": 1468.72,
       "hunt_score": 50.0
     },
     {
@@ -91222,6 +93037,17 @@
       "country": "Indonesia",
       "city": "Gubengairlangga",
       "response_time_ms": 1485.12,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.251.232.2",
+      "port": 8090,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Bangladesh",
+      "city": "Dhaka",
+      "response_time_ms": 1485.47,
       "hunt_score": 50.0
     },
     {
@@ -91973,17 +93799,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "212.118.52.196",
-      "port": 1080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1502.96,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "67.43.228.253",
       "port": 14197,
       "type": "https",
@@ -92113,17 +93928,6 @@
       "country": "United States",
       "city": "Tempe",
       "response_time_ms": 1505.71,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.115.187.208",
-      "port": 10086,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Shenzhen",
-      "response_time_ms": 1506.03,
       "hunt_score": 50.0
     },
     {
@@ -92553,17 +94357,6 @@
       "country": "Netherlands",
       "city": "Naaldwijk",
       "response_time_ms": 1516.47,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "103.157.83.231",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Indonesia",
-      "city": "West Jakarta City",
-      "response_time_ms": 1516.55,
       "hunt_score": 50.0
     },
     {
@@ -93356,6 +95149,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1538.63,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "123.58.219.150",
+      "port": 7890,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Hong Kong",
+      "city": "Hong Kong",
+      "response_time_ms": 1539.07,
       "hunt_score": 50.0
     },
     {
@@ -94217,6 +96021,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "222.66.202.6",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Beijing",
+      "response_time_ms": 1560.33,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.162.196",
       "port": 52513,
       "type": "https",
@@ -94610,6 +96425,17 @@
       "country": "Netherlands",
       "city": "Naaldwijk",
       "response_time_ms": 1569.57,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "151.243.180.211",
+      "port": 2080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "The Netherlands",
+      "city": "Amsterdam",
+      "response_time_ms": 1569.8,
       "hunt_score": 50.0
     },
     {
@@ -95394,17 +97220,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "179.189.120.146",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Brazil",
-      "city": "Teresina",
-      "response_time_ms": 1587.99,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "203.95.198.154",
       "port": 8080,
       "type": "https",
@@ -95845,6 +97660,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "103.216.104.6",
+      "port": 1080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Pinrang",
+      "response_time_ms": 1600.55,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "45.12.62.218",
       "port": 8081,
       "type": "https",
@@ -95897,6 +97723,17 @@
       "country": "France",
       "city": "Strasbourg",
       "response_time_ms": 1601.79,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.46.8.85",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Indonesia",
+      "city": "Denpasar",
+      "response_time_ms": 1602.77,
       "hunt_score": 50.0
     },
     {
@@ -96527,6 +98364,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "13.114.160.78",
+      "port": 80,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Japan",
+      "city": "Tokyo",
+      "response_time_ms": 1620.9,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "157.180.121.252",
       "port": 45189,
       "type": "socks5",
@@ -97055,17 +98903,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "219.249.37.107",
-      "port": 8197,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1635.39,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "72.10.164.178",
       "port": 8099,
       "type": "https",
@@ -97085,6 +98922,17 @@
       "country": "Russia",
       "city": "Moscow",
       "response_time_ms": 1636.08,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "200.114.81.219",
+      "port": 8080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Argentina",
+      "city": "Corrientes",
+      "response_time_ms": 1636.42,
       "hunt_score": 50.0
     },
     {
@@ -97426,6 +99274,17 @@
       "country": "Netherlands",
       "city": "Amsterdam",
       "response_time_ms": 1644.12,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.40.226.126",
+      "port": 26100,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Bangladesh",
+      "city": "Dhaka",
+      "response_time_ms": 1644.56,
       "hunt_score": 50.0
     },
     {
@@ -98221,6 +100080,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "8.210.93.183",
+      "port": 8213,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Hong Kong",
+      "city": "Hong Kong",
+      "response_time_ms": 1665.91,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "89.38.97.145",
       "port": 11747,
       "type": "https",
@@ -98749,17 +100619,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "203.95.196.58",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1680.47,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "62.112.10.88",
       "port": 12071,
       "type": "https",
@@ -98988,6 +100847,17 @@
       "country": "Canada",
       "city": "Montreal",
       "response_time_ms": 1688.84,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "36.147.78.166",
+      "port": 443,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Guangzhou",
+      "response_time_ms": 1689.15,
       "hunt_score": 50.0
     },
     {
@@ -99398,6 +101268,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "142.147.119.181",
+      "port": 8080,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Azle",
+      "response_time_ms": 1701.81,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "203.95.196.131",
       "port": 8080,
       "type": "https",
@@ -99483,6 +101364,17 @@
       "country": null,
       "city": null,
       "response_time_ms": 1704.87,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.129.127.244",
+      "port": 8888,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Vietnam",
+      "city": "Ho Chi Minh City",
+      "response_time_ms": 1705.0,
       "hunt_score": 50.0
     },
     {
@@ -100113,6 +102005,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "47.112.25.109",
+      "port": 7890,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Shenzhen",
+      "response_time_ms": 1722.53,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "174.138.168.90",
       "port": 30211,
       "type": "https",
@@ -100308,6 +102211,17 @@
       "country": "China",
       "city": "Hangzhou",
       "response_time_ms": 1729.08,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "47.52.223.161",
+      "port": 5872,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Hong Kong",
+      "city": "Hong Kong",
+      "response_time_ms": 1729.53,
       "hunt_score": 50.0
     },
     {
@@ -100517,6 +102431,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 1735.47,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "144.24.29.128",
+      "port": 10900,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Phoenix",
+      "response_time_ms": 1735.56,
       "hunt_score": 50.0
     },
     {
@@ -100880,17 +102805,6 @@
       "country": "Netherlands",
       "city": "Maasdijk",
       "response_time_ms": 1746.99,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "74.176.195.135",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Japan",
-      "city": "Tokyo",
-      "response_time_ms": 1747.23,
       "hunt_score": 50.0
     },
     {
@@ -101463,6 +103377,17 @@
       "country": "Vietnam",
       "city": "Th\u1ea1ch Th\u1ea5t",
       "response_time_ms": 1765.58,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "92.118.112.25",
+      "port": 1081,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "United States",
+      "city": "Atlanta",
+      "response_time_ms": 1766.15,
       "hunt_score": 50.0
     },
     {
@@ -102918,17 +104843,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "31.10.83.158",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1811.41,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "72.10.164.178",
       "port": 20625,
       "type": "https",
@@ -103358,6 +105272,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "131.153.163.28",
+      "port": 8158,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Ashburn",
+      "response_time_ms": 1822.84,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "183.80.206.171",
       "port": 16000,
       "type": "https",
@@ -103630,17 +105555,6 @@
       "country": "United States",
       "city": "Ashburn",
       "response_time_ms": 1831.51,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "36.147.78.166",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1831.75,
       "hunt_score": 50.0
     },
     {
@@ -103982,6 +105896,17 @@
       "country": "Netherlands",
       "city": "Naaldwijk",
       "response_time_ms": 1840.51,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "198.24.188.139",
+      "port": 36676,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "United States",
+      "city": "Ashburn",
+      "response_time_ms": 1841.09,
       "hunt_score": 50.0
     },
     {
@@ -104348,6 +106273,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "36.111.205.203",
+      "port": 6666,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Hangzhou",
+      "response_time_ms": 1854.31,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "152.53.194.55",
       "port": 45941,
       "type": "socks5",
@@ -104433,6 +106369,17 @@
       "country": "Finland",
       "city": "Helsinki",
       "response_time_ms": 1856.85,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "43.161.239.147",
+      "port": 8888,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Hong Kong",
+      "city": "Hong Kong",
+      "response_time_ms": 1857.29,
       "hunt_score": 50.0
     },
     {
@@ -105291,6 +107238,17 @@
       "country": "Singapore",
       "city": "Singapore",
       "response_time_ms": 1881.48,
+      "hunt_score": 50.0
+    },
+    {
+      "ip": "103.245.109.70",
+      "port": 21458,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "Bangladesh",
+      "city": "Dhaka",
+      "response_time_ms": 1882.29,
       "hunt_score": 50.0
     },
     {
@@ -106559,17 +108517,6 @@
       "hunt_score": 50.0
     },
     {
-      "ip": "119.194.72.67",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Republic of Korea",
-      "city": "Anseong-si",
-      "response_time_ms": 1917.48,
-      "hunt_score": 50.0
-    },
-    {
       "ip": "134.119.213.231",
       "port": 17622,
       "type": "https",
@@ -106691,6 +108638,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "164.92.165.209",
+      "port": 18080,
+      "type": "socks4",
+      "source": "repository:Proxy-List/main",
+      "repository": "Proxy-List/main",
+      "country": "Germany",
+      "city": "Frankfurt am Main",
+      "response_time_ms": 1920.0,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "103.126.238.253",
       "port": 8080,
       "type": "https",
@@ -106765,17 +108723,6 @@
       "country": "Vietnam",
       "city": "Ho Chi Minh City",
       "response_time_ms": 1922.51,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "31.42.164.144",
-      "port": 23255,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Ukraine",
-      "city": "Khmelnytskyi",
-      "response_time_ms": 1922.59,
       "hunt_score": 50.0
     },
     {
@@ -107227,17 +109174,6 @@
       "country": "Netherlands",
       "city": "Amsterdam",
       "response_time_ms": 1936.11,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "119.235.19.25",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Indonesia",
-      "city": "Bandung",
-      "response_time_ms": 1936.31,
       "hunt_score": 50.0
     },
     {
@@ -107714,6 +109650,17 @@
       "hunt_score": 50.0
     },
     {
+      "ip": "61.49.87.3",
+      "port": 80,
+      "type": "https",
+      "source": "repository:heads/main",
+      "repository": "heads/main",
+      "country": "China",
+      "city": "Beijing",
+      "response_time_ms": 1951.69,
+      "hunt_score": 50.0
+    },
+    {
       "ip": "34.22.184.163",
       "port": 4326,
       "type": "https",
@@ -108118,1953 +110065,6 @@
       "country": null,
       "city": null,
       "response_time_ms": 1966.53,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.84",
-      "port": 56488,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1966.61,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "109.236.84.70",
-      "port": 12783,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Amsterdam",
-      "response_time_ms": 1966.65,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.162.237",
-      "port": 38111,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1967.55,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "151.106.6.79",
-      "port": 12568,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "France",
-      "city": "Strasbourg",
-      "response_time_ms": 1968.0,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "157.180.121.252",
-      "port": 15361,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Finland",
-      "city": "Helsinki",
-      "response_time_ms": 1968.19,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "157.180.121.252",
-      "port": 19633,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Finland",
-      "city": "Helsinki",
-      "response_time_ms": 1968.75,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "204.168.193.248",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Finland",
-      "city": "Helsinki",
-      "response_time_ms": 1968.83,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 21737,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1969.29,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "165.22.71.191",
-      "port": 443,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Germany",
-      "city": "Frankfurt",
-      "response_time_ms": 1969.3,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "3.36.200.151",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": "Republic of Korea",
-      "city": "Incheon",
-      "response_time_ms": 1969.32,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.109",
-      "port": 27065,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1969.35,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "14.225.222.185",
-      "port": 7890,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1969.56,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.160.90",
-      "port": 5731,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1970.06,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "200.106.124.89",
-      "port": 999,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Peru",
-      "city": "Tacna",
-      "response_time_ms": 1970.7,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "43.167.169.100",
-      "port": 6006,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": "Japan",
-      "city": "Tokyo",
-      "response_time_ms": 1970.72,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "106.105.126.73",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Taiwan",
-      "city": "Taipei",
-      "response_time_ms": 1970.79,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "113.111.142.203",
-      "port": 8000,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Guangzhou",
-      "response_time_ms": 1971.1,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "151.106.6.79",
-      "port": 12917,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "France",
-      "city": "Strasbourg",
-      "response_time_ms": 1971.1,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "190.2.142.111",
-      "port": 14503,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "The Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1972.0,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "131.153.163.26",
-      "port": 9857,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Ashburn",
-      "response_time_ms": 1973.01,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.178",
-      "port": 9188,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1973.04,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "88.210.11.43",
-      "port": 5795,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Amsterdam",
-      "response_time_ms": 1973.45,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "178.132.2.28",
-      "port": 14279,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Amsterdam",
-      "response_time_ms": 1973.6,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.171.162",
-      "port": 25003,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1973.74,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "123.154.239.106",
-      "port": 8085,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Hangzhou",
-      "response_time_ms": 1973.91,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.160.93",
-      "port": 5047,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1973.93,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "89.38.98.64",
-      "port": 17277,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Amsterdam",
-      "response_time_ms": 1974.43,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "134.119.213.231",
-      "port": 16752,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "France",
-      "city": "Strasbourg",
-      "response_time_ms": 1974.6,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "139.177.229.72",
-      "port": 8080,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "United States",
-      "city": "Ashburn",
-      "response_time_ms": 1975.89,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 5437,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1975.92,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "93.190.143.27",
-      "port": 12241,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1976.21,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.82.151.125",
-      "port": 3128,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 1976.53,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.91",
-      "port": 50766,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1977.08,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.79.251.24",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 1977.42,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "115.74.10.144",
-      "port": 10009,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Vietnam",
-      "city": "V\u0169ng T\u00e0u",
-      "response_time_ms": 1977.87,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "114.80.40.130",
-      "port": 3081,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Shanghai",
-      "response_time_ms": 1978.17,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "185.100.232.163",
-      "port": 16769,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1978.18,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "180.94.23.27",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Indonesia",
-      "city": "Cianjur",
-      "response_time_ms": 1978.54,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "123.141.181.3",
-      "port": 5031,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Republic of Korea",
-      "city": "Gangnam-gu",
-      "response_time_ms": 1979.02,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "89.39.104.152",
-      "port": 17767,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Amsterdam",
-      "response_time_ms": 1979.02,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "18.183.141.82",
-      "port": 453,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Japan",
-      "city": "Tokyo",
-      "response_time_ms": 1979.3,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "67.43.236.20",
-      "port": 15239,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1979.36,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.160.90",
-      "port": 26327,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1979.51,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "103.118.44.229",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Cambodia",
-      "city": "Phnom Phen City",
-      "response_time_ms": 1979.71,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "157.180.121.252",
-      "port": 24894,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": "Finland",
-      "city": "Helsinki",
-      "response_time_ms": 1980.52,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "93.190.141.108",
-      "port": 17453,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "The Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1981.04,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "89.163.135.59",
-      "port": 16030,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Germany",
-      "city": "Frankfurt",
-      "response_time_ms": 1981.1,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "85.185.206.195",
-      "port": 3131,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1981.12,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "35.181.173.74",
-      "port": 93,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "France",
-      "city": "Paris",
-      "response_time_ms": 1982.02,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "18.213.118.220",
-      "port": 80,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": "United States",
-      "city": "Ashburn",
-      "response_time_ms": 1983.07,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "178.132.0.94",
-      "port": 13342,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Amsterdam",
-      "response_time_ms": 1983.45,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "101.66.198.146",
-      "port": 8085,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Hangzhou",
-      "response_time_ms": 1983.74,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.78",
-      "port": 8924,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1984.21,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.82.160.101",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 1984.28,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "4.213.167.178",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "India",
-      "city": "Pune",
-      "response_time_ms": 1984.86,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "115.231.37.227",
-      "port": 14105,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Guangzhou",
-      "response_time_ms": 1985.84,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.160.94",
-      "port": 4881,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1985.93,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "31.28.4.192",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1986.18,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "123.21.3.1",
-      "port": 1002,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Vietnam",
-      "city": "Ho Chi Minh City",
-      "response_time_ms": 1986.35,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "67.43.228.250",
-      "port": 9835,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1986.36,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "175.110.113.245",
-      "port": 11514,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "The Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1986.73,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "3.235.162.95",
-      "port": 80,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": "United States",
-      "city": "Ashburn",
-      "response_time_ms": 1988.26,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "35.77.36.136",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:main/proxies",
-      "repository": "main/proxies",
-      "country": "Japan",
-      "city": "Tokyo",
-      "response_time_ms": 1988.29,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "46.62.143.200",
-      "port": 8077,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Finland",
-      "city": "Helsinki",
-      "response_time_ms": 1988.52,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "121.230.8.240",
-      "port": 1080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1988.67,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "89.38.97.60",
-      "port": 11213,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1989.21,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "109.236.93.5",
-      "port": 12454,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1989.23,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "190.2.134.118",
-      "port": 12771,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "The Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1989.27,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "102.69.236.152",
-      "port": 443,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "South Africa",
-      "city": "Centurion",
-      "response_time_ms": 1989.45,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "109.236.94.37",
-      "port": 12520,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Maasdijk",
-      "response_time_ms": 1989.52,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "103.166.159.97",
-      "port": 7777,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Indonesia",
-      "city": "Kota Sambas",
-      "response_time_ms": 1989.62,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.75",
-      "port": 8040,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1989.91,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 9115,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1989.96,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "38.159.36.38",
-      "port": 999,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Dominican Republic",
-      "city": "Santo Domingo",
-      "response_time_ms": 1990.24,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "171.236.213.163",
-      "port": 3001,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Vietnam",
-      "city": "Hanoi",
-      "response_time_ms": 1990.37,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "182.47.249.45",
-      "port": 88,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Dezhou",
-      "response_time_ms": 1990.45,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "119.8.101.174",
-      "port": 80,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": "Hong Kong",
-      "city": "Hong Kong",
-      "response_time_ms": 1990.85,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "103.215.36.88",
-      "port": 14942,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "China",
-      "city": "Yancheng",
-      "response_time_ms": 1990.97,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "93.190.139.87",
-      "port": 11517,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "The Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1991.04,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "185.165.241.5",
-      "port": 16682,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1991.3,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "67.43.228.251",
-      "port": 17323,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 1991.52,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.171.162",
-      "port": 38334,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1991.64,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.162.139",
-      "port": 34110,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1991.7,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "185.132.133.56",
-      "port": 11616,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 1992.01,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "171.237.118.180",
-      "port": 1010,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Vietnam",
-      "city": "Hanoi",
-      "response_time_ms": 1992.23,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "67.43.236.20",
-      "port": 9955,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1992.44,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.82.180.9",
-      "port": 3128,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 1992.59,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.168.74",
-      "port": 26756,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 1994.12,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "37.120.162.180",
-      "port": 35741,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Germany",
-      "city": "Karlsruhe",
-      "response_time_ms": 1994.25,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "67.43.236.20",
-      "port": 31619,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1994.26,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "148.178.125.213",
-      "port": 8888,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Dallas",
-      "response_time_ms": 1994.37,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "114.214.163.108",
-      "port": 6789,
-      "type": "https",
-      "source": "repository:main/proxies",
-      "repository": "main/proxies",
-      "country": "China",
-      "city": "Nanjing",
-      "response_time_ms": 1994.38,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "45.159.23.134",
-      "port": 8085,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Chicago",
-      "response_time_ms": 1995.9,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "67.43.236.20",
-      "port": 7273,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1995.94,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "67.43.228.250",
-      "port": 9503,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1996.02,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 8729,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1996.19,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "18.143.165.238",
-      "port": 10009,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 1996.34,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.76.113.85",
-      "port": 1234,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Hong Kong",
-      "city": "Hong Kong",
-      "response_time_ms": 1996.52,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "157.180.121.252",
-      "port": 13155,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Finland",
-      "city": "Helsinki",
-      "response_time_ms": 1996.75,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.82.152.90",
-      "port": 3128,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 1997.24,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.160.170",
-      "port": 6597,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 1997.49,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "180.127.230.32",
-      "port": 1080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Nanjing",
-      "response_time_ms": 1997.87,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "222.129.37.94",
-      "port": 3333,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Beijing",
-      "response_time_ms": 1997.92,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "23.239.111.194",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Salt Lake City",
-      "response_time_ms": 1999.36,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "104.129.203.247",
-      "port": 11703,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": "United States",
-      "city": "San Jose",
-      "response_time_ms": 1999.73,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "93.190.141.108",
-      "port": 17079,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "The Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 2000.19,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "93.190.142.109",
-      "port": 11780,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 2000.38,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.161.203",
-      "port": 56697,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 2000.49,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "67.43.236.20",
-      "port": 24817,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2000.67,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "152.53.194.55",
-      "port": 42731,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "United States",
-      "city": "Ashburn",
-      "response_time_ms": 2001.11,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "49.75.113.94",
-      "port": 7788,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 2001.66,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "131.153.163.28",
-      "port": 32381,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Ashburn",
-      "response_time_ms": 2002.21,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "101.66.195.169",
-      "port": 8085,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Hangzhou",
-      "response_time_ms": 2003.93,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "171.231.131.186",
-      "port": 5105,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Vietnam",
-      "city": "Pleiku",
-      "response_time_ms": 2004.04,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "43.102.204.43",
-      "port": 8001,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Beijing",
-      "response_time_ms": 2004.21,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.161.204",
-      "port": 8254,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 2005.11,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.82.144.61",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 2005.25,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "120.77.236.120",
-      "port": 9100,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Shenzhen",
-      "response_time_ms": 2006.32,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.90.149.238",
-      "port": 8443,
-      "type": "socks4",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 2006.34,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "134.119.219.211",
-      "port": 11514,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "France",
-      "city": "Strasbourg",
-      "response_time_ms": 2006.62,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.133",
-      "port": 9157,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 2006.75,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.90.149.238",
-      "port": 8008,
-      "type": "socks4",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 2007.5,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "15.168.235.57",
-      "port": 8724,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Japan",
-      "city": "Osaka",
-      "response_time_ms": 2007.63,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.252.18.37",
-      "port": 80,
-      "type": "socks4",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Charlottesville",
-      "response_time_ms": 2007.81,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 18899,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2008.54,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "210.76.192.32",
-      "port": 7890,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Beijing",
-      "response_time_ms": 2008.73,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.252.18.37",
-      "port": 8000,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "United States",
-      "city": "Charlottesville",
-      "response_time_ms": 2008.91,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "218.75.224.4",
-      "port": 3309,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Xiangtan",
-      "response_time_ms": 2009.89,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "185.165.240.228",
-      "port": 17484,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 2010.55,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.82.152.233",
-      "port": 3128,
-      "type": "socks4",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 2010.91,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 3707,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2011.01,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "181.209.91.107",
-      "port": 999,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Argentina",
-      "city": "Sierra Colorada",
-      "response_time_ms": 2011.68,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "113.172.67.223",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Vietnam",
-      "city": "Ho Chi Minh City",
-      "response_time_ms": 2011.74,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.82.180.23",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 2011.97,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "175.110.115.54",
-      "port": 16280,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 2012.04,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "157.175.170.170",
-      "port": 9240,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "Bahrain",
-      "city": "Manama",
-      "response_time_ms": 2012.26,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.90.149.238",
-      "port": 8889,
-      "type": "socks4",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 2012.55,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "4.196.80.230",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Australia",
-      "city": "Sydney",
-      "response_time_ms": 2013.52,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 7497,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2013.92,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.160.90",
-      "port": 19285,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 2014.04,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "93.190.142.109",
-      "port": 13859,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 2014.13,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.251.73.54",
-      "port": 8077,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Minkler",
-      "response_time_ms": 2014.63,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.90.149.238",
-      "port": 1080,
-      "type": "https",
-      "source": "repository:PROXY-List/master",
-      "repository": "PROXY-List/master",
-      "country": "United States",
-      "city": "Charlottesville",
-      "response_time_ms": 2014.75,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "101.66.199.26",
-      "port": 8085,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "China",
-      "city": "Hangzhou",
-      "response_time_ms": 2015.06,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.90",
-      "port": 20867,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 2015.09,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.170.67",
-      "port": 37699,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 2015.17,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 24327,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2015.77,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "67.43.236.20",
-      "port": 21157,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2015.93,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "93.190.142.17",
-      "port": 11644,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 2016.21,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "103.217.144.114",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Indonesia",
-      "city": "Cicurug",
-      "response_time_ms": 2016.58,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "79.137.202.115",
-      "port": 63128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Germany",
-      "city": "Frankfurt am Main",
-      "response_time_ms": 2016.66,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 15007,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2017.36,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.164.178",
-      "port": 25979,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2017.52,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.180",
-      "port": 8003,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Tempe",
-      "response_time_ms": 2018.06,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.160.90",
-      "port": 23585,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2018.25,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.254.36.213",
-      "port": 8060,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Minkler",
-      "response_time_ms": 2019.22,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "121.129.24.191",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Republic of Korea",
-      "city": "Seoul",
-      "response_time_ms": 2019.67,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "134.119.213.231",
-      "port": 14263,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "France",
-      "city": "Strasbourg",
-      "response_time_ms": 2020.19,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.90.149.238",
-      "port": 1111,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Charlottesville",
-      "response_time_ms": 2020.2,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "93.190.139.245",
-      "port": 12288,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 2020.73,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.90.149.238",
-      "port": 9050,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Charlottesville",
-      "response_time_ms": 2021.6,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "89.38.99.47",
-      "port": 11175,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Netherlands",
-      "city": "Amsterdam",
-      "response_time_ms": 2021.84,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "47.82.0.94",
-      "port": 3128,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 2022.16,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "103.135.2.67",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Indonesia",
-      "city": "Semarang",
-      "response_time_ms": 2022.8,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.130",
-      "port": 8254,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 2022.83,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "89.110.75.137",
-      "port": 80,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "The Netherlands",
-      "city": "Amsterdam",
-      "response_time_ms": 2022.9,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "72.10.160.174",
-      "port": 10085,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Canada",
-      "city": "Montreal",
-      "response_time_ms": 2022.97,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.206",
-      "port": 31244,
-      "type": "socks5",
-      "source": "repository:Proxy-List/main",
-      "repository": "Proxy-List/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 2023.07,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "62.112.9.200",
-      "port": 11882,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "The Netherlands",
-      "city": "Naaldwijk",
-      "response_time_ms": 2023.78,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "145.220.178.14",
-      "port": 8080,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "The Netherlands",
-      "city": "Utrecht",
-      "response_time_ms": 2023.84,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "134.119.213.231",
-      "port": 14882,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "France",
-      "city": "Strasbourg",
-      "response_time_ms": 2024.31,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.165.214",
-      "port": 55675,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": null,
-      "city": null,
-      "response_time_ms": 2024.42,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "131.153.163.178",
-      "port": 54382,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Ashburn",
-      "response_time_ms": 2024.43,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "103.190.120.98",
-      "port": 30019,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Vietnam",
-      "city": "Da Nang",
-      "response_time_ms": 2024.5,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "45.207.216.212",
-      "port": 1081,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "Singapore",
-      "city": "Singapore",
-      "response_time_ms": 2024.9,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "104.129.194.43",
-      "port": 11083,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Reston",
-      "response_time_ms": 2025.4,
-      "hunt_score": 50.0
-    },
-    {
-      "ip": "174.138.161.203",
-      "port": 55035,
-      "type": "https",
-      "source": "repository:heads/main",
-      "repository": "heads/main",
-      "country": "United States",
-      "city": "Phoenix",
-      "response_time_ms": 2025.52,
       "hunt_score": 50.0
     }
   ]

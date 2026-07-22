@@ -1,56 +1,56 @@
 # 🐕 Proxy Hound Hunt Report
 
-**Generated:** 2026-07-21 17:42:10 UTC
+**Generated:** 2026-07-22 03:34:11 UTC
 
 ## 📊 Hunt Statistics
 
 | Metric | Value |
 |--------|-------|
 | **Territories Hunted** | 4 repositories |
-| **Total Discovered** | 732,801 proxies |
+| **Total Discovered** | 732,966 proxies |
 | **Working Proxies** | 10,000 proxies |
 | **Hunt Success Rate** | 2.05% |
 | **Geographic Coverage** | 10 countries, 10 cities |
-| **Geolocated Proxies** | 13,676 (136.8% coverage) |
+| **Geolocated Proxies** | 13,674 (136.7% coverage) |
 | **Average Hunt Score** | 50.0/100 |
 | **Average Response Time** | 1222ms |
 
 ## 🌍 Geographic Distribution
 
 - **Canada**: 2,379 proxies (23.8%)
-- **United States**: 2,223 proxies (22.2%)
-- **China**: 2,052 proxies (20.5%)
-- **Singapore**: 1,106 proxies (11.1%)
-- **Netherlands**: 968 proxies (9.7%)
-- **Vietnam**: 505 proxies (5.1%)
-- **The Netherlands**: 453 proxies (4.5%)
-- **Japan**: 401 proxies (4.0%)
-- **Germany**: 325 proxies (3.2%)
-- **Finland**: 283 proxies (2.8%)
+- **United States**: 2,237 proxies (22.4%)
+- **China**: 2,067 proxies (20.7%)
+- **Singapore**: 1,102 proxies (11.0%)
+- **Netherlands**: 965 proxies (9.7%)
+- **Vietnam**: 504 proxies (5.0%)
+- **The Netherlands**: 416 proxies (4.2%)
+- **Japan**: 408 proxies (4.1%)
+- **Germany**: 321 proxies (3.2%)
+- **Finland**: 289 proxies (2.9%)
 
 
 ## 🏹 Best Hunting Grounds
 
 | Repository | Proxies | Hunt Score | Avg Response |
 |------------|---------|------------|---------------|
-| `heads/main` | 12,528 | 50.0/100 | 1391ms |
-| `Proxy-List/main` | 1,958 | 50.0/100 | 1281ms |
-| `PROXY-List/master` | 454 | 50.0/100 | 1047ms |
+| `heads/main` | 12,460 | 50.0/100 | 1394ms |
+| `Proxy-List/main` | 2,021 | 50.0/100 | 1277ms |
+| `PROXY-List/master` | 457 | 50.0/100 | 1049ms |
 | `main/proxies` | 88 | 50.0/100 | 1167ms |
 
 
 ## 🎪 Proxy Types Captured
 
-- **HTTPS**: 12,489 proxies (83.1%)
-- **SOCKS4**: 1,624 proxies (10.8%)
-- **SOCKS5**: 915 proxies (6.1%)
+- **HTTPS**: 12,452 proxies (82.9%)
+- **SOCKS4**: 1,656 proxies (11.0%)
+- **SOCKS5**: 918 proxies (6.1%)
 
 
 ## 📈 Performance Metrics
 
 ### Hunt Quality Analysis
-- **Fastest Repository Response**: 1047ms
-- **Slowest Repository Response**: 1391ms
+- **Fastest Repository Response**: 1049ms
+- **Slowest Repository Response**: 1394ms
 - **Average Hunt Score**: 50.0/100
 - **Pack Success Rate**: 2.05%
 
@@ -172,7 +172,7 @@ The JSON exports can be directly integrated into:
 
 ## 🏆 Hunt Summary
 
-**Proxy Hound v2.1** successfully analyzed **4 repository territories** and discovered **732,801 potential proxies**. Through advanced pack validation and geolocation analysis, **10,000 high-quality proxies** were confirmed working across **10 countries**.
+**Proxy Hound v2.1** successfully analyzed **4 repository territories** and discovered **732,966 potential proxies**. Through advanced pack validation and geolocation analysis, **10,000 high-quality proxies** were confirmed working across **10 countries**.
 
 ### Hunt Success Factors
 - **🎯 Scent Analysis**: 50.0/100 average territory quality
